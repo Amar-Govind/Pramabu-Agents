@@ -37,29 +37,69 @@ export function SiteHeader() {
       </div>
 
       <header className="sticky top-0 z-40 border-b border-gold/20 bg-[#faf6ee]/92 backdrop-blur-md">
-        <div className="mx-auto flex max-w-site items-center justify-between gap-3 px-4 py-3.5 md:px-8 md:py-4">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-forest/15 bg-white text-forest md:hidden"
-              onClick={openMobileNav}
-              aria-label="Open menu"
+        <div className="mx-auto max-w-site px-4 md:px-8">
+          <div className="relative flex items-center justify-between py-3 md:py-4">
+            <div className="z-10 flex min-w-[8.5rem] flex-1 items-center justify-start">
+              <button
+                type="button"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-forest/15 bg-white text-forest md:hidden"
+                onClick={openMobileNav}
+                aria-label="Open menu"
+              >
+                <IconMenu />
+              </button>
+            </div>
+
+            <Link
+              href="/"
+              className="absolute left-1/2 top-1/2 z-0 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
             >
-              <IconMenu />
-            </button>
-            <Link href="/" className="flex items-center">
               <Image
-                src="/brand/logo-wordmark-transparent.png"
+                src="/brand/logo-stacked-transparent.png"
                 alt="PARAMBU organics"
-                width={360}
-                height={190}
-                className="h-14 w-auto object-contain sm:h-16 md:h-[4.75rem]"
+                width={319}
+                height={211}
+                className="h-16 w-auto object-contain sm:h-[4.75rem] md:h-24"
                 priority
               />
             </Link>
+
+            <div className="z-10 flex min-w-[8.5rem] flex-1 items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={openSearch}
+                aria-label="Search"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-forest/15 bg-white text-forest hover:border-gold hover:text-gold-deep"
+              >
+                <IconSearch />
+              </button>
+              <Link
+                href="/wishlist"
+                aria-label="Wishlist"
+                className="relative inline-flex h-10 w-10 items-center justify-center rounded-md border border-forest/15 bg-white text-forest hover:border-gold hover:text-gold-deep"
+              >
+                <IconHeart />
+                {wishlistCount > 0 ? (
+                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-ink">
+                    {wishlistCount}
+                  </span>
+                ) : null}
+              </Link>
+              <button
+                type="button"
+                onClick={openCart}
+                aria-label={`Open cart, ${totalItems} items`}
+                className="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-gold text-ink transition hover:bg-gold-deep hover:text-white"
+              >
+                <IconCart className="h-5 w-5" />
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-forest text-[10px] font-bold text-sand ring-2 ring-[#faf6ee]">
+                  {totalItems > 99 ? "99+" : totalItems}
+                </span>
+              </button>
+            </div>
           </div>
 
-          <nav className="hidden items-center gap-1 text-sm font-medium text-ink/80 lg:flex">
+          <nav className="hidden items-center justify-center gap-1 border-t border-gold/15 pb-3 pt-1 text-sm font-medium text-ink/80 lg:flex">
             <Link href="/shop" className="rounded-md px-3 py-2 transition hover:bg-gold/15 hover:text-gold-deep">
               Shop
             </Link>
@@ -81,7 +121,7 @@ export function SiteHeader() {
                 </Link>
 
                 {openMenu === collection.slug ? (
-                  <div className="absolute left-0 top-full z-50 min-w-[220px] pt-2">
+                  <div className="absolute left-1/2 top-full z-50 min-w-[220px] -translate-x-1/2 pt-2">
                     <div className="rounded-xl border border-gold/25 bg-[#fffaf0] p-2 shadow-soft">
                       <Link
                         href={`/shop/${collection.slug}`}
@@ -107,40 +147,6 @@ export function SiteHeader() {
               </div>
             ))}
           </nav>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={openSearch}
-              aria-label="Search"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-forest/15 bg-white text-forest hover:border-gold hover:text-gold-deep"
-            >
-              <IconSearch />
-            </button>
-            <Link
-              href="/wishlist"
-              aria-label="Wishlist"
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-md border border-forest/15 bg-white text-forest hover:border-gold hover:text-gold-deep"
-            >
-              <IconHeart />
-              {wishlistCount > 0 ? (
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-ink">
-                  {wishlistCount}
-                </span>
-              ) : null}
-            </Link>
-            <button
-              type="button"
-              onClick={openCart}
-              aria-label={`Open cart, ${totalItems} items`}
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-gold text-ink transition hover:bg-gold-deep hover:text-white"
-            >
-              <IconCart className="h-5 w-5" />
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-forest text-[10px] font-bold text-sand ring-2 ring-[#faf6ee]">
-                {totalItems > 99 ? "99+" : totalItems}
-              </span>
-            </button>
-          </div>
         </div>
       </header>
 
