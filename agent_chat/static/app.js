@@ -2,7 +2,7 @@ const state = {
   sessionId: localStorage.getItem("parambuChatSession") || "",
   files: [],
   agents: [],
-  activeAgent: "Orchestrator",
+  activeAgent: "Parambu Assistant",
 };
 
 const messagesEl = document.getElementById("messages");
@@ -19,13 +19,35 @@ const activeAgentName = document.getElementById("activeAgentName");
 const activeAgentRole = document.getElementById("activeAgentRole");
 const activeAgentBadge = document.getElementById("activeAgentBadge");
 
+function escapeHtml(text) {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function renderMarkdown(text) {
+  const escaped = escapeHtml(text || "");
+  return escaped
+    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+    .replace(/^## (.+)$/gm, "<h3>$1</h3>")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/^- (.+)$/gm, "<li>$1</li>")
+    .replace(/(?:<li>.*<\/li>\n?)+/g, (block) => `<ul>${block}</ul>`)
+    .replace(/\n{2,}/g, "<br><br>")
+    .replace(/\n/g, "<br>");
+}
+
 function setActiveAgent(name, role = "", badge = "") {
-  state.activeAgent = name || "Orchestrator";
+  state.activeAgent = name || "Parambu Assistant";
   activeAgentName.textContent = state.activeAgent;
   if (role) activeAgentRole.textContent = role;
   else {
     const found = state.agents.find((a) => a.name === state.activeAgent);
-    activeAgentRole.textContent = found?.role || "Specialist agent";
+    activeAgentRole.textContent = found?.role || "Brand knowledge + specialist tools";
   }
   if (badge) activeAgentBadge.textContent = badge;
   [...agentListEl.querySelectorAll("li")].forEach((li) => {
@@ -43,13 +65,15 @@ function addMessage({ role, text, files = [], uploads = [], meta = "" }) {
     div.appendChild(metaEl);
   }
   const body = document.createElement("div");
-  body.textContent = text;
+  body.className = "md";
+  if (role === "assistant" || role === "system") body.innerHTML = renderMarkdown(text);
+  else body.textContent = text;
   div.appendChild(body);
 
   if (uploads.length) {
     const up = document.createElement("div");
     up.className = "uploads";
-    up.textContent = "Uploaded: " + uploads.join(", ");
+    up.textContent = "Attached: " + uploads.join(", ");
     div.appendChild(up);
   }
 
@@ -114,14 +138,21 @@ async function loadAgents() {
       li.style.cursor = "pointer";
       li.addEventListener("click", () => {
         setActiveAgent(agent.name, agent.role, "Selected");
-        if (agent.key === "weekly") inputEl.value = "Run weekly campaign";
-        else if (agent.name === "Poster Production") inputEl.value = "Create posters";
-        else inputEl.value = `Run ${agent.name} agent`;
+        if (agent.key === "assistant") {
+          inputEl.value = "";
+          inputEl.placeholder = "Ask anything about Parambu…";
+        } else if (agent.name === "Poster Production") {
+          inputEl.value = "Create posters for Rose Soap";
+        } else if (agent.key === "weekly" || agent.name === "Orchestrator") {
+          inputEl.value = "Run a weekly campaign focused on soap";
+        } else {
+          inputEl.value = `Please run the ${agent.name} agent and summarize the plan`;
+        }
         inputEl.focus();
       });
       agentListEl.appendChild(li);
     }
-    setActiveAgent("Orchestrator", "Full weekly campaign pipeline", "Ready");
+    setActiveAgent("Parambu Assistant", "Brand knowledge + specialist tools", "Ready");
   } catch {
     agentListEl.innerHTML = "<li><strong>Could not load agents</strong><span>Is the server running?</span></li>";
   }
@@ -148,8 +179,8 @@ formEl.addEventListener("submit", async (event) => {
   state.files = [];
   renderFilePills();
   sendBtn.disabled = true;
-  modePill.textContent = "Agents working…";
-  activeAgentBadge.textContent = "Working…";
+  modePill.textContent = "Thinking…";
+  activeAgentBadge.textContent = "Thinking…";
 
   try {
     const res = await fetch("/api/chat", { method: "POST", body: form });
@@ -159,20 +190,20 @@ formEl.addEventListener("submit", async (event) => {
     state.sessionId = data.session_id;
     localStorage.setItem("parambuChatSession", state.sessionId);
 
-    const agent = data.agent || "Orchestrator";
+    const agent = data.agent || "Parambu Assistant";
     const found = state.agents.find((a) => a.name === agent);
-    setActiveAgent(agent, found?.role || "", `${data.mode || "template"} · ${data.intent || "chat"}`);
+    setActiveAgent(
+      agent,
+      found?.role || "Brand knowledge + specialist tools",
+      `${data.mode || "knowledge"} · ${data.intent || "chat"}`
+    );
     modePill.textContent = agent;
-
-    const focusBits = [];
-    if (data.focus?.products?.length) focusBits.push(data.focus.products.join(", "));
-    const focusNote = focusBits.length ? ` · Focus: ${focusBits.join(" · ")}` : "";
 
     addMessage({
       role: "assistant",
       text: data.reply,
       files: data.files || [],
-      meta: `${agent}${focusNote}`,
+      meta: agent,
     });
   } catch (err) {
     addMessage({
@@ -192,10 +223,10 @@ clearBtn.addEventListener("click", () => {
   state.files = [];
   renderFilePills();
   messagesEl.innerHTML = "";
-  setActiveAgent("Orchestrator", "Full weekly campaign pipeline", "Ready");
+  setActiveAgent("Parambu Assistant", "Brand knowledge + specialist tools", "Ready");
   addMessage({
     role: "system",
-    text: "New chat started. Select an agent above or ask for a weekly campaign.",
+    text: "New chat started. Ask me about Parambu products, voice, or campaigns — or upload a brief.",
   });
   modePill.textContent = "Ready";
 });
@@ -221,8 +252,16 @@ dropzoneEl.addEventListener("drop", (e) => {
   if (e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files);
 });
 
+// Enter to send, Shift+Enter for newline
+inputEl.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    formEl.requestSubmit();
+  }
+});
+
 addMessage({
   role: "system",
-  text: "Welcome. Pick an agent from the left, or type a request. Mentions like “rose soap” or “crm” change the reply.",
+  text: "Hi — I’m **Parambu Assistant**. I use your brand bible, product catalog, and any files you upload as my knowledge base.\n\nAsk naturally, like chatting with an LLM. Example: “What’s special about Rose Soap?” or “Create posters for neem soap”.",
 });
 loadAgents();

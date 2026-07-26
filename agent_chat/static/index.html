@@ -12,8 +12,8 @@
         <div class="brand">
           <img src="/static/logo.png" alt="Parambu Organics" onerror="this.style.display='none'" />
           <div>
-            <h1>Parambu Agent Chat</h1>
-            <p>Talk to every specialist agent · upload briefs · download outputs</p>
+            <h1>Parambu Assistant</h1>
+            <p>Chat with brand knowledge · upload files · download generated outputs</p>
           </div>
         </div>
         <div class="pill"><span class="dot"></span><span id="modePill">Ready</span></div>
@@ -21,32 +21,32 @@
 
       <div class="shell">
         <aside class="sidebar">
-          <h2>Agents</h2>
+          <h2>Knowledge & tools</h2>
           <ul class="agent-list" id="agentList">
-            <li><strong>Loading…</strong><span>Fetching agent roster</span></li>
+            <li><strong>Loading…</strong><span>Fetching assistant tools</span></li>
           </ul>
           <div class="hints">
-            Try:
-            <div><code>run weekly campaign</code></div>
-            <div><code>create posters for neem soap</code></div>
-            <div><code>run influencer agent</code></div>
-            Upload PDFs, docs, images, CSV, or text as context.
+            Chat naturally:
+            <div><code>What’s special about Rose Soap?</code></div>
+            <div><code>Rewrite this caption in our brand voice</code></div>
+            <div><code>Create posters for neem soap</code></div>
+            Uploads become part of the knowledge base for this chat.
           </div>
         </aside>
 
         <main class="chat-panel">
           <div class="chat-heading" id="chatHeading">
             <div>
-              <p class="chat-heading-label">Active agent</p>
-              <h2 id="activeAgentName">Orchestrator</h2>
-              <p class="chat-heading-sub" id="activeAgentRole">Full weekly campaign pipeline</p>
+              <p class="chat-heading-label">Chatting with</p>
+              <h2 id="activeAgentName">Parambu Assistant</h2>
+              <p class="chat-heading-sub" id="activeAgentRole">Brand knowledge + specialist tools</p>
             </div>
             <div class="chat-heading-badge" id="activeAgentBadge">Ready</div>
           </div>
           <div class="messages" id="messages" aria-live="polite"></div>
           <form class="composer" id="chatForm">
             <div class="dropzone" id="dropzone">
-              Drop images or documents here, or
+              Drop images or documents into the knowledge base, or
               <label for="fileInput" style="color:#b18767;font-weight:700;cursor:pointer"> browse</label>
               <input id="fileInput" type="file" multiple accept="*/*" />
               <div class="file-pills" id="filePills"></div>
@@ -54,7 +54,7 @@
             <div class="row">
               <textarea
                 id="messageInput"
-                placeholder="Ask the agents… e.g. Create a weekly campaign using the attached brief"
+                placeholder="Message Parambu Assistant…"
                 required
               ></textarea>
               <div class="actions">

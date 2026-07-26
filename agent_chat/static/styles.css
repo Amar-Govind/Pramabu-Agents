@@ -210,9 +210,27 @@ body {
   padding: 14px 16px;
   border-radius: 18px;
   line-height: 1.55;
-  white-space: pre-wrap;
   word-break: break-word;
 }
+.msg .md h3 {
+  margin: 0 0 8px;
+  font-family: var(--display);
+  font-size: 1.15rem;
+  color: var(--forest);
+}
+.msg .md ul {
+  margin: 8px 0;
+  padding-left: 1.1rem;
+}
+.msg .md li { margin: 0.25rem 0; }
+.msg .md code {
+  font-size: 0.86em;
+  background: rgba(214, 170, 132, 0.18);
+  padding: 0.1em 0.35em;
+  border-radius: 6px;
+}
+.msg .md a { color: var(--gold-deep); }
+.msg.user .md a { color: #f0d2b4; }
 .msg.user {
   align-self: flex-end;
   background: var(--forest);

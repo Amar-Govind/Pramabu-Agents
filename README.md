@@ -72,10 +72,20 @@ python -m agent_chat.app
 
 Open http://localhost:8000
 
-- Chat with any specialist agent or run the full weekly pipeline
-- Upload images, PDFs, Word docs, CSV, text, and more as agent context
-- Read the reply in chat
-- Download generated posters, markdown, and JSON from the reply chips
+Chat like an LLM assistant grounded in your knowledge base:
+
+- Uses `brand/brand_bible.yaml`, product catalog, and uploaded files as context
+- Answers product/voice/campaign questions in natural conversation
+- When you ask to generate work (`create posters…`, `run weekly campaign…`), specialist agents run as tools
+- Download posters/reports from chips under the reply
+
+For live LLM replies (recommended):
+
+```bash
+cp .env.example .env
+# set OPENAI_API_KEY=...
+python -m agent_chat.app
+```
 
 ## Quick start — custom storefront
 

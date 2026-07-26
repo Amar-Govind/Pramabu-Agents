@@ -6,6 +6,13 @@ from pathlib import Path
 from typing import Any
 
 from agent_chat.focus import extract_focus
+from agent_chat.history import as_llm_messages, load_history, save_history
+from agent_chat.knowledge import (
+    attachment_chunks,
+    dump_brand_snapshot,
+    format_knowledge_block,
+    retrieve_knowledge,
+)
 from pramabu_agents.agents import (
     AnalyticsAgent,
     BrandGuardianAgent,
@@ -27,6 +34,7 @@ from pramabu_agents.agents import (
     TrendScoutAgent,
 )
 from pramabu_agents.config import load_brand, llm_enabled
+from pramabu_agents.llm import complete_chat
 from pramabu_agents.models import CampaignPack
 from pramabu_agents.orchestrator import Orchestrator
 from pramabu_agents.report import pack_to_markdown, write_outputs
@@ -64,7 +72,14 @@ def list_agents() -> list[dict[str, str]]:
             continue
         seen.add(key)
         rows.append({"name": cls(load_brand()).name, "key": name, "role": role})
-    rows.insert(0, {"name": "Orchestrator", "key": "weekly", "role": "Full weekly campaign pipeline"})
+    rows.insert(
+        0,
+        {
+            "name": "Parambu Assistant",
+            "key": "assistant",
+            "role": "Conversational assistant with brand knowledge + agent tools",
+        },
+    )
     return rows
 
 
@@ -73,7 +88,6 @@ def _match_agent(message: str):
     for key, cls, _role in sorted(AGENT_CATALOG, key=lambda row: len(row[0]), reverse=True):
         if key in lowered:
             return key, cls
-    # Also match display names like "Content Ideation"
     for _key, cls, _role in AGENT_CATALOG:
         agent_name = cls(load_brand()).name.lower()
         if agent_name in lowered:
@@ -81,41 +95,29 @@ def _match_agent(message: str):
     return None, None
 
 
-def _intent(message: str) -> str:
+def _wants_tool(message: str) -> str | None:
+    """Return tool intent when user asks to generate/run something actionable."""
     lowered = message.lower().strip()
-    if not lowered:
-        return "help"
-    if any(token in lowered for token in ("help", "what can you", "how do i")):
-        return "help"
-    if any(token in lowered for token in ("list agents", "show agents", "which agents")):
-        return "list_agents"
-    if any(token in lowered for token in ("run all", "weekly", "campaign pack", "full pipeline")):
+    action_verbs = ("create", "make", "generate", "render", "design", "run", "build", "draft", "produce")
+    has_action = any(v in lowered for v in action_verbs)
+
+    if any(t in lowered for t in ("run all", "weekly campaign", "campaign pack", "full pipeline")):
         return "weekly"
-    if "poster" in lowered:
-        if any(token in lowered for token in ("create", "make", "generate", "render", "design", "poster production")):
-            return "posters"
+    if "poster" in lowered and (has_action or "please" in lowered or lowered.endswith("poster") or "poster for" in lowered):
+        return "posters"
     matched, _ = _match_agent(lowered)
-    if matched:
+    if matched and has_action:
         return "single_agent"
-    return "weekly"
+    # Explicit "use the crm agent" style
+    if matched and any(t in lowered for t in ("use", "ask", "with", "via", "using")):
+        return "single_agent"
+    return None
 
 
-def _enrich_objective(message: str, attachment_summary: dict[str, Any], focus: dict[str, Any]) -> str:
-    parts = [message.strip() or "Grow D2C sales on parambu.in"]
-    if focus.get("product_names"):
-        parts.append("Focus products: " + ", ".join(focus["product_names"]))
-    if focus.get("categories"):
-        parts.append("Focus categories: " + ", ".join(focus["categories"]))
-    if attachment_summary.get("notes"):
-        parts.append("Attachments: " + "; ".join(attachment_summary["notes"]))
-    if attachment_summary.get("combined_text"):
-        excerpt = attachment_summary["combined_text"][:2500]
-        parts.append("Reference document excerpts:\n" + excerpt)
-    return "\n\n".join(parts)
-
-
-def _collect_files(session_dir: Path, pack: CampaignPack) -> list[dict[str, str]]:
+def _collect_files(session_dir: Path, pack: CampaignPack | None) -> list[dict[str, str]]:
     files: list[dict[str, str]] = []
+    if not pack:
+        return files
     for poster in pack.posters:
         src = Path(poster.path)
         if not src.exists():
@@ -132,7 +134,6 @@ def _collect_files(session_dir: Path, pack: CampaignPack) -> list[dict[str, str]
                 "url": f"/api/files/{session_dir.name}/outputs/{dest.name}",
             }
         )
-
     for pattern in (f"campaign_{pack.week_of}.md", f"campaign_{pack.week_of}.json"):
         src = session_dir / pattern
         if src.exists():
@@ -147,176 +148,16 @@ def _collect_files(session_dir: Path, pack: CampaignPack) -> list[dict[str, str]
     return files
 
 
-def _section(title: str, items: list[str], limit: int = 6) -> list[str]:
-    if not items:
-        return []
-    lines = [f"**{title}**"]
-    lines.extend(f"- {item}" for item in items[:limit])
-    lines.append("")
-    return lines
-
-
-def _pack_reply(pack: CampaignPack, *, agent_name: str, intent: str, focus: dict[str, Any]) -> str:
-    lines = [
-        f"### {agent_name}",
-        "",
-        f"**Request:** {focus.get('raw') or pack.objective.splitlines()[0]}",
-    ]
-    if focus.get("product_names"):
-        lines.append("**Focus:** " + ", ".join(focus["product_names"]))
-    lines.extend(
-        [
-            f"**Week:** {pack.week_of}",
-            f"**Approved:** {'yes' if pack.approved else 'needs review'}",
-            "",
-        ]
-    )
-
-    # Intent / agent-specific body so replies don't look identical
-    if intent == "posters" or agent_name == "Poster Production":
-        lines.extend(_section("Poster concepts", [f"{p.idea_title} — {p.headline}" for p in pack.posters], 8))
-        if not pack.posters:
-            lines.extend(_section("Creative headlines", [f"{c.idea_title}: {c.headline}" for c in pack.creatives], 5))
-    elif agent_name == "CRM":
-        lines.extend(_section("CRM actions", pack.crm_actions))
-    elif agent_name == "Influencer":
-        lines.extend(_section("Influencer / UGC plan", pack.influencer_plan))
-    elif agent_name == "Marketplace":
-        lines.extend(_section("Marketplace actions", pack.marketplace_actions))
-    elif agent_name == "Supply Chain":
-        lines.extend(_section("Supply chain actions", pack.supply_chain_actions))
-    elif agent_name == "Crisis & PR":
-        lines.extend(_section("Crisis & PR plan", pack.crisis_pr_plan))
-    elif agent_name == "Localization":
-        lines.extend(_section("Localization plan", pack.localization_plan))
-    elif agent_name == "Business Growth":
-        lines.extend(_section("Growth opportunities", pack.growth_opportunities))
-    elif agent_name == "Performance Marketing":
-        lines.extend(_section("Ad plan", pack.ad_plan))
-    elif agent_name == "E-commerce Website":
-        lines.extend(_section("E-commerce actions", pack.ecommerce_actions))
-    elif agent_name == "Social Media Manager":
-        lines.extend(
-            _section(
-                "Social calendar",
-                [
-                    f"{p.day} | {p.platform} | {p.format} — {p.creative_ref}"
-                    for p in pack.social_calendar
-                ],
-                8,
-            )
-        )
-    elif agent_name == "Analytics & BI":
-        lines.extend(_section("Analytics plan", pack.analytics_plan))
-    elif agent_name == "Trend Scout":
-        lines.extend(_section("Trends", pack.trends))
-    elif agent_name == "Market Analysis":
-        lines.extend(_section("Insights", pack.insights))
-    elif agent_name == "Content Ideation":
-        lines.extend(
-            _section(
-                "Content ideas",
-                [f"{i.title} ({i.format}) — {i.hook}" for i in pack.ideas],
-                8,
-            )
-        )
-    elif agent_name == "Creative Production":
-        lines.extend(
-            _section(
-                "Creative briefs",
-                [f"{c.idea_title}: {c.headline}" for c in pack.creatives],
-                8,
-            )
-        )
-    elif agent_name == "Brand Guardian":
-        lines.extend(_section("QA / brand flags", pack.qa_flags or ["No brand flags. Creatives look safe."], 8))
-    elif agent_name == "QA":
-        lines.extend(_section("QA flags", pack.qa_flags or ["No blockers. Ready for review."], 8))
-    else:
-        # Orchestrator / weekly: mixed summary tailored by focus
-        lines.extend(
-            _section(
-                "Content ideas",
-                [f"{i.title} ({i.format}) — {i.hook}" for i in pack.ideas],
-                5,
-            )
-        )
-        lines.extend(
-            _section(
-                "Creatives",
-                [f"{c.idea_title}: {c.headline}" for c in pack.creatives],
-                4,
-            )
-        )
-        lines.extend(_section("Growth opportunities", pack.growth_opportunities, 3))
-        lines.extend(_section("CRM actions", pack.crm_actions, 3))
-        if pack.posters:
-            lines.extend(_section("Posters ready", [p.idea_title for p in pack.posters], 6))
-
-    lines.append("Download the files below for full details.")
-    return "\n".join(lines)
-
-
-def run_chat_turn(
+def _run_tool(
     *,
+    tool: str,
     message: str,
+    brand: dict[str, Any],
+    context: dict[str, Any],
     session_dir: Path,
-    attachment_paths: list[Path],
-) -> dict[str, Any]:
-    from agent_chat.attachments import summarize_attachments
-
-    brand = load_brand()
-    attachment_summary = summarize_attachments(attachment_paths)
-    focus = extract_focus(message, brand)
-    intent = _intent(message)
-    mode = "LLM" if llm_enabled() else "template"
-    objective = _enrich_objective(message, attachment_summary, focus)
-    context = {
-        "output_dir": str(session_dir),
-        "content_pieces": 5,
-        "growth_ideas": 4,
-        "uploaded_images": attachment_summary["images"],
-        "uploaded_documents": [d["name"] for d in attachment_summary["documents"]],
-        "focus": focus,
-        "user_message": message,
-    }
-
-    inputs_dir = session_dir / "inputs"
-    inputs_dir.mkdir(parents=True, exist_ok=True)
-
-    if intent == "help":
-        return {
-            "agent": "Orchestrator",
-            "reply": (
-                "### Orchestrator\n\n"
-                "You can:\n"
-                "- Ask for a full weekly campaign (`run weekly campaign`)\n"
-                "- Ask a specialist (`run influencer agent`, `crm plan`, `create posters for rose soap`)\n"
-                "- Upload briefs, PDFs, images, or spreadsheets as context\n\n"
-                "Generated posters and reports appear as downloadable files in the reply."
-            ),
-            "files": [],
-            "intent": intent,
-            "mode": mode,
-        }
-
-    if intent == "list_agents":
-        rows = list_agents()
-        body = ["### Orchestrator", "", "**Available agents**", ""]
-        for row in rows:
-            body.append(f"- **{row['name']}** — {row['role']}")
-        return {
-            "agent": "Orchestrator",
-            "reply": "\n".join(body),
-            "files": [],
-            "intent": intent,
-            "mode": mode,
-        }
-
-    pack: CampaignPack
-    agent_name: str
-
-    if intent == "posters":
+) -> tuple[str, CampaignPack, str]:
+    objective = message.strip()
+    if tool == "posters":
         agent_name = "Poster Production"
         pack = CampaignPack(
             brand=brand.get("brand", {}).get("name", "Parambu Organics"),
@@ -330,7 +171,14 @@ def run_chat_turn(
         for creative in pack.creatives:
             creative.format = "poster"
         pack = PosterProductionAgent(brand).run(pack, context)
-    elif intent == "single_agent":
+        write_outputs(pack, session_dir)
+        facts = [
+            f"Generated {len(pack.posters)} poster file(s).",
+            *[f"- {p.idea_title}: {p.headline}" for p in pack.posters[:6]],
+        ]
+        return agent_name, pack, "\n".join(facts)
+
+    if tool == "single_agent":
         _key, cls = _match_agent(message)
         pack = CampaignPack(
             brand=brand.get("brand", {}).get("name", "Parambu Organics"),
@@ -357,35 +205,220 @@ def run_chat_turn(
                 pack = TrendScoutAgent(brand).run(pack, context)
         agent = cls(brand)
         pack = agent.run(pack, context)
-        agent_name = agent.name
-    else:
-        agent_name = "Orchestrator"
-        pack = Orchestrator(brand).run_weekly_campaign(
-            objective=objective,
-            week_of=date.today().isoformat(),
-            context=context,
+        write_outputs(pack, session_dir)
+        # Collect the most relevant list field
+        payload = {
+            "CRM": pack.crm_actions,
+            "Influencer": pack.influencer_plan,
+            "Marketplace": pack.marketplace_actions,
+            "Supply Chain": pack.supply_chain_actions,
+            "Crisis & PR": pack.crisis_pr_plan,
+            "Localization": pack.localization_plan,
+            "Business Growth": pack.growth_opportunities,
+            "Performance Marketing": pack.ad_plan,
+            "E-commerce Website": pack.ecommerce_actions,
+            "Analytics & BI": pack.analytics_plan,
+            "Trend Scout": pack.trends,
+            "Market Analysis": pack.insights,
+            "Content Ideation": [f"{i.title} ({i.format}) — {i.hook}" for i in pack.ideas],
+            "Creative Production": [f"{c.idea_title}: {c.headline}" for c in pack.creatives],
+            "Social Media Manager": [
+                f"{p.day} | {p.platform} | {p.format} — {p.creative_ref}" for p in pack.social_calendar
+            ],
+            "Brand Guardian": pack.qa_flags or ["No brand flags."],
+            "QA": pack.qa_flags or ["No blockers."],
+            "Poster Production": [f"{p.idea_title}: {p.headline}" for p in pack.posters],
+        }.get(agent.name, [])
+        facts = [f"{agent.name} completed."] + [f"- {item}" for item in payload[:8]]
+        return agent.name, pack, "\n".join(facts)
+
+    # weekly
+    pack = Orchestrator(brand).run_weekly_campaign(
+        objective=objective,
+        week_of=date.today().isoformat(),
+        context=context,
+    )
+    write_outputs(pack, session_dir)
+    facts = [
+        f"Weekly campaign ready for {pack.week_of}.",
+        f"Ideas: {len(pack.ideas)}, creatives: {len(pack.creatives)}, posters: {len(pack.posters)}.",
+        *[f"- {i.title} ({i.format}) — {i.hook}" for i in pack.ideas[:5]],
+    ]
+    return "Orchestrator", pack, "\n".join(facts)
+
+
+def _conversational_fallback(
+    *,
+    message: str,
+    knowledge: str,
+    tool_facts: str | None,
+    agent_name: str,
+) -> str:
+    """Chatty non-LLM response grounded in retrieved knowledge."""
+    lines = []
+    if tool_facts:
+        lines.append(f"Done — I ran **{agent_name}** for you.")
+        lines.append("")
+        lines.append(tool_facts)
+        lines.append("")
+        lines.append("You can download the generated files from the chips below. Want me to tweak the tone, focus on another SKU, or draft captions next?")
+        return "\n".join(lines)
+
+    # Knowledge-grounded Q&A style
+    lowered = message.lower()
+    brand = load_brand()
+    focus = extract_focus(message, brand)
+    matched = focus.get("products") or []
+
+    if any(g in lowered for g in ("hello", "hi ", "hey", "good morning", "good evening")):
+        return (
+            "Hi — I’m your Parambu Assistant. I know the Parambu Organics brand bible, products, "
+            "voice, and your uploaded files.\n\n"
+            "Ask me anything (e.g. “What’s special about Rose Soap?”), or ask me to create posters / "
+            "run a weekly campaign."
         )
 
-    write_outputs(pack, session_dir)
-    reply = _pack_reply(pack, agent_name=agent_name, intent=intent, focus=focus)
-    if attachment_summary["notes"]:
-        reply += "\n\n**Using your uploads**\n" + "\n".join(f"- {n}" for n in attachment_summary["notes"])
+    if matched:
+        lines.append("Here’s what I know from the Parambu knowledge base:")
+        lines.append("")
+        for product in matched[:3]:
+            benefits = "; ".join(product.get("benefits") or [])
+            lines.append(
+                f"**{product.get('name')}** ({product.get('category')}) — ₹{product.get('price_inr')}. "
+                f"{benefits}. Shop: {product.get('url')}"
+            )
+        lines.append("")
+        lines.append("Want a caption, poster, or comparison with another product?")
+        return "\n".join(lines)
 
-    snippet = session_dir / "latest_reply.md"
-    snippet.write_text(reply + "\n\n---\n\n" + pack_to_markdown(pack), encoding="utf-8")
+    if "voice" in lowered or "tone" in lowered or "claim" in lowered:
+        voice = (brand.get("brand") or {}).get("voice") or {}
+        return (
+            f"Parambu’s voice is **{voice.get('tone', 'warm and natural')}**.\n\n"
+            f"Do: {'; '.join(voice.get('do') or [])}\n\n"
+            f"Don’t: {'; '.join(voice.get('dont') or [])}\n\n"
+            "I can rewrite any draft in this voice if you paste it."
+        )
 
-    files = _collect_files(session_dir, pack)
-    files.append(
-        {
-            "name": "latest_reply.md",
-            "path": str(snippet),
-            "kind": "report",
-            "url": f"/api/files/{session_dir.name}/latest_reply.md",
-        }
+    # Generic grounded answer using retrieved chunk titles/text
+    snippet = knowledge.strip().split("\n\n")[:3]
+    body = "\n\n".join(snippet) if snippet else "I have the Parambu brand bible loaded."
+    return (
+        "Based on the Parambu knowledge base:\n\n"
+        f"{body}\n\n"
+        "Ask a follow-up, or tell me to create posters / run an agent when you want deliverables."
     )
 
+
+def _system_prompt(knowledge: str) -> str:
+    return f"""You are Parambu Assistant — a helpful, conversational AI for Parambu Organics.
+You chat like a thoughtful teammate in a chat window (similar to ChatGPT/Cursor): clear, natural, concise, and useful.
+
+Always ground answers in the knowledge base and any uploaded documents below.
+Never invent medical cures or forbidden claims (no "clinically proven", "cures", "treats disease", etc.).
+Brand voice: warm, heritage-rooted, trustworthy, practical.
+
+If tool results are provided, explain them in natural language and mention that downloadable files are attached in the chat.
+If the user is just asking a question, answer directly — do not dump a campaign pack unless they asked to generate one.
+
+KNOWLEDGE BASE:
+{knowledge}
+
+BRAND SNAPSHOT:
+{dump_brand_snapshot()[:6000]}
+"""
+
+
+def run_chat_turn(
+    *,
+    message: str,
+    session_dir: Path,
+    attachment_paths: list[Path],
+) -> dict[str, Any]:
+    from agent_chat.attachments import summarize_attachments
+
+    brand = load_brand()
+    history = load_history(session_dir)
+    attachment_summary = summarize_attachments(attachment_paths)
+    focus = extract_focus(message, brand)
+    mode = "LLM" if llm_enabled() else "knowledge"
+    tool = _wants_tool(message)
+
+    extra = attachment_chunks(attachment_summary)
+    chunks = retrieve_knowledge(message, extra_chunks=extra, brand=brand, limit=8)
+    knowledge = format_knowledge_block(chunks)
+
+    context = {
+        "output_dir": str(session_dir),
+        "content_pieces": 5,
+        "growth_ideas": 4,
+        "uploaded_images": attachment_summary["images"],
+        "uploaded_documents": [d["name"] for d in attachment_summary["documents"]],
+        "focus": focus,
+        "user_message": message,
+    }
+
+    session_dir.mkdir(parents=True, exist_ok=True)
+    (session_dir / "inputs").mkdir(parents=True, exist_ok=True)
+
+    pack: CampaignPack | None = None
+    agent_name = "Parambu Assistant"
+    tool_facts = None
+    intent = "chat"
+
+    if tool:
+        intent = tool
+        agent_name, pack, tool_facts = _run_tool(
+            tool=tool,
+            message=message,
+            brand=brand,
+            context=context,
+            session_dir=session_dir,
+        )
+
+    user_content = message
+    if attachment_summary.get("notes"):
+        user_content += "\n\n[Uploads]\n" + "\n".join(f"- {n}" for n in attachment_summary["notes"])
+    if tool_facts:
+        user_content += (
+            "\n\n[Internal tool results — rewrite these as a natural chat reply for the user]\n"
+            + tool_facts
+        )
+
+    llm_messages = as_llm_messages(history) + [{"role": "user", "content": user_content}]
+    fallback = _conversational_fallback(
+        message=message,
+        knowledge=knowledge,
+        tool_facts=tool_facts,
+        agent_name=agent_name,
+    )
+    reply = complete_chat(
+        system=_system_prompt(knowledge),
+        messages=llm_messages,
+        fallback=fallback,
+        temperature=0.55,
+    )
+
+    # Persist conversation
+    history.append({"role": "user", "content": message})
+    history.append({"role": "assistant", "content": reply, "agent": agent_name})
+    save_history(session_dir, history)
+
+    files = _collect_files(session_dir, pack)
+    if pack:
+        snippet = session_dir / "latest_reply.md"
+        snippet.write_text(reply + "\n\n---\n\n" + pack_to_markdown(pack), encoding="utf-8")
+        files.append(
+            {
+                "name": "latest_reply.md",
+                "path": str(snippet),
+                "kind": "report",
+                "url": f"/api/files/{session_dir.name}/latest_reply.md",
+            }
+        )
+
     return {
-        "agent": agent_name,
+        "agent": agent_name if tool else "Parambu Assistant",
         "reply": reply,
         "files": files,
         "intent": intent,
@@ -395,7 +428,9 @@ def run_chat_turn(
             "categories": focus.get("categories", []),
             "formats": focus.get("formats", []),
         },
-        "pack": {
+        "pack": None
+        if not pack
+        else {
             "week_of": pack.week_of,
             "approved": pack.approved,
             "ideas": len(pack.ideas),
