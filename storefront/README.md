@@ -26,17 +26,17 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Included (current)
 
-- Golden logo header + announcement bar
-- Search modal, mobile nav, wishlist
-- Slide-over cart drawer + improved cart page
-- Rich homepage with hero, category tiles, campaign banners, bestsellers, testimonials
-- Product image gallery (multi-image)
-- Recommended products + frequently bought together
+- Custom generated hero + sub-banner + category images
+- Hero banner carousel, testimonial carousel, product carousels
+- Icons across header, trust bars, cart, wishlist, checkout
+- Visible favorite (wishlist) buttons on product cards
+- Slide-over cart with shipping progress + checkout steps
+- Stepped checkout flow: Cart → Details → Payment
+- Product image gallery, recommended / also-bought
 - Shop filters/sort
-- Quantity selectors, discount badges, trust cues
 
 ## Still next
 
-- Razorpay native checkout
-- Live inventory/order sync
+- Live Razorpay keys + order webhooks
+- Inventory/order sync
 - Customer accounts + real review ingestion
