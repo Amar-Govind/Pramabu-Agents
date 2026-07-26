@@ -4,7 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState, type FormEvent } from "react";
 import { CheckoutSteps } from "@/components/CheckoutSteps";
+import { OrderTotals } from "@/components/OrderTotals";
 import { IconCheck, IconShield, IconTruck } from "@/components/icons";
+import { calcOrderTotals } from "@/lib/pricing";
 import { formatINR } from "@/lib/products";
 import { useCart } from "@/store/cart";
 
@@ -12,6 +14,7 @@ type Step = "details" | "payment" | "done";
 
 export default function CheckoutPage() {
   const items = useCart((state) => state.items);
+  const couponCode = useCart((state) => state.couponCode);
   const clear = useCart((state) => state.clear);
   const [step, setStep] = useState<Step>("details");
   const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "external">("razorpay");
@@ -24,12 +27,10 @@ export default function CheckoutPage() {
     pincode: "",
   });
 
-  const subtotal = useMemo(
-    () => items.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
-    [items]
+  const totals = useMemo(
+    () => calcOrderTotals(items, couponCode),
+    [items, couponCode]
   );
-  const shipping = subtotal >= 999 || subtotal === 0 ? 0 : 49;
-  const total = subtotal + shipping;
 
   if (!items.length && step !== "done") {
     return (
@@ -145,7 +146,9 @@ export default function CheckoutPage() {
                   Back
                 </button>
                 <button type="submit" className="flex-1 rounded-md bg-gold px-5 py-3 text-sm font-semibold text-ink hover:bg-gold-light">
-                  {paymentMethod === "external" ? "Open live checkout" : `Pay ${formatINR(total)}`}
+                  {paymentMethod === "external"
+                    ? "Open live checkout"
+                    : `Pay ${formatINR(totals.total)}`}
                 </button>
               </div>
             </form>
@@ -172,10 +175,8 @@ export default function CheckoutPage() {
               </li>
             ))}
           </ul>
-          <div className="mt-5 space-y-2 border-t border-gold/20 pt-4 text-sm">
-            <div className="flex justify-between"><span className="text-ink/65">Subtotal</span><span className="font-semibold text-forest">{formatINR(subtotal)}</span></div>
-            <div className="flex justify-between"><span className="text-ink/65">Shipping</span><span className="font-semibold text-forest">{shipping === 0 ? "Free" : formatINR(shipping)}</span></div>
-            <div className="flex justify-between text-base"><span className="font-semibold text-ink">Total</span><span className="font-semibold text-forest">{formatINR(total)}</span></div>
+          <div className="mt-5 border-t border-gold/20 pt-4">
+            <OrderTotals showFreeShipHint={false} />
           </div>
         </aside>
       </div>

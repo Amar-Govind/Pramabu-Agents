@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { CheckoutSteps } from "@/components/CheckoutSteps";
 import { QuantitySelector } from "@/components/QuantitySelector";
 import { IconClose, IconTrash } from "@/components/icons";
+import { FREE_SHIPPING_THRESHOLD, calcOrderTotals } from "@/lib/pricing";
 import { formatINR } from "@/lib/products";
 import { useCart } from "@/store/cart";
 
@@ -13,14 +14,19 @@ export function CartDrawer() {
   const isOpen = useCart((state) => state.isOpen);
   const closeCart = useCart((state) => state.closeCart);
   const items = useCart((state) => state.items);
+  const couponCode = useCart((state) => state.couponCode);
   const setQuantity = useCart((state) => state.setQuantity);
   const removeItem = useCart((state) => state.removeItem);
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
+  const totals = useMemo(
+    () => calcOrderTotals(items, couponCode),
+    [items, couponCode]
   );
+  const subtotal = totals.subtotal;
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
-  const remainingForFreeShip = Math.max(0, 999 - subtotal);
+  const remainingForFreeShip =
+    totals.shipping === 0
+      ? 0
+      : Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -132,12 +138,24 @@ export function CartDrawer() {
         </div>
 
         <div className="border-t border-gold/20 bg-white/70 px-5 py-5">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-ink/65">Subtotal</span>
-            <span className="text-lg font-semibold text-forest">{formatINR(subtotal)}</span>
+          <div className="space-y-1.5 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-ink/65">Subtotal</span>
+              <span className="font-semibold text-forest">{formatINR(subtotal)}</span>
+            </div>
+            {totals.discount > 0 ? (
+              <div className="flex items-center justify-between">
+                <span className="text-ink/65">Discount{couponCode ? ` (${couponCode})` : ""}</span>
+                <span className="font-semibold text-leaf">−{formatINR(totals.discount)}</span>
+              </div>
+            ) : null}
+            <div className="flex items-center justify-between">
+              <span className="text-ink/65">Total</span>
+              <span className="text-lg font-semibold text-forest">{formatINR(totals.total)}</span>
+            </div>
           </div>
           <p className="mt-2 text-xs text-ink/50">
-            Next: add delivery details, then pay securely.
+            Apply coupons on the cart or checkout page.
           </p>
           <Link
             href="/checkout"

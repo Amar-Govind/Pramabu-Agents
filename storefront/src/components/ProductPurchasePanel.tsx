@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { QuantitySelector } from "@/components/QuantitySelector";
+import { StarRating } from "@/components/StarRating";
 import { WishlistButton } from "@/components/WishlistButton";
 import { discountPercent, formatINR, type Product } from "@/lib/products";
 
@@ -24,10 +25,13 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
         ) : null}
       </div>
 
-      <p className="mt-3 text-sm text-ink/60">
-        ★ {product.rating.toFixed(1)} · {product.reviewCount} reviews ·{" "}
-        <span className="text-leaf">{product.inStock ? "In stock" : "Out of stock"}</span>
-      </p>
+      <a href="#reviews" className="mt-3 inline-flex items-center gap-2 text-sm text-ink/60 hover:text-gold-deep">
+        <StarRating value={product.rating} size="sm" />
+        <span>
+          {product.rating.toFixed(1)} · {product.reviewCount} reviews
+        </span>
+        <span className="text-leaf">· {product.inStock ? "In stock" : "Out of stock"}</span>
+      </a>
 
       <div className="mt-8 flex flex-wrap items-center gap-3">
         <QuantitySelector value={quantity} onChange={setQuantity} />

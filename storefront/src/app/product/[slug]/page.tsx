@@ -6,6 +6,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ProductPurchasePanel } from "@/components/ProductPurchasePanel";
 import { ProductRail } from "@/components/ProductRail";
+import { ProductReviews } from "@/components/ProductReviews";
 import { getSubCategoryForProductCategory } from "@/lib/collections";
 import {
   getProduct,
@@ -89,6 +90,12 @@ export default async function ProductPage({ params }: Props) {
           ) : null}
         </div>
       </div>
+
+      <ProductReviews
+        productSlug={product.slug}
+        fallbackRating={product.rating}
+        fallbackCount={product.reviewCount}
+      />
 
       <AlsoBought product={product} related={alsoBought} />
 

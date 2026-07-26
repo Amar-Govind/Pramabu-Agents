@@ -1,0 +1,74 @@
+[
+  {
+    "id": "r-vco-1",
+    "productSlug": "virgin-coconut-oil",
+    "author": "Ananya R.",
+    "rating": 5,
+    "title": "Pure and fragrant",
+    "body": "Cold-pressed smell, light on hair, and absorbs well. Already reordered once.",
+    "createdAt": "2026-05-12"
+  },
+  {
+    "id": "r-vco-2",
+    "productSlug": "virgin-coconut-oil",
+    "author": "Karthik M.",
+    "rating": 4,
+    "title": "Everyday oil we trust",
+    "body": "Great for scalp massage. Wish the bottle had a pour spout, otherwise excellent.",
+    "createdAt": "2026-04-03"
+  },
+  {
+    "id": "r-vet-1",
+    "productSlug": "vetpalai-soap",
+    "author": "Meera S.",
+    "rating": 5,
+    "title": "Gentle on sensitive skin",
+    "body": "No dryness after bathing. The herbal scent is subtle and clean.",
+    "createdAt": "2026-06-01"
+  },
+  {
+    "id": "r-char-1",
+    "productSlug": "charcoal-soap",
+    "author": "Rohit P.",
+    "rating": 5,
+    "title": "Clears oil without harshness",
+    "body": "Face feels fresh, not stripped. Good lather for a natural bar.",
+    "createdAt": "2026-03-18"
+  },
+  {
+    "id": "r-rose-1",
+    "productSlug": "rose-soap",
+    "author": "Divya K.",
+    "rating": 5,
+    "title": "Soft rose finish",
+    "body": "Lovely fragrance that lasts lightly on skin. Gifted two bars already.",
+    "createdAt": "2026-05-28"
+  },
+  {
+    "id": "r-neem-1",
+    "productSlug": "neem-handcrafted-organic-soap",
+    "author": "Suresh N.",
+    "rating": 4,
+    "title": "Solid neem soap",
+    "body": "Helped with occasional breakouts. Natural neem aroma, as expected.",
+    "createdAt": "2026-02-14"
+  },
+  {
+    "id": "r-coco-1",
+    "productSlug": "coco-pith-low-ec-2",
+    "author": "Priya L.",
+    "rating": 5,
+    "title": "Plants love this",
+    "body": "Mixes well, holds moisture, and seedlings look healthier this season.",
+    "createdAt": "2026-06-20"
+  },
+  {
+    "id": "r-manj-1",
+    "productSlug": "manjistha-soap",
+    "author": "Lakshmi V.",
+    "rating": 5,
+    "title": "Bright, clean wash",
+    "body": "Skin tone looks even after a few weeks. Soft bar, no artificial perfume blast.",
+    "createdAt": "2026-04-22"
+  }
+]

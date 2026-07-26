@@ -11,6 +11,7 @@ export type CartItem = {
 
 type CartState = {
   items: CartItem[];
+  couponCode: string | null;
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -20,6 +21,8 @@ type CartState = {
   setQuantity: (slug: string, quantity: number) => void;
   increment: (slug: string) => void;
   decrement: (slug: string) => void;
+  setCouponCode: (code: string | null) => void;
+  clearCoupon: () => void;
   clear: () => void;
 };
 
@@ -27,6 +30,7 @@ export const useCart = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      couponCode: null,
       isOpen: false,
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
@@ -71,11 +75,13 @@ export const useCart = create<CartState>()(
         const item = get().items.find((entry) => entry.product.slug === slug);
         if (item) get().setQuantity(slug, item.quantity - 1);
       },
-      clear: () => set({ items: [] }),
+      setCouponCode: (code) => set({ couponCode: code }),
+      clearCoupon: () => set({ couponCode: null }),
+      clear: () => set({ items: [], couponCode: null }),
     }),
     {
       name: "parambu-cart",
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({ items: state.items, couponCode: state.couponCode }),
     }
   )
 );

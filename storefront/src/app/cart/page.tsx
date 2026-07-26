@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CheckoutSteps } from "@/components/CheckoutSteps";
+import { OrderTotals } from "@/components/OrderTotals";
 import { ProductRail } from "@/components/ProductRail";
 import { QuantitySelector } from "@/components/QuantitySelector";
 import { formatINR, products } from "@/lib/products";
@@ -13,12 +14,6 @@ export default function CartPage() {
   const setQuantity = useCart((state) => state.setQuantity);
   const removeItem = useCart((state) => state.removeItem);
   const openCart = useCart((state) => state.openCart);
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
-  const shipping = subtotal >= 999 || subtotal === 0 ? 0 : 49;
-  const total = subtotal + shipping;
   const suggestions = products.filter((product) =>
     ["virgin-coconut-oil", "neem-handcrafted-organic-soap", "coco-pith-low-ec-2", "rose-soap"].includes(
       product.slug
@@ -108,28 +103,9 @@ export default function CartPage() {
 
           <aside className="h-fit rounded-xl border border-gold/25 bg-white/80 p-6">
             <h2 className="font-display text-2xl text-ink">Order summary</h2>
-            <div className="mt-6 space-y-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-ink/70">Subtotal</span>
-                <span className="font-semibold text-forest">{formatINR(subtotal)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-ink/70">Shipping</span>
-                <span className="font-semibold text-forest">
-                  {shipping === 0 ? "Free" : formatINR(shipping)}
-                </span>
-              </div>
-              <div className="gold-rule" />
-              <div className="flex items-center justify-between text-base">
-                <span className="font-semibold text-ink">Total</span>
-                <span className="font-semibold text-forest">{formatINR(total)}</span>
-              </div>
+            <div className="mt-6">
+              <OrderTotals />
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-ink/60">
-              {subtotal < 999
-                ? `Add ${formatINR(999 - subtotal)} more for free shipping.`
-                : "You’ve unlocked free shipping."}
-            </p>
             <Link
               href="/checkout"
               className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-gold px-5 py-3 text-sm font-semibold text-ink hover:bg-gold-light"
