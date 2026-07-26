@@ -10,7 +10,7 @@ We are shipping **Phase 1 MVP now** — a runnable weekly pipeline that coordina
 |---|---|---|
 | **0 – Today** | Run pipeline against Parambu Organics brand bible + [parambu.in](https://parambu.in) | Ready |
 | **1 – This sprint** | LLM mode + human review loop for weekly content/ads/site actions | In progress |
-| **1b – Storefront** | Custom Next.js site MVP in `/storefront` (home, shop, PDP, cart) | In progress |
+| **1b – Storefront** | Custom Next.js site in `/storefront` with gold branding, gallery, recommendations, cart drawer | In progress |
 | **2 – Next** | Razorpay checkout, social drafts, ads APIs, approval workflow | Planned |
 | **3 – Scale** | CRM, influencer, supply chain, crisis/PR, closed-loop learning | Planned |
 

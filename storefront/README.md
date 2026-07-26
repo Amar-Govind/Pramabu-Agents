@@ -1,13 +1,18 @@
 # Parambu Organics Storefront
 
-Custom Next.js storefront MVP for [Parambu Organics](https://parambu.in).
+Production-oriented Next.js storefront for [Parambu Organics](https://parambu.in).
 
 ## Stack
 
 - Next.js (App Router) + TypeScript
-- Tailwind CSS
-- Zustand cart
-- Product catalog seeded from live WooCommerce SKUs
+- Tailwind CSS with **golden brand system**
+- Zustand cart + wishlist
+- Catalog seeded from live WooCommerce SKUs
+
+## Brand
+
+- Logo: `/public/brand/logo-gold.png` (from Parambu Golden Logo)
+- Accent: `#C9A227` gold with deep forest supporting tones
 
 ## Run locally
 
@@ -19,18 +24,19 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## What’s included
+## Included (current)
 
-- Home with full-bleed brand hero
-- Shop + Oils / Soap / Gardening categories
-- Product detail pages
-- Persistent cart
-- Mobile-first organic brand design
+- Golden logo header + announcement bar
+- Search modal, mobile nav, wishlist
+- Slide-over cart drawer + improved cart page
+- Rich homepage with hero, category tiles, campaign banners, bestsellers, testimonials
+- Product image gallery (multi-image)
+- Recommended products + frequently bought together
+- Shop filters/sort
+- Quantity selectors, discount badges, trust cues
 
-## Not in v1
+## Still next
 
-- Razorpay checkout
-- Customer accounts
-- Live inventory sync
-
-Live commerce remains on https://parambu.in until cutover.
+- Razorpay native checkout
+- Live inventory/order sync
+- Customer accounts + real review ingestion

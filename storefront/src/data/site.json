@@ -1,0 +1,72 @@
+{
+  "name": "Parambu Organics",
+  "tagline": "Everyday Pure & Natural",
+  "website": "https://parambu.in",
+  "logo": "/brand/logo-gold.png",
+  "colors": {
+    "gold": "#C9A227",
+    "goldLight": "#E2C56A",
+    "goldDeep": "#8C6B12",
+    "forest": "#1B4332",
+    "leaf": "#2D6A4F",
+    "ink": "#14201A",
+    "sand": "#F7F1E4"
+  },
+  "banners": [
+    {
+      "title": "Handcrafted Organic Soap",
+      "subtitle": "Essential daily nourishment for gentle skin care",
+      "image": "https://parambu.in/wp-content/uploads/2026/06/soapbannerHD-2048x1024.jpg",
+      "href": "/shop/soap",
+      "cta": "Shop soaps"
+    },
+    {
+      "title": "Virgin Coconut Oil",
+      "subtitle": "Cold pressed purity for family wellness",
+      "image": "https://parambu.in/wp-content/uploads/2026/07/VirginCocoOil.png",
+      "href": "/product/virgin-coconut-oil",
+      "cta": "Shop oil"
+    },
+    {
+      "title": "Premium Coco Growing Media",
+      "subtitle": "Moisture-rich support for thriving gardens",
+      "image": "https://parambu.in/wp-content/uploads/2026/07/cocopithbannerOG.png",
+      "href": "/shop/gardening",
+      "cta": "Shop gardening"
+    }
+  ],
+  "categoryTiles": [
+    {
+      "title": "Oils",
+      "href": "/shop/oils",
+      "image": "https://parambu.in/wp-content/uploads/2026/07/VOilImge.png",
+      "copy": "Cold processed virgin coconut oil"
+    },
+    {
+      "title": "Soap",
+      "href": "/shop/soap",
+      "image": "https://parambu.in/wp-content/uploads/2026/07/SoapImge.png",
+      "copy": "Heritage herbal handcrafted bars"
+    },
+    {
+      "title": "Gardening",
+      "href": "/shop/gardening",
+      "image": "https://parambu.in/wp-content/uploads/2026/06/gardening.png",
+      "copy": "Coco pith and chips for healthy plants"
+    }
+  ],
+  "testimonials": [
+    {
+      "name": "Murugan",
+      "quote": "Plant health has improved a lot. It\u2019s a genuine product and I would definitely recommend it."
+    },
+    {
+      "name": "Priya",
+      "quote": "The packaging was neat and the product quality is excellent. A trusted organic brand."
+    },
+    {
+      "name": "Lakshmi R",
+      "quote": "While searching for chemical-free products, I found Parambu Organics. Fully satisfied."
+    }
+  ]
+}

@@ -11,20 +11,27 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        gold: {
+          DEFAULT: "#c9a227",
+          light: "#e2c56a",
+          deep: "#8c6b12",
+        },
         forest: "#1b4332",
         leaf: "#2d6a4f",
         moss: "#40916c",
-        mist: "#e8f0ea",
-        sand: "#f3efe6",
+        mist: "#eef5ef",
+        sand: "#f7f1e4",
         ink: "#14201a",
-        clay: "#8a6a3d",
       },
       fontFamily: {
         display: ["var(--font-display)", "Georgia", "serif"],
         sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       maxWidth: {
-        site: "72rem",
+        site: "74rem",
+      },
+      boxShadow: {
+        soft: "0 10px 30px rgba(20, 32, 26, 0.08)",
       },
     },
   },

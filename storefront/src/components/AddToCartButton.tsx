@@ -6,10 +6,14 @@ import { useCart } from "@/store/cart";
 
 export function AddToCartButton({
   product,
+  quantity = 1,
   className = "",
+  label = "Add to cart",
 }: {
   product: Product;
+  quantity?: number;
   className?: string;
+  label?: string;
 }) {
   const addItem = useCart((state) => state.addItem);
   const [added, setAdded] = useState(false);
@@ -18,13 +22,13 @@ export function AddToCartButton({
     <button
       type="button"
       onClick={() => {
-        addItem(product);
+        addItem(product, quantity);
         setAdded(true);
-        window.setTimeout(() => setAdded(false), 1400);
+        window.setTimeout(() => setAdded(false), 1200);
       }}
-      className={`rounded-md bg-forest px-5 py-3 text-sm font-semibold text-sand transition hover:bg-leaf ${className}`}
+      className={`rounded-md bg-gold px-5 py-3 text-sm font-semibold text-ink transition hover:bg-gold-light ${className}`}
     >
-      {added ? "Added" : "Add to cart"}
+      {added ? "Added" : label}
     </button>
   );
 }

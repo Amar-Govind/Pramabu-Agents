@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import { AppShell } from "@/components/AppShell";
 import "./globals.css";
 
 const display = Fraunces({
@@ -24,6 +23,9 @@ export const metadata: Metadata = {
   description:
     "Everyday pure & natural care from Parambu Organics — handcrafted soaps, virgin coconut oil, and coco gardening essentials.",
   metadataBase: new URL("https://parambu.in"),
+  icons: {
+    icon: "/brand/logo-gold.png",
+  },
 };
 
 export default function RootLayout({
@@ -34,9 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${display.variable} ${sans.variable} font-sans antialiased`}>
-        <SiteHeader />
-        <main>{children}</main>
-        <SiteFooter />
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

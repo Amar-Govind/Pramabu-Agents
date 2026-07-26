@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ProductGrid } from "@/components/ProductGrid";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { ShopToolbar } from "@/components/ShopToolbar";
 import { categories, getProductsByCategory } from "@/lib/products";
 
 type Props = {
@@ -42,12 +43,18 @@ export default async function CategoryPage({ params }: Props) {
   const list = getProductsByCategory(meta.title);
 
   return (
-    <div className="mx-auto max-w-site px-5 py-14 md:px-8 md:py-20">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-leaf">Category</p>
-      <h1 className="mt-3 font-display text-5xl text-ink">{meta.title}</h1>
+    <div className="mx-auto max-w-site px-5 py-12 md:px-8 md:py-16">
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Shop", href: "/shop" },
+          { label: meta.title },
+        ]}
+      />
+      <h1 className="mt-4 font-display text-5xl text-ink">{meta.title}</h1>
       <p className="mt-4 max-w-xl text-base text-ink/70">{meta.description}</p>
-      <div className="mt-12">
-        <ProductGrid products={list} />
+      <div className="mt-10">
+        <ShopToolbar products={list} showCategoryFilter={false} />
       </div>
     </div>
   );
