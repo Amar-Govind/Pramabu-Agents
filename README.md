@@ -9,9 +9,9 @@ We are shipping **Phase 1 MVP now** — a runnable weekly pipeline that coordina
 | Phase | Focus | Status |
 |---|---|---|
 | **0 – Today** | Run pipeline against Parambu Organics brand bible + [parambu.in](https://parambu.in) | Ready |
-| **1 – This sprint** | LLM mode + human review loop for weekly content/ads/site actions | In progress |
-| **2 – Next** | Social drafts, ads APIs, marketplace listings, approval workflow | Planned |
-| **3 – Scale** | CRM, influencer, supply chain, crisis/PR, closed-loop learning | Planned |
+| **1 – Agents** | Full specialist agent suite in weekly campaign pack | Ready |
+| **2 – Next** | Social drafts, ads APIs, approval workflow, live connectors | Planned |
+| **3 – Scale** | Closed-loop learning from analytics winners | Planned |
 
 ### Why this starting point
 
@@ -22,7 +22,7 @@ Building every agent at once stalls delivery. The fastest path to value:
 3. **Template mode** so the system works immediately without API keys
 4. **Optional LLM mode** when `OPENAI_API_KEY` is set
 
-## MVP agents included
+## Agents included (full suite)
 
 1. Orchestrator  
 2. Trend Scout  
@@ -34,8 +34,14 @@ Building every agent at once stalls delivery. The fastest path to value:
 8. E-commerce Website  
 9. Performance Marketing  
 10. Business Growth  
-11. Analytics & BI  
-12. QA (approval gate)
+11. Marketplace  
+12. Influencer  
+13. CRM  
+14. Supply Chain  
+15. Crisis & PR  
+16. Localization  
+17. Analytics & BI  
+18. QA (approval gate)
 
 ## Quick start
 
@@ -93,6 +99,12 @@ Goal
   → E-commerce
   → Performance Marketing
   → Business Growth
+  → Marketplace
+  → Influencer
+  → CRM
+  → Supply Chain
+  → Crisis & PR
+  → Localization
   → Analytics
   → QA / Approval
 ```
@@ -120,6 +132,6 @@ pytest -q
 
 1. Connect Instagram/Facebook draft publishing (manual approve first)
 2. Hook Meta/Google ads campaign draft creation
-3. Website agent → GitHub issues / Shopify task export
+3. Website agent → WooCommerce / GitHub task export
 4. Simple approval UI or Slack “Approve / Reject”
-5. Add marketplace + influencer agents once weekly loop is stable
+5. Live marketplace + CRM connectors for drafted actions
