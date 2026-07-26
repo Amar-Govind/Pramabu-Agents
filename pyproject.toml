@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pramabu-agents"
+version = "0.1.0"
+description = "Multi-agent system for FMCG brand operations (Pramabu)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "pyyaml>=6.0",
+  "rich>=13.0",
+  "pydantic>=2.0",
+  "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+llm = ["openai>=1.40"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+pramabu = "pramabu_agents.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pramabu_agents*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

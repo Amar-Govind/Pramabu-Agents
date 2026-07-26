@@ -1,0 +1,65 @@
+brand:
+  name: Pramabu
+  tagline: Everyday quality for every home
+  category: FMCG
+  markets:
+    - India
+  voice:
+    tone: warm, confident, simple
+    do:
+      - Speak like a trusted household brand
+      - Keep benefits concrete and practical
+      - Prefer short sentences and clear CTAs
+    dont:
+      - Use medical or exaggerated health claims
+      - Sound corporate or jargon-heavy
+      - Promise unrealistic results
+  visual:
+    primary_colors: ["#0F6B4C", "#F5C518", "#1A1A1A"]
+    style: clean product-first photography, bold type, high contrast
+  compliance:
+    required_disclaimers: []
+    forbidden_claims:
+      - cures
+      - clinically proven
+      - 100% natural guaranteed
+
+products:
+  - sku: PRM-SOAP-001
+    name: Pramabu Everyday Soap
+    benefits:
+      - Gentle clean
+      - Long-lasting fragrance
+      - Family-friendly
+    price_inr: 45
+    channels: [d2c, amazon, blinkit]
+  - sku: PRM-DETERGENT-001
+    name: Pramabu Fresh Detergent
+    benefits:
+      - Tough on stains
+      - Soft on fabric
+      - Value pack friendly
+    price_inr: 199
+    channels: [d2c, amazon, flipkart]
+
+goals:
+  primary:
+    - Grow D2C repeat purchase
+    - Improve social content velocity
+    - Win on value + freshness positioning
+  kpis:
+    - ROAS
+    - engagement_rate
+    - conversion_rate
+    - repeat_purchase_rate
+
+channels:
+  social: [instagram, youtube_shorts, facebook]
+  commerce: [website, amazon, blinkit]
+  ads: [meta, google]
+
+weekly_defaults:
+  content_pieces: 7
+  poster_concepts: 3
+  video_concepts: 3
+  growth_ideas: 5
