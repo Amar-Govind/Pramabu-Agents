@@ -4,9 +4,9 @@
   "website": "https://parambu.in",
   "logo": "/brand/logo-gold.png",
   "colors": {
-    "gold": "#D6AA84",
-    "goldLight": "#E8C9AD",
-    "goldDeep": "#B18767",
+    "gold": "#B18767",
+    "goldLight": "#D6AA84",
+    "goldDeep": "#8F6B4F",
     "forest": "#1B4332",
     "leaf": "#2D6A4F",
     "ink": "#14201A",

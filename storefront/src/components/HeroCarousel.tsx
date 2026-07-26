@@ -18,7 +18,7 @@ export function HeroCarousel() {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-forest via-forest/78 to-forest/20" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(214,170,132,0.3),transparent_40%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(177,135,103,0.3),transparent_40%)]" />
       </div>
 
       <div className="relative mx-auto flex min-h-[88vh] max-w-site flex-col justify-center px-5 py-20 md:px-8">

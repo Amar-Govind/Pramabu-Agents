@@ -11,11 +11,11 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        // Champagne rose-gold from Parambu leaf logo — kept as `gold` token name
+        // Warm rose-copper from Parambu leaf logo — kept as `gold` token name
         gold: {
-          DEFAULT: "#D6AA84",
-          light: "#E8C9AD",
-          deep: "#B18767",
+          DEFAULT: "#B18767",
+          light: "#D6AA84",
+          deep: "#8F6B4F",
         },
         forest: "#1b4332",
         leaf: "#2d6a4f",
