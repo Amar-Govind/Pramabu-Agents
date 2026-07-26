@@ -27,5 +27,12 @@ export function TestimonialCarousel() {
     </blockquote>
   ));
 
-  return <Carousel items={slides} autoPlayMs={5000} ariaLabel="Customer testimonials" />;
+  return (
+    <Carousel
+      items={slides}
+      autoPlayMs={5000}
+      ariaLabel="Customer testimonials"
+      variant="dark"
+    />
+  );
 }
