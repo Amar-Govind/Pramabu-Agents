@@ -1,4 +1,5 @@
 import productsData from "@/data/products.json";
+import { getCollection, getCollectionForProductCategory } from "@/lib/collections";
 
 export type ProductImage = {
   src: string;
@@ -27,8 +28,6 @@ export type Product = {
 
 export const products = productsData as Product[];
 
-export const categories = ["Oils", "Soap", "Gardening"] as const;
-
 export function getProduct(slug: string): Product | undefined {
   return products.find((product) => product.slug === slug);
 }
@@ -36,6 +35,16 @@ export function getProduct(slug: string): Product | undefined {
 export function getProductsByCategory(category: string): Product[] {
   return products.filter(
     (product) => product.category.toLowerCase() === category.toLowerCase()
+  );
+}
+
+export function getProductsByCollection(slug: string): Product[] {
+  const collection = getCollection(slug);
+  if (!collection) return [];
+  return products.filter((product) =>
+    collection.productCategories.some(
+      (category) => category.toLowerCase() === product.category.toLowerCase()
+    )
   );
 }
 
@@ -48,12 +57,21 @@ export function getProductsBySlugs(slugs: string[]): Product[] {
 export function searchProducts(query: string): Product[] {
   const q = query.trim().toLowerCase();
   if (!q) return products;
-  return products.filter((product) =>
-    [product.name, product.shortName, product.category, product.tagline, product.description]
+  return products.filter((product) => {
+    const collection = getCollectionForProductCategory(product.category);
+    return [
+      product.name,
+      product.shortName,
+      product.category,
+      collection?.title ?? "",
+      collection?.shortLabel ?? "",
+      product.tagline,
+      product.description,
+    ]
       .join(" ")
       .toLowerCase()
-      .includes(q)
-  );
+      .includes(q);
+  });
 }
 
 export function formatINR(amount: number): string {

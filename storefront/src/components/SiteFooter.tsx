@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NewsletterForm } from "@/components/NewsletterForm";
+import { collections } from "@/lib/collections";
 
 export function SiteFooter() {
   return (
@@ -18,17 +19,24 @@ export function SiteFooter() {
             <p className="font-display text-3xl text-gold-light">Parambu Organics</p>
           </div>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-sand/80">
-            Everyday pure & natural care — handcrafted soaps, cold-pressed oils,
-            and coco growing media for healthier homes and gardens.
+            Everyday pure & natural care — hair care oils, skin care soaps,
+            and cocopeat for healthier homes and gardens.
           </p>
         </div>
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-light">Shop</p>
           <div className="mt-4 flex flex-col gap-2 text-sm">
             <Link href="/shop" className="hover:text-gold-light">All products</Link>
-            <Link href="/shop/oils" className="hover:text-gold-light">Oils</Link>
-            <Link href="/shop/soap" className="hover:text-gold-light">Soap</Link>
-            <Link href="/shop/gardening" className="hover:text-gold-light">Gardening</Link>
+            {collections.map((collection) => (
+              <Link
+                key={collection.slug}
+                href={`/shop/${collection.slug}`}
+                className="hover:text-gold-light"
+              >
+                {collection.title}
+                <span className="ml-1 text-sand/50">({collection.shortLabel})</span>
+              </Link>
+            ))}
           </div>
         </div>
         <div>

@@ -11,10 +11,11 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        // Rose gold (Parambu leaf accent) — kept as `gold` token name for class stability
         gold: {
-          DEFAULT: "#c9a227",
-          light: "#e2c56a",
-          deep: "#8c6b12",
+          DEFAULT: "#B76E79",
+          light: "#E0A8B0",
+          deep: "#8E4A54",
         },
         forest: "#1b4332",
         leaf: "#2d6a4f",

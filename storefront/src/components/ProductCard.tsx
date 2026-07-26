@@ -3,10 +3,12 @@ import Link from "next/link";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { WishlistButton } from "@/components/WishlistButton";
 import { IconStar } from "@/components/icons";
+import { getCollectionForProductCategory } from "@/lib/collections";
 import { discountPercent, formatINR, type Product } from "@/lib/products";
 
 export function ProductCard({ product }: { product: Product }) {
   const discount = discountPercent(product);
+  const collection = getCollectionForProductCategory(product.category);
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-forest/10 bg-white/70 shadow-soft">
@@ -38,7 +40,7 @@ export function ProductCard({ product }: { product: Product }) {
 
       <div className="flex flex-1 flex-col p-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-deep">
-          {product.category}
+          {collection?.title ?? product.category}
         </p>
         <Link
           href={`/product/${product.slug}`}

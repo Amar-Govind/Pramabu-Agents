@@ -18,13 +18,13 @@ export function HeroCarousel() {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-forest via-forest/78 to-forest/20" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(201,162,39,0.28),transparent_40%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(183,110,121,0.28),transparent_40%)]" />
       </div>
 
       <div className="relative mx-auto flex min-h-[88vh] max-w-site flex-col justify-center px-5 py-20 md:px-8">
         <Image
           src={site.logo}
-          alt="Parambu Organics golden logo"
+          alt="Parambu Organics rose gold logo"
           width={88}
           height={88}
           className="h-20 w-20 object-contain md:h-24 md:w-24"

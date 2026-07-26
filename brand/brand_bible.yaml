@@ -8,9 +8,13 @@ brand:
   markets:
     - India
   categories:
-    - Oils
-    - Soap
+    - Hair Care
+    - Skin Care
     - Gardening
+  category_map:
+    Hair Care: Oils
+    Skin Care: Soap
+    Gardening: Cocopeat
   voice:
     tone: warm, natural, heritage-rooted, trustworthy
     do:
@@ -25,9 +29,13 @@ brand:
       - Sound corporate or jargon-heavy
       - Overstate "100% guaranteed" outcomes
   visual:
-    primary_colors: ["#C9A227", "#1B4332", "#F7F1E4", "#1A1A1A"]
+    primary_colors: ["#B76E79", "#1B4332", "#F7F1E4", "#1A1A1A"]
     logo: /brand/logo-gold.png
-    style: golden logo lockup, natural product photography, earthy textures, clean typography, heritage organic feel
+    style: rose-gold leaf accent, natural product photography, earthy textures, clean typography, heritage organic feel
+  menu:
+    - Hair Care (Oils)
+    - Skin Care (Soap)
+    - Gardening (Cocopeat)
   compliance:
     required_disclaimers: []
     forbidden_claims:

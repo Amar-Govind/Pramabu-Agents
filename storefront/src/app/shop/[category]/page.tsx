@@ -1,46 +1,42 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ShopToolbar } from "@/components/ShopToolbar";
-import { categories, getProductsByCategory } from "@/lib/products";
+import { collections, getCollection } from "@/lib/collections";
+import { getProductsByCollection } from "@/lib/products";
 
 type Props = {
   params: Promise<{ category: string }>;
 };
 
-const copy: Record<string, { title: string; description: string }> = {
-  oils: {
-    title: "Oils",
-    description: "Cold processed virgin coconut oil for skin, hair, and daily wellness.",
-  },
-  soap: {
-    title: "Soap",
-    description: "Handcrafted organic bars inspired by heritage botanicals.",
-  },
-  gardening: {
-    title: "Gardening",
-    description: "Coco pith and coco chips for moisture-rich, healthy plant growth.",
-  },
-};
-
 export function generateStaticParams() {
-  return categories.map((category) => ({ category: category.toLowerCase() }));
+  const params = collections.map((collection) => ({ category: collection.slug }));
+  for (const collection of collections) {
+    for (const alias of collection.aliases ?? []) {
+      params.push({ category: alias });
+    }
+  }
+  return params;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params;
-  const meta = copy[category.toLowerCase()];
-  if (!meta) return { title: "Shop" };
-  return { title: meta.title, description: meta.description };
+  const collection = getCollection(category);
+  if (!collection) return { title: "Shop" };
+  return { title: collection.title, description: collection.description };
 }
 
 export default async function CategoryPage({ params }: Props) {
   const { category } = await params;
-  const key = category.toLowerCase();
-  const meta = copy[key];
-  if (!meta) notFound();
+  const collection = getCollection(category);
+  if (!collection) notFound();
 
-  const list = getProductsByCategory(meta.title);
+  // Canonicalize aliases like /shop/soap -> /shop/skin-care
+  if (category.toLowerCase() !== collection.slug) {
+    redirect(`/shop/${collection.slug}`);
+  }
+
+  const list = getProductsByCollection(collection.slug);
 
   return (
     <div className="mx-auto max-w-site px-5 py-12 md:px-8 md:py-16">
@@ -48,11 +44,14 @@ export default async function CategoryPage({ params }: Props) {
         items={[
           { label: "Home", href: "/" },
           { label: "Shop", href: "/shop" },
-          { label: meta.title },
+          { label: collection.title },
         ]}
       />
-      <h1 className="mt-4 font-display text-5xl text-ink">{meta.title}</h1>
-      <p className="mt-4 max-w-xl text-base text-ink/70">{meta.description}</p>
+      <p className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-gold-deep">
+        {collection.shortLabel}
+      </p>
+      <h1 className="mt-2 font-display text-5xl text-ink">{collection.title}</h1>
+      <p className="mt-4 max-w-xl text-base text-ink/70">{collection.description}</p>
       <div className="mt-10">
         <ShopToolbar products={list} showCategoryFilter={false} />
       </div>

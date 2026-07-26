@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ProductGrid } from "@/components/ProductGrid";
+import { collections } from "@/lib/collections";
 import type { Product } from "@/lib/products";
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "name";
@@ -20,7 +21,14 @@ export function ShopToolbar({
   const filtered = useMemo(() => {
     let list = [...products];
     if (category !== "all") {
-      list = list.filter((product) => product.category.toLowerCase() === category);
+      const collection = collections.find((item) => item.slug === category);
+      if (collection) {
+        list = list.filter((product) =>
+          collection.productCategories.some(
+            (item) => item.toLowerCase() === product.category.toLowerCase()
+          )
+        );
+      }
     }
     if (query.trim()) {
       const q = query.toLowerCase();
@@ -61,9 +69,11 @@ export function ShopToolbar({
               className="rounded-md border border-forest/15 bg-white px-3 py-2 text-sm"
             >
               <option value="all">All categories</option>
-              <option value="oils">Oils</option>
-              <option value="soap">Soap</option>
-              <option value="gardening">Gardening</option>
+              {collections.map((collection) => (
+                <option key={collection.slug} value={collection.slug}>
+                  {collection.title}
+                </option>
+              ))}
             </select>
           ) : null}
           <select

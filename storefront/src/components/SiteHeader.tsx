@@ -9,15 +9,18 @@ import {
   IconMenu,
   IconSearch,
 } from "@/components/icons";
+import { collections } from "@/lib/collections";
 import { useCart } from "@/store/cart";
 import { useUI } from "@/store/ui";
 import { useWishlist } from "@/store/wishlist";
 
 const links = [
   { href: "/shop", label: "Shop" },
-  { href: "/shop/oils", label: "Oils" },
-  { href: "/shop/soap", label: "Soap" },
-  { href: "/shop/gardening", label: "Gardening" },
+  ...collections.map((collection) => ({
+    href: `/shop/${collection.slug}`,
+    label: collection.title,
+    note: collection.shortLabel,
+  })),
 ];
 
 export function SiteHeader() {
@@ -52,7 +55,7 @@ export function SiteHeader() {
             <Link href="/" className="flex items-center gap-2.5">
               <Image
                 src="/brand/logo-gold.png"
-                alt="Parambu Organics golden logo"
+                alt="Parambu Organics rose gold logo"
                 width={44}
                 height={44}
                 className="h-11 w-11 object-contain"
@@ -71,8 +74,18 @@ export function SiteHeader() {
 
           <nav className="hidden items-center gap-6 text-sm font-medium text-ink/80 lg:flex">
             {links.map((link) => (
-              <Link key={link.href} href={link.href} className="transition hover:text-gold-deep">
-                {link.label}
+              <Link
+                key={link.href}
+                href={link.href}
+                className="group transition hover:text-gold-deep"
+                title={"note" in link ? `${link.label} · ${link.note}` : link.label}
+              >
+                <span className="block">{link.label}</span>
+                {"note" in link && link.note ? (
+                  <span className="block text-[10px] font-normal uppercase tracking-[0.14em] text-ink/40 group-hover:text-gold-deep/80">
+                    {link.note}
+                  </span>
+                ) : null}
               </Link>
             ))}
           </nav>
@@ -93,7 +106,7 @@ export function SiteHeader() {
             >
               <IconHeart />
               {wishlistCount > 0 ? (
-                <span className="absolute -right-1 -top-1 inline-flex min-w-5 justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-ink">
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-white">
                   {wishlistCount}
                 </span>
               ) : null}
@@ -101,13 +114,12 @@ export function SiteHeader() {
             <button
               type="button"
               onClick={openCart}
-              aria-label="Open cart"
-              className="relative inline-flex h-10 items-center gap-2 rounded-md bg-gold px-3 text-sm font-semibold text-ink transition hover:bg-gold-light"
+              aria-label={`Open cart, ${totalItems} items`}
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-gold text-white transition hover:bg-gold-deep"
             >
               <IconCart className="h-5 w-5" />
-              <span className="hidden sm:inline">Cart</span>
-              <span className="inline-flex min-w-5 justify-center rounded-sm bg-forest px-1.5 text-[11px] font-bold text-sand">
-                {totalItems}
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-forest text-[10px] font-bold text-sand ring-2 ring-[#faf6ee]">
+                {totalItems > 99 ? "99+" : totalItems}
               </span>
             </button>
           </div>
@@ -125,9 +137,13 @@ export function SiteHeader() {
               </button>
             </div>
             <nav className="mt-8 flex flex-col gap-4 text-base font-medium text-ink">
-              {links.map((link) => (
-                <Link key={link.href} href={link.href} onClick={closeMobileNav}>
-                  {link.label}
+              <Link href="/shop" onClick={closeMobileNav}>Shop</Link>
+              {collections.map((collection) => (
+                <Link key={collection.slug} href={`/shop/${collection.slug}`} onClick={closeMobileNav}>
+                  <span className="block">{collection.title}</span>
+                  <span className="text-xs font-normal text-ink/45">
+                    {collection.shortLabel}
+                  </span>
                 </Link>
               ))}
               <Link href="/wishlist" onClick={closeMobileNav}>Wishlist</Link>

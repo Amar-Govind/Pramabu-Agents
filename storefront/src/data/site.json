@@ -4,9 +4,9 @@
   "website": "https://parambu.in",
   "logo": "/brand/logo-gold.png",
   "colors": {
-    "gold": "#C9A227",
-    "goldLight": "#E2C56A",
-    "goldDeep": "#8C6B12",
+    "gold": "#B76E79",
+    "goldLight": "#E0A8B0",
+    "goldDeep": "#8E4A54",
     "forest": "#1B4332",
     "leaf": "#2D6A4F",
     "ink": "#14201A",
@@ -15,27 +15,27 @@
   "banners": [
     {
       "title": "Everyday Pure & Natural",
-      "subtitle": "Handcrafted soaps, cold-pressed oil, and coco growing media for every home.",
+      "subtitle": "Hair care oils, skin care soaps, and cocopeat for every home.",
       "image": "/banners/hero-banner.png",
       "href": "/shop",
       "cta": "Shop all essentials"
     },
     {
-      "title": "Handcrafted Organic Soap",
+      "title": "Skin Care Soaps",
       "subtitle": "Heritage herbal bars cured slowly for a gentle daily cleanse.",
       "image": "/banners/sub-banner-soap.png",
-      "href": "/shop/soap",
-      "cta": "Shop soaps"
+      "href": "/shop/skin-care",
+      "cta": "Shop skin care"
     },
     {
-      "title": "Virgin Coconut Oil",
-      "subtitle": "Cold pressed purity for skin, hair, and family wellness.",
+      "title": "Hair Care Oils",
+      "subtitle": "Cold pressed virgin coconut oil for soft, nourished hair.",
       "image": "/banners/sub-banner-oil.png",
-      "href": "/product/virgin-coconut-oil",
-      "cta": "Shop oil"
+      "href": "/shop/hair-care",
+      "cta": "Shop hair care"
     },
     {
-      "title": "Premium Coco Growing Media",
+      "title": "Gardening Cocopeat",
       "subtitle": "Moisture-rich coco pith and chips for thriving terrace gardens.",
       "image": "/banners/sub-banner-gardening.png",
       "href": "/shop/gardening",
@@ -44,28 +44,28 @@
   ],
   "categoryTiles": [
     {
-      "title": "Oils",
-      "href": "/shop/oils",
+      "title": "Hair Care",
+      "href": "/shop/hair-care",
       "image": "/categories/category-oils.png",
-      "copy": "Cold processed virgin coconut oil"
+      "copy": "Oils for soft, nourished hair"
     },
     {
-      "title": "Soap",
-      "href": "/shop/soap",
+      "title": "Skin Care",
+      "href": "/shop/skin-care",
       "image": "/categories/category-soap.png",
-      "copy": "Heritage herbal handcrafted bars"
+      "copy": "Soaps for gentle daily skin care"
     },
     {
       "title": "Gardening",
       "href": "/shop/gardening",
       "image": "/categories/category-gardening.png",
-      "copy": "Coco pith and chips for healthy plants"
+      "copy": "Cocopeat for thriving gardens"
     }
   ],
   "testimonials": [
     {
       "name": "Murugan",
-      "quote": "Plant health has improved a lot. It\u2019s a genuine product and I would definitely recommend it.",
+      "quote": "Plant health has improved a lot. It’s a genuine product and I would definitely recommend it.",
       "role": "Terrace gardener"
     },
     {

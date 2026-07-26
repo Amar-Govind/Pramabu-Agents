@@ -66,7 +66,7 @@ export default function HomePage() {
             Shop by category
           </p>
           <h2 className="mt-3 font-display text-4xl text-ink md:text-5xl">
-            Oils. Soap. Gardening.
+            Hair Care. Skin Care. Gardening.
           </h2>
         </div>
         <div className="mt-10 grid gap-5 md:grid-cols-3">

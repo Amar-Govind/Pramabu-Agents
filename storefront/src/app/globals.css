@@ -3,9 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --gold: #c9a227;
-  --gold-light: #e2c56a;
-  --gold-deep: #8c6b12;
+  /* Rose gold — Parambu leaf accent */
+  --gold: #b76e79;
+  --gold-light: #e0a8b0;
+  --gold-deep: #8e4a54;
   --forest: #1b4332;
   --leaf: #2d6a4f;
   --moss: #40916c;
@@ -23,7 +24,7 @@ html {
 body {
   color: var(--foreground);
   background:
-    radial-gradient(1000px 520px at 8% -8%, rgba(201, 162, 39, 0.16), transparent 55%),
+    radial-gradient(1000px 520px at 8% -8%, rgba(183, 110, 121, 0.16), transparent 55%),
     radial-gradient(900px 480px at 100% 0%, rgba(27, 67, 50, 0.1), transparent 50%),
     linear-gradient(180deg, #faf6ee 0%, #f3f0e6 48%, #faf6ee 100%);
   min-height: 100vh;
@@ -35,7 +36,7 @@ body::before {
   inset: 0;
   pointer-events: none;
   opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cpath fill='%23c9a227' d='M80 8c18 24 28 44 28 62S98 102 80 126C62 102 52 88 52 70S62 32 80 8z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cpath fill='%23b76e79' d='M80 8c18 24 28 44 28 62S98 102 80 126C62 102 52 88 52 70S62 32 80 8z'/%3E%3C/svg%3E");
   background-size: 180px 180px;
   z-index: 0;
 }
@@ -112,11 +113,11 @@ footer {
 
 .gold-rule {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.65), transparent);
+  background: linear-gradient(90deg, transparent, rgba(183, 110, 121, 0.65), transparent);
 }
 
 .gold-text {
-  background: linear-gradient(120deg, #8c6b12 0%, #c9a227 45%, #e2c56a 100%);
+  background: linear-gradient(120deg, #8e4a54 0%, #b76e79 45%, #e0a8b0 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
