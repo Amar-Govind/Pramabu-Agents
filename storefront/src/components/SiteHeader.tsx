@@ -38,33 +38,44 @@ export function SiteHeader() {
 
       <header className="sticky top-0 z-40 border-b border-gold/20 bg-[#faf6ee]/92 backdrop-blur-md">
         <div className="mx-auto max-w-site px-4 md:px-8">
-          <div className="relative flex items-center justify-between py-3 md:py-4">
-            <div className="z-10 flex min-w-[8.5rem] flex-1 items-center justify-start">
+          {/* Mobile: logo left · Desktop: large centered logo */}
+          <div className="relative flex items-center justify-between gap-3 py-3 md:py-5">
+            <div className="z-10 flex min-w-0 flex-1 items-center gap-2.5 md:flex-none md:min-w-[9rem]">
               <button
                 type="button"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-forest/15 bg-white text-forest md:hidden"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-forest/15 bg-white text-forest md:hidden"
                 onClick={openMobileNav}
                 aria-label="Open menu"
               >
                 <IconMenu />
               </button>
+              <Link href="/" className="flex min-w-0 items-center md:hidden">
+                <Image
+                  src="/brand/logo-wordmark-transparent.png"
+                  alt="PARAMBU organics"
+                  width={2026}
+                  height={533}
+                  className="h-11 w-auto max-w-[58vw] object-contain object-left sm:h-12"
+                  priority
+                />
+              </Link>
             </div>
 
             <Link
               href="/"
-              className="absolute left-1/2 top-1/2 z-0 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
+              className="absolute left-1/2 top-1/2 z-0 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center md:flex"
             >
               <Image
-                src="/brand/logo-stacked-transparent.png"
+                src="/brand/logo-wordmark-transparent.png"
                 alt="PARAMBU organics"
-                width={319}
-                height={211}
-                className="h-16 w-auto object-contain sm:h-[4.75rem] md:h-24"
+                width={2026}
+                height={533}
+                className="h-16 w-auto object-contain lg:h-20 xl:h-24"
                 priority
               />
             </Link>
 
-            <div className="z-10 flex min-w-[8.5rem] flex-1 items-center justify-end gap-2">
+            <div className="z-10 flex shrink-0 items-center justify-end gap-2 md:min-w-[9rem]">
               <button
                 type="button"
                 onClick={openSearch}

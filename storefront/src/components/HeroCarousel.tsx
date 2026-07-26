@@ -21,7 +21,7 @@ export function HeroCarousel() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(214,170,132,0.28),transparent_40%)]" />
       </div>
 
-      <div className="relative mx-auto flex min-h-[88vh] max-w-site flex-col justify-center px-5 py-20 md:px-8">
+      <div className="relative mx-auto flex min-h-[88vh] max-w-site flex-col justify-center px-5 pb-28 pt-20 md:px-8">
         <p className="animate-rise font-display text-5xl leading-none text-gold-light sm:text-6xl md:text-7xl lg:text-8xl">
           Parambu Organics
         </p>
@@ -55,8 +55,8 @@ export function HeroCarousel() {
       autoPlayMs={6500}
       showDots
       ariaLabel="Homepage banners"
-      variant="light"
-      controls="overlay"
+      variant="dark"
+      controls="below"
       className="[&>div:last-child]:absolute [&>div:last-child]:bottom-6 [&>div:last-child]:left-0 [&>div:last-child]:right-0 [&>div:last-child]:z-20 [&>div:last-child]:mt-0"
     />
   );
