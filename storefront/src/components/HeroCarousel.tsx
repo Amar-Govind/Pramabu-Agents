@@ -22,15 +22,10 @@ export function HeroCarousel() {
       </div>
 
       <div className="relative mx-auto flex min-h-[88vh] max-w-site flex-col justify-center px-5 py-20 md:px-8">
-        <Image
-          src="/brand/logo-wordmark-transparent.png"
-          alt="PARAMBU organics"
-          width={640}
-          height={336}
-          className="animate-rise h-auto w-[min(88vw,420px)] object-contain md:w-[480px]"
-          priority
-        />
-        <h1 className="animate-rise-delay mt-7 max-w-xl font-display text-3xl leading-tight text-sand md:text-4xl">
+        <p className="animate-rise font-display text-5xl leading-none text-gold-light sm:text-6xl md:text-7xl lg:text-8xl">
+          Parambu Organics
+        </p>
+        <h1 className="animate-rise-delay mt-6 max-w-xl font-display text-3xl leading-tight text-sand md:text-4xl">
           {banner.title}
         </h1>
         <p className="animate-rise-delay-2 mt-5 max-w-md text-base leading-relaxed text-sand/85 md:text-lg">

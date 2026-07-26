@@ -37,7 +37,7 @@ export function SiteHeader() {
       </div>
 
       <header className="sticky top-0 z-40 border-b border-gold/20 bg-[#faf6ee]/92 backdrop-blur-md">
-        <div className="mx-auto flex max-w-site items-center justify-between gap-3 px-4 py-3 md:px-8">
+        <div className="mx-auto flex max-w-site items-center justify-between gap-3 px-4 py-3.5 md:px-8 md:py-4">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -47,13 +47,13 @@ export function SiteHeader() {
             >
               <IconMenu />
             </button>
-            <Link href="/" className="flex items-center gap-2.5">
+            <Link href="/" className="flex items-center">
               <Image
                 src="/brand/logo-wordmark-transparent.png"
                 alt="PARAMBU organics"
-                width={180}
-                height={95}
-                className="h-10 w-auto object-contain md:h-12"
+                width={360}
+                height={190}
+                className="h-14 w-auto object-contain sm:h-16 md:h-[4.75rem]"
                 priority
               />
             </Link>
