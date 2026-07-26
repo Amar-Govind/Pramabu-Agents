@@ -15,12 +15,13 @@ class TrendScoutAgent(BaseAgent):
         season = context.get("season", "general")
         fallback = {
             "trends": [
-                "POV / day-in-the-life product usage",
-                "Before-after stain/clean transformations",
-                "Value-for-money pack comparisons",
-                "Regional festival / monsoon / summer routines",
-                "ASMR unboxing and first-use moments",
-                "Myth-busting household cleaning tips",
+                "POV morning self-care rituals with oil and soap",
+                "Handcrafted process / behind-the-scenes making",
+                "Ingredient spotlight (neem, coconut, rose, charcoal)",
+                "Terrace garden before-after with coco pith",
+                "ASMR unboxing and first-use lather moments",
+                "Myth-busting organic vs chemical personal care",
+                "Festival / seasonal natural wellness routines",
             ]
         }
         result = complete_json(
