@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --forest: #1b4332;
+  --leaf: #2d6a4f;
+  --moss: #40916c;
+  --mist: #e8f0ea;
+  --sand: #f3efe6;
+  --ink: #14201a;
+  --clay: #8a6a3d;
+  --background: #f7f4ee;
+  --foreground: #14201a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--foreground);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(64, 145, 108, 0.18), transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, rgba(27, 67, 50, 0.12), transparent 50%),
+    linear-gradient(180deg, #f7f4ee 0%, #eef3ef 45%, #f7f4ee 100%);
+  min-height: 100vh;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cpath fill='%231b4332' d='M80 8c18 24 28 44 28 62S98 102 80 126C62 102 52 88 52 70S62 32 80 8z'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  z-index: 0;
+}
+
+main,
+header,
+footer {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-rise {
+  animation: rise 0.8s ease-out both;
+}
+
+.animate-rise-delay {
+  animation: rise 0.9s ease-out 0.15s both;
+}
+
+.animate-rise-delay-2 {
+  animation: rise 0.9s ease-out 0.3s both;
+}
+
+.animate-drift {
+  animation: drift 7s ease-in-out infinite;
+}
+
+.animate-fade {
+  animation: fade-in 1s ease-out both;
+}
+
+.leaf-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(45, 106, 79, 0.45), transparent);
+}

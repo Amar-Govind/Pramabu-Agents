@@ -10,7 +10,8 @@ We are shipping **Phase 1 MVP now** — a runnable weekly pipeline that coordina
 |---|---|---|
 | **0 – Today** | Run pipeline against Parambu Organics brand bible + [parambu.in](https://parambu.in) | Ready |
 | **1 – This sprint** | LLM mode + human review loop for weekly content/ads/site actions | In progress |
-| **2 – Next** | Social drafts, ads APIs, marketplace listings, approval workflow | Planned |
+| **1b – Storefront** | Custom Next.js site MVP in `/storefront` (home, shop, PDP, cart) | In progress |
+| **2 – Next** | Razorpay checkout, social drafts, ads APIs, approval workflow | Planned |
 | **3 – Scale** | CRM, influencer, supply chain, crisis/PR, closed-loop learning | Planned |
 
 ### Why this starting point
@@ -37,7 +38,7 @@ Building every agent at once stalls delivery. The fastest path to value:
 11. Analytics & BI  
 12. QA (approval gate)
 
-## Quick start
+## Quick start — agents
 
 ```bash
 python3 -m venv .venv
@@ -53,6 +54,16 @@ python -m pramabu_agents agents
 # Run this week's campaign pack (no API key needed)
 python -m pramabu_agents weekly --print
 ```
+
+## Quick start — custom storefront
+
+```bash
+cd storefront
+npm install
+npm run dev
+```
+
+Open http://localhost:3000. Includes home, shop, category pages, product pages, and cart. Live checkout remains on https://parambu.in until Razorpay is added.
 
 Outputs land in `output/`:
 

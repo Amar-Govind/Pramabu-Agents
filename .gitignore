@@ -13,3 +13,9 @@ venv/
 .DS_Store
 output/
 *.log
+node_modules/
+.next/
+storefront/.next/
+storefront/node_modules/
+storefront/out/
+*.tsbuildinfo
