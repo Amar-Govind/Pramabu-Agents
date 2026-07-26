@@ -63,6 +63,24 @@ def pack_to_markdown(pack: CampaignPack) -> str:
     lines.extend(["", "## Growth Opportunities"])
     lines.extend(f"- {item}" for item in pack.growth_opportunities or ["_None_"])
 
+    lines.extend(["", "## Marketplace Actions"])
+    lines.extend(f"- {item}" for item in pack.marketplace_actions or ["_None_"])
+
+    lines.extend(["", "## Influencer / UGC Plan"])
+    lines.extend(f"- {item}" for item in pack.influencer_plan or ["_None_"])
+
+    lines.extend(["", "## CRM Actions"])
+    lines.extend(f"- {item}" for item in pack.crm_actions or ["_None_"])
+
+    lines.extend(["", "## Supply Chain"])
+    lines.extend(f"- {item}" for item in pack.supply_chain_actions or ["_None_"])
+
+    lines.extend(["", "## Crisis & PR"])
+    lines.extend(f"- {item}" for item in pack.crisis_pr_plan or ["_None_"])
+
+    lines.extend(["", "## Localization"])
+    lines.extend(f"- {item}" for item in pack.localization_plan or ["_None_"])
+
     lines.extend(["", "## Analytics Plan"])
     lines.extend(f"- {item}" for item in pack.analytics_plan or ["_None_"])
 

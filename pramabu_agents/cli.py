@@ -54,10 +54,16 @@ def cmd_agents(verbose: bool = False) -> None:
         ("E-commerce Website", "PDP/site improvement actions"),
         ("Performance Marketing", "Paid media allocation plan"),
         ("Business Growth", "Options to improve the business"),
+        ("Marketplace", "Amazon/Flipkart listing actions"),
+        ("Influencer", "Creator seeding and UGC briefs"),
+        ("CRM", "Lifecycle, retention, and reorder flows"),
+        ("Supply Chain", "Inventory, QC, and fulfillment readiness"),
+        ("Crisis & PR", "Brand-safe response and reputation plan"),
+        ("Localization", "Tamil/English bilingual content plan"),
         ("Analytics & BI", "Measurement and learning loop"),
         ("QA", "Approval gate before publish"),
     ]
-    table = Table(title="Parambu Organics MVP Agents")
+    table = Table(title="Parambu Organics Full Agent Suite")
     table.add_column("Agent")
     table.add_column("Role")
     for name, role in rows:
@@ -66,9 +72,9 @@ def cmd_agents(verbose: bool = False) -> None:
     if verbose:
         console.print(
             Panel(
-                "Phase 1 ships these 12 roles. Later phases add influencer, CRM, supply chain, "
-                "marketplace, crisis/PR, and localization agents.",
-                title="Roadmap note",
+                "Full suite is wired into the weekly pipeline. Live API publishing "
+                "(social, ads, marketplaces) remains a later integration step.",
+                title="Status",
             )
         )
 
@@ -90,12 +96,12 @@ Phase 1 — This sprint
 
 Phase 2 — Next
 • Performance ads API hooks (Meta/Google)
-• Marketplace listing agent
 • Human approval UI / Slack notifications
+• Marketplace / CRM draft connectors
 
 Phase 3 — Scale
-• CRM, influencer, supply chain, crisis agents
 • Closed-loop learning from analytics winners
+• Live publishing + inventory sync
 """,
             title="Start Plan",
             expand=False,
