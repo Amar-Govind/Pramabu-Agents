@@ -146,8 +146,50 @@ body {
 
 .chat-panel {
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: auto 1fr auto;
   min-height: 0;
+}
+
+.chat-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(120deg, rgba(27, 67, 50, 0.96), rgba(27, 67, 50, 0.84)),
+    radial-gradient(circle at 90% 20%, rgba(214, 170, 132, 0.35), transparent 40%);
+  color: #f7f1e4;
+}
+.chat-heading-label {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(247, 241, 228, 0.7);
+}
+.chat-heading h2 {
+  margin: 4px 0 0;
+  font-family: var(--display);
+  font-size: 1.55rem;
+  font-weight: 650;
+  color: #fffaf0;
+}
+.chat-heading-sub {
+  margin: 4px 0 0;
+  font-size: 0.84rem;
+  color: rgba(247, 241, 228, 0.78);
+}
+.chat-heading-badge {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(214, 170, 132, 0.55);
+  background: rgba(214, 170, 132, 0.18);
+  color: #f7f1e4;
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .messages {
@@ -156,6 +198,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+.agent-list li.active {
+  border-color: var(--gold);
+  background: rgba(214, 170, 132, 0.16);
 }
 
 .msg {

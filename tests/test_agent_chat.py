@@ -23,12 +23,32 @@ def test_chat_turn_creates_downloadable_outputs(tmp_path):
         attachment_paths=[brief],
     )
 
-    assert "Poster" in result["reply"] or "poster" in result["reply"].lower()
+    assert result["agent"] == "Poster Production"
+    assert "Neem" in result["reply"] or "neem" in result["reply"].lower()
     assert result["files"]
     assert any(f["name"].endswith(".png") for f in result["files"])
     assert any(f["name"].endswith(".md") for f in result["files"])
     for item in result["files"]:
         assert Path(item["path"]).exists()
+
+
+def test_chat_replies_differ_by_request(tmp_path):
+    rose = run_chat_turn(
+        message="create posters for rose soap",
+        session_dir=tmp_path / "rose",
+        attachment_paths=[],
+    )
+    crm = run_chat_turn(
+        message="run crm agent for repeat purchase",
+        session_dir=tmp_path / "crm",
+        attachment_paths=[],
+    )
+
+    assert rose["agent"] == "Poster Production"
+    assert crm["agent"] == "CRM"
+    assert rose["reply"] != crm["reply"]
+    assert "CRM" in crm["reply"] or "crm" in crm["reply"].lower() or "Welcome" in crm["reply"] or "reorder" in crm["reply"].lower()
+    assert "Rose" in rose["reply"] or "rose" in rose["reply"].lower()
 
 
 def test_extract_text_from_txt(tmp_path):

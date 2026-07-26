@@ -68,10 +68,12 @@ async def chat(
 
     return {
         "session_id": sid,
+        "agent": result.get("agent", "Orchestrator"),
         "reply": result["reply"],
         "files": result["files"],
         "intent": result.get("intent"),
         "mode": result.get("mode"),
+        "focus": result.get("focus"),
         "pack": result.get("pack"),
         "uploads": [path.name for path in saved],
     }

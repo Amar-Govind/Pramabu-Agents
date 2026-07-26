@@ -1,6 +1,8 @@
 const state = {
   sessionId: localStorage.getItem("parambuChatSession") || "",
   files: [],
+  agents: [],
+  activeAgent: "Orchestrator",
 };
 
 const messagesEl = document.getElementById("messages");
@@ -13,6 +15,23 @@ const dropzoneEl = document.getElementById("dropzone");
 const sendBtn = document.getElementById("sendBtn");
 const clearBtn = document.getElementById("clearBtn");
 const modePill = document.getElementById("modePill");
+const activeAgentName = document.getElementById("activeAgentName");
+const activeAgentRole = document.getElementById("activeAgentRole");
+const activeAgentBadge = document.getElementById("activeAgentBadge");
+
+function setActiveAgent(name, role = "", badge = "") {
+  state.activeAgent = name || "Orchestrator";
+  activeAgentName.textContent = state.activeAgent;
+  if (role) activeAgentRole.textContent = role;
+  else {
+    const found = state.agents.find((a) => a.name === state.activeAgent);
+    activeAgentRole.textContent = found?.role || "Specialist agent";
+  }
+  if (badge) activeAgentBadge.textContent = badge;
+  [...agentListEl.querySelectorAll("li")].forEach((li) => {
+    li.classList.toggle("active", li.dataset.name === state.activeAgent);
+  });
+}
 
 function addMessage({ role, text, files = [], uploads = [], meta = "" }) {
   const div = document.createElement("div");
@@ -86,17 +105,23 @@ async function loadAgents() {
   try {
     const res = await fetch("/api/agents");
     const data = await res.json();
+    state.agents = data.agents || [];
     agentListEl.innerHTML = "";
-    for (const agent of data.agents || []) {
+    for (const agent of state.agents) {
       const li = document.createElement("li");
+      li.dataset.name = agent.name;
       li.innerHTML = `<strong>${agent.name}</strong><span>${agent.role}</span>`;
       li.style.cursor = "pointer";
       li.addEventListener("click", () => {
-        inputEl.value = `Run ${agent.name} agent`;
+        setActiveAgent(agent.name, agent.role, "Selected");
+        if (agent.key === "weekly") inputEl.value = "Run weekly campaign";
+        else if (agent.name === "Poster Production") inputEl.value = "Create posters";
+        else inputEl.value = `Run ${agent.name} agent`;
         inputEl.focus();
       });
       agentListEl.appendChild(li);
     }
+    setActiveAgent("Orchestrator", "Full weekly campaign pipeline", "Ready");
   } catch {
     agentListEl.innerHTML = "<li><strong>Could not load agents</strong><span>Is the server running?</span></li>";
   }
@@ -124,6 +149,7 @@ formEl.addEventListener("submit", async (event) => {
   renderFilePills();
   sendBtn.disabled = true;
   modePill.textContent = "Agents working…";
+  activeAgentBadge.textContent = "Working…";
 
   try {
     const res = await fetch("/api/chat", { method: "POST", body: form });
@@ -132,13 +158,21 @@ formEl.addEventListener("submit", async (event) => {
 
     state.sessionId = data.session_id;
     localStorage.setItem("parambuChatSession", state.sessionId);
-    modePill.textContent = `${data.mode || "template"} · ${data.intent || "chat"}`;
+
+    const agent = data.agent || "Orchestrator";
+    const found = state.agents.find((a) => a.name === agent);
+    setActiveAgent(agent, found?.role || "", `${data.mode || "template"} · ${data.intent || "chat"}`);
+    modePill.textContent = agent;
+
+    const focusBits = [];
+    if (data.focus?.products?.length) focusBits.push(data.focus.products.join(", "));
+    const focusNote = focusBits.length ? ` · Focus: ${focusBits.join(" · ")}` : "";
 
     addMessage({
       role: "assistant",
       text: data.reply,
       files: data.files || [],
-      meta: "Parambu Agents",
+      meta: `${agent}${focusNote}`,
     });
   } catch (err) {
     addMessage({
@@ -146,6 +180,7 @@ formEl.addEventListener("submit", async (event) => {
       text: err.message || "Something went wrong.",
     });
     modePill.textContent = "Error";
+    activeAgentBadge.textContent = "Error";
   } finally {
     sendBtn.disabled = false;
   }
@@ -157,9 +192,10 @@ clearBtn.addEventListener("click", () => {
   state.files = [];
   renderFilePills();
   messagesEl.innerHTML = "";
+  setActiveAgent("Orchestrator", "Full weekly campaign pipeline", "Ready");
   addMessage({
     role: "system",
-    text: "New chat started. Upload a brief or ask for a weekly campaign.",
+    text: "New chat started. Select an agent above or ask for a weekly campaign.",
   });
   modePill.textContent = "Ready";
 });
@@ -187,6 +223,6 @@ dropzoneEl.addEventListener("drop", (e) => {
 
 addMessage({
   role: "system",
-  text: "Welcome. Ask any agent for help, or upload images/documents as input context. Generated posters and reports will appear as download chips.",
+  text: "Welcome. Pick an agent from the left, or type a request. Mentions like “rose soap” or “crm” change the reply.",
 });
 loadAgents();
