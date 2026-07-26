@@ -49,21 +49,13 @@ export function SiteHeader() {
             </button>
             <Link href="/" className="flex items-center gap-2.5">
               <Image
-                src="/brand/logo-gold.png"
-                alt="Parambu Organics rose gold logo"
-                width={44}
-                height={44}
-                className="h-11 w-11 object-contain"
+                src="/brand/logo-wordmark-transparent.png"
+                alt="PARAMBU organics"
+                width={180}
+                height={95}
+                className="h-10 w-auto object-contain md:h-12"
                 priority
               />
-              <span className="leading-tight">
-                <span className="block font-display text-xl text-forest md:text-2xl">
-                  Parambu Organics
-                </span>
-                <span className="hidden text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-deep sm:block">
-                  Everyday Pure & Natural
-                </span>
-              </span>
             </Link>
           </div>
 

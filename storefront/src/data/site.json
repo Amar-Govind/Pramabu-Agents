@@ -2,7 +2,8 @@
   "name": "Parambu Organics",
   "tagline": "Everyday Pure & Natural",
   "website": "https://parambu.in",
-  "logo": "/brand/logo-gold.png",
+  "logo": "/brand/logo-wordmark-transparent.png",
+  "logoMark": "/brand/logo-gold.png",
   "colors": {
     "gold": "#D6AA84",
     "goldLight": "#E8C9AD",
