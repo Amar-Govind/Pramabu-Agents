@@ -1,6 +1,6 @@
-# Pramabu Agents
+# Parambu Agents
 
-Multi-agent system for FMCG brand operations: content, social, e-commerce, marketing, and growth.
+Multi-agent system for **Parambu Organics** ([parambu.in](https://parambu.in)): content, social, e-commerce, marketing, and growth.
 
 ## Start here (immediate)
 
@@ -8,7 +8,7 @@ We are shipping **Phase 1 MVP now** — a runnable weekly pipeline that coordina
 
 | Phase | Focus | Status |
 |---|---|---|
-| **0 – Today** | Run pipeline in template mode, customize `brand/brand_bible.yaml` | Ready |
+| **0 – Today** | Run pipeline against Parambu Organics brand bible + [parambu.in](https://parambu.in) | Ready |
 | **1 – This sprint** | LLM mode + human review loop for weekly content/ads/site actions | In progress |
 | **2 – Next** | Social drafts, ads APIs, marketplace listings, approval workflow | Planned |
 | **3 – Scale** | CRM, influencer, supply chain, crisis/PR, closed-loop learning | Planned |
@@ -67,12 +67,16 @@ cp .env.example .env
 python -m pramabu_agents weekly --objective "Grow D2C repeat purchase"
 ```
 
-## Customize your brand
+## Brand source of truth
 
-Edit `brand/brand_bible.yaml`:
+Configured for **Parambu Organics** at **https://parambu.in** (WooCommerce).
+
+Categories: Oils · Soap · Gardening
+
+Edit `brand/brand_bible.yaml` to refine:
 
 - Brand voice / forbidden claims
-- Real SKUs and benefits
+- SKUs, PDP URLs, and benefits
 - Channels and weekly defaults
 - Goals and KPIs
 

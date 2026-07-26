@@ -12,25 +12,32 @@ class EcommerceAgent(BaseAgent):
 
     def run(self, pack: CampaignPack, context: dict[str, Any]) -> CampaignPack:
         products = self.brand.get("products", [])
+        site = self.website
         actions = [
-            "Audit PDP hero image contrast and first 80 characters of title for mobile.",
-            "Add trust strip: delivery promise, secure payment, easy returns.",
-            "Create homepage banner aligned to this week's lead creative.",
-            "Ensure WhatsApp/support CTA is visible above the fold on mobile.",
+            f"Audit homepage hero on {site} against this week's lead creative and CTA.",
+            "Keep Shop by category (Oils / Soap / Gardening) above the fold on mobile.",
+            "Add trust strip: organic/handcrafted story, secure payment, easy support.",
+            "Ensure WhatsApp/support and Login/Register flows remain friction-light.",
+            "Review active discount badges for margin safety while keeping conversion.",
+            "Improve product image consistency across soap, oil, and gardening PDPs.",
         ]
-        for product in products:
+        for product in products[:6]:
             name = product.get("name", "SKU")
-            actions.append(
-                f"Refresh {name} bullets to mirror campaign benefits: "
-                + ", ".join(product.get("benefits", [])[:3])
-            )
-            channels = product.get("channels", [])
-            if "amazon" in channels or "blinkit" in channels:
-                actions.append(f"Sync marketplace listing keywords for {name} with campaign hooks.")
+            url = product.get("url", site)
+            benefits = ", ".join(product.get("benefits", [])[:3])
+            actions.append(f"Refresh PDP bullets for {name} ({url}): {benefits}.")
 
         if any(i.format == "poster" for i in pack.ideas):
-            actions.append("Export poster creative variants for website promo strip and PDP gallery.")
+            actions.append(
+                f"Export poster variants for {site} homepage promo strip and PDP gallery."
+            )
 
+        actions.append("Sync campaign hooks into WooCommerce short descriptions and meta titles.")
         pack.ecommerce_actions = actions
-        pack.agent_trace.append(self.trace("Planned e-commerce improvements", {"actions": len(actions)}))
+        pack.agent_trace.append(
+            self.trace(
+                f"Planned e-commerce improvements for {site}",
+                {"actions": len(actions), "website": site},
+            )
+        )
         return pack

@@ -20,17 +20,23 @@ class CreativeProductionAgent(BaseAgent):
         for idea in pack.ideas[:6]:
             fallback = {
                 "headline": idea.hook,
-                "body": f"{idea.angle}. Built for everyday homes with {self.brand_name}.",
-                "visual_direction": f"{style}. Colors: {colors}. Product hero center frame.",
+                "body": (
+                    f"{idea.angle}. Crafted for everyday pure & natural living with "
+                    f"{self.brand_name}."
+                ),
+                "visual_direction": (
+                    f"{style}. Colors: {colors}. Product hero center frame. "
+                    f"End card with {self.website}."
+                ),
                 "script_beats": [
                     "0-2s: bold hook on screen",
                     "2-6s: product in real use",
                     "6-10s: benefit proof",
-                    "10-12s: CTA + brand lockup",
+                    f"10-12s: CTA + brand lockup + {self.website}",
                 ]
                 if idea.format in {"reel", "short"}
                 else [],
-                "hashtags": [f"#{self.brand_name}", "#EverydayFresh", "#HomeCare"],
+                "hashtags": ["#ParambuOrganics", "#EverydayPureAndNatural", "#OrganicLiving"],
             }
             result = complete_json(
                 system=(

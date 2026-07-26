@@ -17,7 +17,7 @@ console = Console()
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="pramabu",
-        description="Pramabu FMCG multi-agent system",
+        description="Parambu Organics multi-agent system",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -57,7 +57,7 @@ def cmd_agents(verbose: bool = False) -> None:
         ("Analytics & BI", "Measurement and learning loop"),
         ("QA", "Approval gate before publish"),
     ]
-    table = Table(title="Pramabu MVP Agents")
+    table = Table(title="Parambu Organics MVP Agents")
     table.add_column("Agent")
     table.add_column("Role")
     for name, role in rows:
@@ -80,13 +80,13 @@ def cmd_plan() -> None:
 
 Phase 0 — Today
 • Run template-mode weekly pipeline (no API key needed)
-• Fill brand/brand_bible.yaml with real SKUs and voice
+• Brand bible points to https://parambu.in (Parambu Organics)
 • Review output/ campaign pack with humans
 
 Phase 1 — This sprint
 • Add OPENAI_API_KEY for stronger ideation/creatives
 • Connect one social channel draft workflow
-• Connect website checklist to your store backlog
+• Turn e-commerce actions into WooCommerce tasks for parambu.in
 
 Phase 2 — Next
 • Performance ads API hooks (Meta/Google)

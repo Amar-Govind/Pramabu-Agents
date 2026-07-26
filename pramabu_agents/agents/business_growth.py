@@ -13,21 +13,22 @@ class BusinessGrowthAgent(BaseAgent):
 
     def run(self, pack: CampaignPack, context: dict[str, Any]) -> CampaignPack:
         n = int(context.get("growth_ideas", self.brand.get("weekly_defaults", {}).get("growth_ideas", 5)))
+        site = self.website
         fallback = {
             "opportunities": [
-                "Launch a 2-SKU starter bundle for first-time D2C buyers.",
-                "Add subscription/refill option with 5-8% loyalty incentive.",
-                "Partner with 10 micro-creators in Tier-1/2 cities for UGC seeding.",
-                "Create Blinkit/Zepto-specific creatives optimized for thumbnail readability.",
-                "Run a win-back WhatsApp flow for customers inactive 45+ days.",
-                "Test regional language captions (Hindi + one state language) on top posts.",
-                "Introduce limited festive packaging sleeve without changing core SKU.",
+                f"Launch a first-order soap sampler bundle on {site} for new D2C buyers.",
+                "Create Oil + Soap and Gardening starter kits to raise average order value.",
+                "Partner with 10 micro-creators in Tamil Nadu / Kerala for UGC seeding.",
+                "Add WhatsApp reorder + abandoned-cart recovery for WooCommerce shoppers.",
+                "Publish Tamil + English captions on top Reels to expand local reach.",
+                "Improve SEO landing pages for 'organic soap', 'virgin coconut oil', and 'coco pith'.",
+                "Collect review photos from terrace-garden customers for gardening PDP trust.",
             ]
         }
         result = complete_json(
-            system="You are a growth strategist for FMCG. Return JSON with opportunities (array of strings).",
+            system="You are a growth strategist for organic D2C FMCG. Return JSON with opportunities (array of strings).",
             user=(
-                f"Brand={self.brand_name}. Objective={pack.objective}. "
+                f"Brand={self.brand_name}. Website={site}. Objective={pack.objective}. "
                 f"Insights={pack.insights}. Suggest {n} practical growth opportunities."
             ),
             fallback=fallback,

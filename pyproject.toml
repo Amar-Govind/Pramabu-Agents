@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pramabu-agents"
 version = "0.1.0"
-description = "Multi-agent system for FMCG brand operations (Pramabu)"
+description = "Multi-agent system for Parambu Organics (parambu.in)"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

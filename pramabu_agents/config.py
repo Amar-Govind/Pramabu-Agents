@@ -22,8 +22,11 @@ def load_brand(path: Path | None = None) -> dict[str, Any]:
 
     # Optional env overrides
     brand = data.setdefault("brand", {})
-    brand["name"] = os.getenv("BRAND_NAME", brand.get("name", "Pramabu"))
-    brand["category"] = os.getenv("BRAND_CATEGORY", brand.get("category", "FMCG"))
+    brand["name"] = os.getenv("BRAND_NAME", brand.get("name", "Parambu Organics"))
+    brand["category"] = os.getenv("BRAND_CATEGORY", brand.get("category", "Organic FMCG"))
+    brand["website"] = os.getenv("BRAND_WEBSITE", brand.get("website", "https://parambu.in"))
+    channels = data.setdefault("channels", {})
+    channels["website"] = brand["website"]
     return data
 
 

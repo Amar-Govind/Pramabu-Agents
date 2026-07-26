@@ -15,77 +15,82 @@ class ContentIdeationAgent(BaseAgent):
         n = int(context.get("content_pieces", self.brand.get("weekly_defaults", {}).get("content_pieces", 7)))
         products = self.brand.get("products", [])
         hero = products[0]["name"] if products else self.brand_name
+        soap = next((p["name"] for p in products if p.get("category") == "Soap"), "Neem Soap")
+        garden = next(
+            (p["name"] for p in products if p.get("category") == "Gardening"), "Coco Pith (Low EC)"
+        )
         channels = self.brand.get("channels", {}).get("social", ["instagram", "youtube_shorts"])
+        site = self.website
 
         seed_ideas = [
             ContentIdea(
-                title=f"{hero}: 10-second stain rescue",
+                title=f"{hero}: morning self-care ritual",
                 format="reel",
-                hook="Wait… this stain came out in one wash?",
-                angle="Transformation proof",
-                cta="Shop the value pack today",
+                hook="One cold-pressed habit for everyday glow",
+                angle="Oil as daily nourishment",
+                cta=f"Shop now at {site}",
                 platforms=channels[:2],
-                trend_tags=["before-after", "transformation"],
+                trend_tags=["routine", "self-care"],
                 priority=1,
             ),
             ContentIdea(
-                title="Family morning routine poster",
+                title=f"{soap}: handcrafted clean poster",
                 format="poster",
-                hook="Fresh start. Real value.",
-                angle="Everyday ritual branding",
-                cta="Add to cart",
+                hook="Pure heritage care for your skin",
+                angle="Handcrafted organic soap story",
+                cta="Shop soap essentials",
                 platforms=["instagram", "facebook"],
-                trend_tags=["routine", "family"],
-                priority=2,
+                trend_tags=["heritage", "organic"],
+                priority=1,
             ),
             ContentIdea(
-                title="Myth vs fact: fragrance vs clean",
+                title="Soap finder: which bar for your skin?",
                 format="carousel",
-                hook="Smell ≠ clean. Here's the truth.",
-                angle="Education + trust",
-                cta="See what actually works",
+                hook="Neem, Rose, Charcoal, Vetpalai — pick yours",
+                angle="Education + product discovery",
+                cta=f"Explore soaps on {site}",
                 platforms=["instagram"],
-                trend_tags=["myth-busting"],
+                trend_tags=["guide", "carousel"],
                 priority=2,
             ),
             ContentIdea(
-                title="Quick commerce unboxing ASMR",
+                title=f"{garden}: terrace garden transformation",
                 format="short",
-                hook="From doorstep to first wash",
-                angle="Convenience + sensory",
-                cta="Order in minutes",
+                hook="Same pot. Healthier roots.",
+                angle="Gardening proof / moisture retention",
+                cta="Shop gardening essentials",
                 platforms=["youtube_shorts", "instagram"],
-                trend_tags=["asmr", "unboxing"],
+                trend_tags=["before-after", "gardening"],
                 priority=1,
             ),
             ContentIdea(
-                title="Festival home-ready checklist",
+                title="What's inside organic vs regular soap",
+                format="reel",
+                hook="Read the bar before you buy the bar",
+                angle="Myth-busting / trust",
+                cta="Choose pure & natural",
+                platforms=["instagram", "youtube_shorts"],
+                trend_tags=["myth-busting", "trust"],
+                priority=2,
+            ),
+            ContentIdea(
+                title="Family wellness shelf essentials",
                 format="poster",
-                hook="Guest-ready home in 3 steps",
-                angle="Seasonal utility",
-                cta="Get festival pack",
+                hook="Oil + soap + garden — one natural home",
+                angle="Cross-category bundle storytelling",
+                cta="Build your Parambu shelf",
                 platforms=["instagram", "facebook"],
-                trend_tags=["seasonal", "checklist"],
+                trend_tags=["bundle", "home"],
                 priority=3,
             ),
             ContentIdea(
-                title="Value pack math for families",
+                title="Customer story: chemical-free switch",
                 format="reel",
-                hook="Same clean. Smarter spend.",
-                angle="Price-value storytelling",
-                cta="Compare packs",
-                platforms=["instagram", "youtube_shorts"],
-                trend_tags=["value", "comparison"],
-                priority=1,
-            ),
-            ContentIdea(
-                title="Customer tip of the week",
-                format="reel",
-                hook="A tip our customers swear by",
+                hook="Why families are switching to Parambu",
                 angle="UGC-style social proof",
-                cta="Try it and tell us",
+                cta="Join the pure & natural routine",
                 platforms=["instagram"],
-                trend_tags=["ugc", "tips"],
+                trend_tags=["ugc", "testimonial"],
                 priority=3,
             ),
         ]
@@ -93,11 +98,13 @@ class ContentIdeationAgent(BaseAgent):
         fallback = {"ideas": [i.model_dump() for i in seed_ideas[:n]]}
         result = complete_json(
             system=(
-                "You create FMCG content ideas. Return JSON: {ideas:[{title,format,hook,angle,cta,platforms,trend_tags,priority}]} "
-                "Formats: poster|reel|short|carousel. Priority 1 is highest."
+                "You create FMCG/organic brand content ideas for Parambu Organics. "
+                "Return JSON: {ideas:[{title,format,hook,angle,cta,platforms,trend_tags,priority}]} "
+                "Formats: poster|reel|short|carousel. Priority 1 is highest. "
+                f"Website CTA should prefer {site}."
             ),
             user=(
-                f"Brand={self.brand_name}. Objective={pack.objective}. "
+                f"Brand={self.brand_name}. Website={site}. Objective={pack.objective}. "
                 f"Trends={pack.trends}. Insights={pack.insights}. Generate {n} ideas."
             ),
             fallback=fallback,

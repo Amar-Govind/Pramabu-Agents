@@ -44,7 +44,7 @@ class Orchestrator:
         week_of: str | None = None,
         context: dict[str, Any] | None = None,
     ) -> CampaignPack:
-        brand_name = self.brand.get("brand", {}).get("name", "Pramabu")
+        brand_name = self.brand.get("brand", {}).get("name", "Parambu Organics")
         goals = self.brand.get("goals", {}).get("primary", [])
         pack = CampaignPack(
             brand=brand_name,

@@ -11,7 +11,8 @@ def test_weekly_pipeline_produces_approved_pack(tmp_path):
         context={"content_pieces": 5, "growth_ideas": 4, "weekly_ad_budget_inr": 10000},
     )
 
-    assert pack.brand == "Pramabu"
+    assert pack.brand == "Parambu Organics"
+    assert any("parambu.in" in action for action in pack.ecommerce_actions)
     assert pack.week_of == "2026-07-26"
     assert len(pack.trends) >= 3
     assert len(pack.insights) >= 3

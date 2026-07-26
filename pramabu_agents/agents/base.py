@@ -15,7 +15,13 @@ class BaseAgent(ABC):
 
     @property
     def brand_name(self) -> str:
-        return self.brand.get("brand", {}).get("name", "Pramabu")
+        return self.brand.get("brand", {}).get("name", "Parambu Organics")
+
+    @property
+    def website(self) -> str:
+        return self.brand.get("brand", {}).get("website") or self.brand.get("channels", {}).get(
+            "website", "https://parambu.in"
+        )
 
     def trace(self, content: str, data: dict[str, Any] | None = None) -> AgentMessage:
         return AgentMessage(role=self.role, content=content, data=data or {})

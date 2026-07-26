@@ -24,8 +24,14 @@ class TrendScoutAgent(BaseAgent):
             ]
         }
         result = complete_json(
-            system="You are a social trend scout for an Indian FMCG brand. Return JSON with key trends (array of strings).",
-            user=f"Brand={self.brand_name}. Season={season}. Find current short-form content trends useful for posters and Reels.",
+            system=(
+                "You are a social trend scout for an Indian organic D2C brand "
+                "(soaps, oils, gardening). Return JSON with key trends (array of strings)."
+            ),
+            user=(
+                f"Brand={self.brand_name}. Website={self.website}. Season={season}. "
+                "Find current short-form content trends useful for posters and Reels."
+            ),
             fallback=fallback,
         )
         pack.trends = list(result.get("trends", fallback["trends"]))[:8]
