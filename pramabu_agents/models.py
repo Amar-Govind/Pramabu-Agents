@@ -18,6 +18,12 @@ class AgentRole(str, Enum):
     ECOMMERCE = "ecommerce"
     PERFORMANCE_MARKETING = "performance_marketing"
     BUSINESS_GROWTH = "business_growth"
+    MARKETPLACE = "marketplace"
+    INFLUENCER = "influencer"
+    CRM = "crm"
+    SUPPLY_CHAIN = "supply_chain"
+    CRISIS_PR = "crisis_pr"
+    LOCALIZATION = "localization"
     ANALYTICS = "analytics"
     QA = "qa"
 
@@ -73,6 +79,12 @@ class CampaignPack(BaseModel):
     ecommerce_actions: list[str] = Field(default_factory=list)
     ad_plan: list[str] = Field(default_factory=list)
     growth_opportunities: list[str] = Field(default_factory=list)
+    marketplace_actions: list[str] = Field(default_factory=list)
+    influencer_plan: list[str] = Field(default_factory=list)
+    crm_actions: list[str] = Field(default_factory=list)
+    supply_chain_actions: list[str] = Field(default_factory=list)
+    crisis_pr_plan: list[str] = Field(default_factory=list)
+    localization_plan: list[str] = Field(default_factory=list)
     analytics_plan: list[str] = Field(default_factory=list)
     qa_flags: list[str] = Field(default_factory=list)
     approved: bool = False
