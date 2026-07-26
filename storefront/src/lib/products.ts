@@ -1,5 +1,9 @@
 import productsData from "@/data/products.json";
-import { getCollection, getCollectionForProductCategory } from "@/lib/collections";
+import {
+  getCollection,
+  getCollectionForProductCategory,
+  getSubCategory,
+} from "@/lib/collections";
 
 export type ProductImage = {
   src: string;
@@ -38,7 +42,13 @@ export function getProductsByCategory(category: string): Product[] {
   );
 }
 
-export function getProductsByCollection(slug: string): Product[] {
+export function getProductsByCollection(slug: string, subSlug?: string): Product[] {
+  if (subSlug) {
+    const matched = getSubCategory(slug, subSlug);
+    if (!matched) return [];
+    return getProductsByCategory(matched.sub.productCategory);
+  }
+
   const collection = getCollection(slug);
   if (!collection) return [];
   return products.filter((product) =>
@@ -59,12 +69,14 @@ export function searchProducts(query: string): Product[] {
   if (!q) return products;
   return products.filter((product) => {
     const collection = getCollectionForProductCategory(product.category);
+    const childTitles =
+      collection?.children.map((child) => child.title).join(" ") ?? "";
     return [
       product.name,
       product.shortName,
       product.category,
       collection?.title ?? "",
-      collection?.shortLabel ?? "",
+      childTitles,
       product.tagline,
       product.description,
     ]

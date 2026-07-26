@@ -21,13 +21,24 @@ export function ShopToolbar({
   const filtered = useMemo(() => {
     let list = [...products];
     if (category !== "all") {
-      const collection = collections.find((item) => item.slug === category);
+      const [parent, child] = category.split("/");
+      const collection = collections.find((item) => item.slug === parent);
       if (collection) {
-        list = list.filter((product) =>
-          collection.productCategories.some(
-            (item) => item.toLowerCase() === product.category.toLowerCase()
-          )
-        );
+        if (child) {
+          const sub = collection.children.find((item) => item.slug === child);
+          if (sub) {
+            list = list.filter(
+              (product) =>
+                product.category.toLowerCase() === sub.productCategory.toLowerCase()
+            );
+          }
+        } else {
+          list = list.filter((product) =>
+            collection.productCategories.some(
+              (item) => item.toLowerCase() === product.category.toLowerCase()
+            )
+          );
+        }
       }
     }
     if (query.trim()) {
@@ -70,9 +81,17 @@ export function ShopToolbar({
             >
               <option value="all">All categories</option>
               {collections.map((collection) => (
-                <option key={collection.slug} value={collection.slug}>
-                  {collection.title}
-                </option>
+                <optgroup key={collection.slug} label={collection.title}>
+                  <option value={collection.slug}>All {collection.title}</option>
+                  {collection.children.map((child) => (
+                    <option
+                      key={`${collection.slug}-${child.slug}`}
+                      value={`${collection.slug}/${child.slug}`}
+                    >
+                      {child.title}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           ) : null}

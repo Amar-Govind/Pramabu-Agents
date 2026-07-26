@@ -6,7 +6,7 @@ import { collections } from "@/lib/collections";
 export function SiteFooter() {
   return (
     <footer className="mt-20 border-t border-gold/25 bg-forest text-sand">
-      <div className="mx-auto grid max-w-site gap-10 px-5 py-14 md:grid-cols-[1.3fr_1fr_1fr_1fr] md:px-8">
+      <div className="mx-auto grid max-w-site gap-10 px-5 py-14 md:grid-cols-[1.2fr_1fr_1fr_1fr] md:px-8">
         <div>
           <div className="flex items-center gap-3">
             <Image
@@ -19,45 +19,46 @@ export function SiteFooter() {
             <p className="font-display text-3xl text-gold-light">Parambu Organics</p>
           </div>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-sand/80">
-            Everyday pure & natural care — hair care oils, skin care soaps,
-            and cocopeat for healthier homes and gardens.
+            Everyday pure & natural care — hair care, skin care, and gardening
+            essentials for healthier homes.
           </p>
         </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-light">Shop</p>
-          <div className="mt-4 flex flex-col gap-2 text-sm">
-            <Link href="/shop" className="hover:text-gold-light">All products</Link>
-            {collections.map((collection) => (
+
+        {collections.map((collection) => (
+          <div key={collection.slug}>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-light">
+              {collection.title}
+            </p>
+            <div className="mt-4 flex flex-col gap-2 text-sm">
               <Link
-                key={collection.slug}
                 href={`/shop/${collection.slug}`}
                 className="hover:text-gold-light"
               >
-                {collection.title}
-                <span className="ml-1 text-sand/50">({collection.shortLabel})</span>
+                All {collection.title}
               </Link>
-            ))}
+              {collection.children.map((child) => (
+                <Link
+                  key={child.slug}
+                  href={`/shop/${collection.slug}/${child.slug}`}
+                  className="text-sand/75 hover:text-gold-light"
+                >
+                  {child.title}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-light">Help</p>
-          <div className="mt-4 flex flex-col gap-2 text-sm text-sand/80">
-            <span>Shipping across India</span>
-            <span>Secure payments</span>
-            <span>Easy support via WhatsApp</span>
-            <a href="https://parambu.in" className="hover:text-gold-light" target="_blank" rel="noreferrer">
-              Live store: parambu.in
-            </a>
+        ))}
+      </div>
+
+      <div className="mx-auto max-w-site px-5 pb-8 md:px-8">
+        <div className="rounded-xl border border-sand/15 p-5 md:flex md:items-center md:justify-between">
+          <p className="text-sm text-sand/80">Get natural living tips and new drops.</p>
+          <div className="mt-3 md:mt-0 md:w-80">
+            <NewsletterForm />
           </div>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-light">Stay close</p>
-          <p className="mt-4 text-sm text-sand/80">
-            Get natural living tips and new drops.
-          </p>
-          <NewsletterForm />
         </div>
       </div>
+
       <div className="border-t border-sand/10 px-5 py-4 text-center text-xs text-sand/55 md:px-8">
         © {new Date().getFullYear()} Parambu Organics. All rights reserved.
       </div>

@@ -6,7 +6,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ProductPurchasePanel } from "@/components/ProductPurchasePanel";
 import { ProductRail } from "@/components/ProductRail";
-import { getCollectionForProductCategory } from "@/lib/collections";
+import { getSubCategoryForProductCategory } from "@/lib/collections";
 import {
   getProduct,
   getProductsBySlugs,
@@ -38,9 +38,13 @@ export default async function ProductPage({ params }: Props) {
 
   const recommended = getProductsBySlugs(product.recommended);
   const alsoBought = getProductsBySlugs(product.alsoBought);
-  const collection = getCollectionForProductCategory(product.category);
-  const collectionHref = collection ? `/shop/${collection.slug}` : "/shop";
-  const collectionLabel = collection?.title ?? product.category;
+  const matched = getSubCategoryForProductCategory(product.category);
+  const collectionHref = matched ? `/shop/${matched.collection.slug}` : "/shop";
+  const subHref = matched
+    ? `/shop/${matched.collection.slug}/${matched.sub.slug}`
+    : "/shop";
+  const collectionLabel = matched?.collection.title ?? product.category;
+  const subLabel = matched?.sub.title ?? product.category;
 
   return (
     <div className="mx-auto max-w-site px-5 py-12 md:px-8 md:py-16">
@@ -49,6 +53,7 @@ export default async function ProductPage({ params }: Props) {
           { label: "Home", href: "/" },
           { label: "Shop", href: "/shop" },
           { label: collectionLabel, href: collectionHref },
+          { label: subLabel, href: subHref },
           { label: product.shortName },
         ]}
       />
@@ -58,11 +63,10 @@ export default async function ProductPage({ params }: Props) {
 
         <div className="animate-rise">
           <Link
-            href={collectionHref}
+            href={subHref}
             className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-deep"
           >
-            {collectionLabel}
-            {collection ? ` · ${collection.shortLabel}` : ""}
+            {collectionLabel} · {subLabel}
           </Link>
           <h1 className="mt-3 font-display text-4xl text-ink md:text-5xl">{product.name}</h1>
           <p className="mt-4 text-lg text-ink/70">{product.tagline}</p>

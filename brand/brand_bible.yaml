@@ -33,9 +33,12 @@ brand:
     logo: /brand/logo-gold.png
     style: champagne rose-gold leaf accent (#D6AA84), natural product photography, earthy textures, clean typography, heritage organic feel
   menu:
-    - Hair Care (Oils)
-    - Skin Care (Soap)
-    - Gardening (Cocopeat)
+    Hair Care:
+      - Oils
+    Skin Care:
+      - Soap
+    Gardening:
+      - Cocopeat
   compliance:
     required_disclaimers: []
     forbidden_claims:

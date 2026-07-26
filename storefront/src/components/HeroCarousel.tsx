@@ -63,7 +63,9 @@ export function HeroCarousel() {
       autoPlayMs={6500}
       showDots
       ariaLabel="Homepage banners"
-      className="[&>div:last-child]:absolute [&>div:last-child]:bottom-6 [&>div:last-child]:left-0 [&>div:last-child]:right-0 [&>div:last-child]:mt-0"
+      variant="light"
+      controls="overlay"
+      className="[&>div:last-child]:absolute [&>div:last-child]:bottom-6 [&>div:last-child]:left-0 [&>div:last-child]:right-0 [&>div:last-child]:z-20 [&>div:last-child]:mt-0"
     />
   );
 }

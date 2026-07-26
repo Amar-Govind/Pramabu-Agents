@@ -15,31 +15,31 @@
   "banners": [
     {
       "title": "Everyday Pure & Natural",
-      "subtitle": "Hair care oils, skin care soaps, and cocopeat for every home.",
+      "subtitle": "Hair care, skin care, and gardening essentials for every home.",
       "image": "/banners/hero-banner.png",
       "href": "/shop",
       "cta": "Shop all essentials"
     },
     {
-      "title": "Skin Care Soaps",
-      "subtitle": "Heritage herbal bars cured slowly for a gentle daily cleanse.",
+      "title": "Skin Care",
+      "subtitle": "Heritage herbal soaps cured slowly for a gentle daily cleanse.",
       "image": "/banners/sub-banner-soap.png",
-      "href": "/shop/skin-care",
-      "cta": "Shop skin care"
+      "href": "/shop/skin-care/soap",
+      "cta": "Shop soap"
     },
     {
-      "title": "Hair Care Oils",
+      "title": "Hair Care",
       "subtitle": "Cold pressed virgin coconut oil for soft, nourished hair.",
       "image": "/banners/sub-banner-oil.png",
-      "href": "/shop/hair-care",
-      "cta": "Shop hair care"
+      "href": "/shop/hair-care/oils",
+      "cta": "Shop oils"
     },
     {
-      "title": "Gardening Cocopeat",
-      "subtitle": "Moisture-rich coco pith and chips for thriving terrace gardens.",
+      "title": "Gardening",
+      "subtitle": "Moisture-rich cocopeat for thriving terrace gardens.",
       "image": "/banners/sub-banner-gardening.png",
-      "href": "/shop/gardening",
-      "cta": "Shop gardening"
+      "href": "/shop/gardening/cocopeat",
+      "cta": "Shop cocopeat"
     }
   ],
   "categoryTiles": [
@@ -47,19 +47,19 @@
       "title": "Hair Care",
       "href": "/shop/hair-care",
       "image": "/categories/category-oils.png",
-      "copy": "Oils for soft, nourished hair"
+      "copy": "Oils and more for nourished hair"
     },
     {
       "title": "Skin Care",
       "href": "/shop/skin-care",
       "image": "/categories/category-soap.png",
-      "copy": "Soaps for gentle daily skin care"
+      "copy": "Soaps and more for gentle skin care"
     },
     {
       "title": "Gardening",
       "href": "/shop/gardening",
       "image": "/categories/category-gardening.png",
-      "copy": "Cocopeat for thriving gardens"
+      "copy": "Cocopeat and more for thriving plants"
     }
   ],
   "testimonials": [

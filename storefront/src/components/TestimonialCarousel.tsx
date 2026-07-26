@@ -33,6 +33,7 @@ export function TestimonialCarousel() {
       autoPlayMs={5000}
       ariaLabel="Customer testimonials"
       variant="dark"
+      controls="below"
     />
   );
 }
