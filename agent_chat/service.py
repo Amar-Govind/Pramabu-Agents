@@ -5,6 +5,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+from agent_chat.assistant_local import local_chat_reply
 from agent_chat.focus import extract_focus
 from agent_chat.history import as_llm_messages, load_history, save_history
 from agent_chat.knowledge import (
@@ -247,69 +248,6 @@ def _run_tool(
     return "Orchestrator", pack, "\n".join(facts)
 
 
-def _conversational_fallback(
-    *,
-    message: str,
-    knowledge: str,
-    tool_facts: str | None,
-    agent_name: str,
-) -> str:
-    """Chatty non-LLM response grounded in retrieved knowledge."""
-    lines = []
-    if tool_facts:
-        lines.append(f"Done — I ran **{agent_name}** for you.")
-        lines.append("")
-        lines.append(tool_facts)
-        lines.append("")
-        lines.append("You can download the generated files from the chips below. Want me to tweak the tone, focus on another SKU, or draft captions next?")
-        return "\n".join(lines)
-
-    # Knowledge-grounded Q&A style
-    lowered = message.lower()
-    brand = load_brand()
-    focus = extract_focus(message, brand)
-    matched = focus.get("products") or []
-
-    if any(g in lowered for g in ("hello", "hi ", "hey", "good morning", "good evening")):
-        return (
-            "Hi — I’m your Parambu Assistant. I know the Parambu Organics brand bible, products, "
-            "voice, and your uploaded files.\n\n"
-            "Ask me anything (e.g. “What’s special about Rose Soap?”), or ask me to create posters / "
-            "run a weekly campaign."
-        )
-
-    if matched:
-        lines.append("Here’s what I know from the Parambu knowledge base:")
-        lines.append("")
-        for product in matched[:3]:
-            benefits = "; ".join(product.get("benefits") or [])
-            lines.append(
-                f"**{product.get('name')}** ({product.get('category')}) — ₹{product.get('price_inr')}. "
-                f"{benefits}. Shop: {product.get('url')}"
-            )
-        lines.append("")
-        lines.append("Want a caption, poster, or comparison with another product?")
-        return "\n".join(lines)
-
-    if "voice" in lowered or "tone" in lowered or "claim" in lowered:
-        voice = (brand.get("brand") or {}).get("voice") or {}
-        return (
-            f"Parambu’s voice is **{voice.get('tone', 'warm and natural')}**.\n\n"
-            f"Do: {'; '.join(voice.get('do') or [])}\n\n"
-            f"Don’t: {'; '.join(voice.get('dont') or [])}\n\n"
-            "I can rewrite any draft in this voice if you paste it."
-        )
-
-    # Generic grounded answer using retrieved chunk titles/text
-    snippet = knowledge.strip().split("\n\n")[:3]
-    body = "\n\n".join(snippet) if snippet else "I have the Parambu brand bible loaded."
-    return (
-        "Based on the Parambu knowledge base:\n\n"
-        f"{body}\n\n"
-        "Ask a follow-up, or tell me to create posters / run an agent when you want deliverables."
-    )
-
-
 def _system_prompt(knowledge: str) -> str:
     return f"""You are Parambu Assistant — a helpful, conversational AI for Parambu Organics.
 You chat like a thoughtful teammate in a chat window (similar to ChatGPT/Cursor): clear, natural, concise, and useful.
@@ -341,7 +279,6 @@ def run_chat_turn(
     history = load_history(session_dir)
     attachment_summary = summarize_attachments(attachment_paths)
     focus = extract_focus(message, brand)
-    mode = "LLM" if llm_enabled() else "knowledge"
     tool = _wants_tool(message)
 
     extra = attachment_chunks(attachment_summary)
@@ -386,18 +323,20 @@ def run_chat_turn(
         )
 
     llm_messages = as_llm_messages(history) + [{"role": "user", "content": user_content}]
-    fallback = _conversational_fallback(
+    fallback = local_chat_reply(
         message=message,
+        history=history,
         knowledge=knowledge,
         tool_facts=tool_facts,
         agent_name=agent_name,
     )
-    reply = complete_chat(
+    reply, llm_meta = complete_chat(
         system=_system_prompt(knowledge),
         messages=llm_messages,
         fallback=fallback,
         temperature=0.55,
     )
+    mode = "LLM" if llm_meta.get("ok") else "knowledge"
 
     # Persist conversation
     history.append({"role": "user", "content": message})
@@ -423,6 +362,7 @@ def run_chat_turn(
         "files": files,
         "intent": intent,
         "mode": mode,
+        "llm": llm_meta,
         "focus": {
             "products": focus.get("product_names", []),
             "categories": focus.get("categories", []),

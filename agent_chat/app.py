@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 
 from agent_chat.attachments import safe_filename
 from agent_chat.service import list_agents, run_chat_turn
+from pramabu_agents.config import load_env, llm_enabled, openai_model
 
 ROOT = Path(__file__).resolve().parent
 STATIC_DIR = ROOT / "static"
@@ -17,6 +18,7 @@ CHAT_OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(title="Parambu Agent Chat", version="1.0.0")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+load_env()
 
 
 @app.get("/")
@@ -26,7 +28,13 @@ def index() -> FileResponse:
 
 @app.get("/api/health")
 def health() -> dict:
-    return {"ok": True, "service": "parambu-agent-chat"}
+    return {
+        "ok": True,
+        "service": "parambu-agent-chat",
+        "llm_enabled": llm_enabled(),
+        "model": openai_model() if llm_enabled() else None,
+        "mode": "LLM" if llm_enabled() else "knowledge",
+    }
 
 
 @app.get("/api/agents")
@@ -68,11 +76,12 @@ async def chat(
 
     return {
         "session_id": sid,
-        "agent": result.get("agent", "Orchestrator"),
+        "agent": result.get("agent", "Parambu Assistant"),
         "reply": result["reply"],
         "files": result["files"],
         "intent": result.get("intent"),
         "mode": result.get("mode"),
+        "llm": result.get("llm"),
         "focus": result.get("focus"),
         "pack": result.get("pack"),
         "uploads": [path.name for path in saved],

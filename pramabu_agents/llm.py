@@ -40,15 +40,26 @@ def complete_chat(
     messages: list[dict[str, str]],
     fallback: str,
     temperature: float = 0.5,
-) -> str:
-    """Free-form conversational completion with history."""
+) -> tuple[str, dict[str, Any]]:
+    """Free-form conversational completion with history.
+
+    Returns (text, meta) where meta includes ok/error details for the UI.
+    """
     if not llm_enabled():
-        return fallback
+        return fallback, {
+            "ok": False,
+            "provider": "local-knowledge",
+            "error": "OPENAI_API_KEY is not set",
+        }
 
     try:
         from openai import OpenAI
     except ImportError:
-        return fallback
+        return fallback, {
+            "ok": False,
+            "provider": "local-knowledge",
+            "error": "openai package is not installed",
+        }
 
     try:
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -58,6 +69,20 @@ def complete_chat(
             messages=[{"role": "system", "content": system}, *messages],
         )
         content = (response.choices[0].message.content or "").strip()
-        return content or fallback
-    except Exception:
-        return fallback
+        if not content:
+            return fallback, {
+                "ok": False,
+                "provider": "openai",
+                "error": "Empty model response",
+            }
+        return content, {
+            "ok": True,
+            "provider": "openai",
+            "model": openai_model(),
+        }
+    except Exception as exc:  # noqa: BLE001
+        return fallback, {
+            "ok": False,
+            "provider": "local-knowledge",
+            "error": str(exc),
+        }

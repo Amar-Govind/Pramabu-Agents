@@ -16,8 +16,16 @@
             <p>Chat with brand knowledge · upload files · download generated outputs</p>
           </div>
         </div>
-        <div class="pill"><span class="dot"></span><span id="modePill">Ready</span></div>
+        <div class="pill"><span class="dot" id="statusDot"></span><span id="modePill">Checking LLM…</span></div>
       </header>
+
+      <div id="setupBanner" class="setup-banner hidden">
+        <strong>Live LLM is off.</strong>
+        Add your OpenAI key to enable full Parambu LLM chat:
+        <code>cp .env.example .env</code> then set <code>OPENAI_API_KEY=sk-...</code> and restart
+        <code>python -m agent_chat.app</code>.
+        Knowledge-base chat still works meanwhile.
+      </div>
 
       <div class="shell">
         <aside class="sidebar">

@@ -31,9 +31,29 @@ body {
   margin: 0 auto;
   padding: 20px;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto 1fr;
   gap: 16px;
 }
+
+.setup-banner {
+  border: 1px solid rgba(177, 135, 103, 0.45);
+  background: rgba(214, 170, 132, 0.18);
+  color: var(--forest-deep);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.setup-banner.hidden { display: none; }
+.setup-banner code {
+  font-size: 0.8rem;
+  background: rgba(255,255,255,0.7);
+  padding: 0.1em 0.35em;
+  border-radius: 6px;
+}
+.pill.warn { border-color: #c9875a; color: #7a3f16; }
+.pill.warn .dot { background: #c9875a; box-shadow: 0 0 0 4px rgba(201, 135, 90, 0.2); }
+.pill.ok .dot { background: #2d6a4f; box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.2); }
 
 .topbar {
   display: flex;

@@ -15,9 +15,12 @@ const dropzoneEl = document.getElementById("dropzone");
 const sendBtn = document.getElementById("sendBtn");
 const clearBtn = document.getElementById("clearBtn");
 const modePill = document.getElementById("modePill");
+const statusDot = document.getElementById("statusDot");
+const setupBanner = document.getElementById("setupBanner");
 const activeAgentName = document.getElementById("activeAgentName");
 const activeAgentRole = document.getElementById("activeAgentRole");
 const activeAgentBadge = document.getElementById("activeAgentBadge");
+const modePillWrap = modePill?.parentElement;
 
 function escapeHtml(text) {
   return text
@@ -125,6 +128,29 @@ function addFiles(fileList) {
   renderFilePills();
 }
 
+async function loadStatus() {
+  try {
+    const res = await fetch("/api/health");
+    const data = await res.json();
+    if (data.llm_enabled) {
+      modePill.textContent = `LLM · ${data.model || "ready"}`;
+      modePillWrap?.classList.add("ok");
+      modePillWrap?.classList.remove("warn");
+      setupBanner?.classList.add("hidden");
+      activeAgentBadge.textContent = "LLM ready";
+    } else {
+      modePill.textContent = "Knowledge mode · add API key";
+      modePillWrap?.classList.add("warn");
+      modePillWrap?.classList.remove("ok");
+      setupBanner?.classList.remove("hidden");
+      activeAgentBadge.textContent = "Knowledge mode";
+    }
+  } catch {
+    modePill.textContent = "Server offline";
+    modePillWrap?.classList.add("warn");
+  }
+}
+
 async function loadAgents() {
   try {
     const res = await fetch("/api/agents");
@@ -197,7 +223,15 @@ formEl.addEventListener("submit", async (event) => {
       found?.role || "Brand knowledge + specialist tools",
       `${data.mode || "knowledge"} · ${data.intent || "chat"}`
     );
-    modePill.textContent = agent;
+    if (data.mode === "LLM") {
+      modePill.textContent = `LLM · ${agent}`;
+      modePillWrap?.classList.add("ok");
+      modePillWrap?.classList.remove("warn");
+    } else {
+      modePill.textContent = `Knowledge · ${agent}`;
+      modePillWrap?.classList.add("warn");
+      modePillWrap?.classList.remove("ok");
+    }
 
     addMessage({
       role: "assistant",
@@ -205,6 +239,10 @@ formEl.addEventListener("submit", async (event) => {
       files: data.files || [],
       meta: agent,
     });
+
+    if (data.llm && data.llm.ok === false && data.llm.error && data.intent === "chat") {
+      // Keep quiet for normal knowledge answers; banner already explains setup.
+    }
   } catch (err) {
     addMessage({
       role: "system",
@@ -264,4 +302,5 @@ addMessage({
   role: "system",
   text: "Hi — I’m **Parambu Assistant**. I use your brand bible, product catalog, and any files you upload as my knowledge base.\n\nAsk naturally, like chatting with an LLM. Example: “What’s special about Rose Soap?” or “Create posters for neem soap”.",
 });
+loadStatus();
 loadAgents();

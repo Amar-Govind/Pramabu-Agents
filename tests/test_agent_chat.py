@@ -27,8 +27,20 @@ def test_chat_answers_from_knowledge_without_tool(tmp_path):
     )
     assert result["agent"] == "Parambu Assistant"
     assert result["intent"] == "chat"
+    assert result["mode"] == "knowledge"
+    assert result["llm"]["ok"] is False
     assert "Rose" in result["reply"] or "rose" in result["reply"].lower()
     assert result["files"] == []
+
+
+def test_local_caption_generation(tmp_path):
+    result = run_chat_turn(
+        message="Write an Instagram caption for Virgin Coconut Oil",
+        session_dir=tmp_path / "caption",
+        attachment_paths=[],
+    )
+    assert "Virgin Coconut Oil" in result["reply"]
+    assert "Shop now" in result["reply"] or "parambu.in" in result["reply"]
 
 
 def test_chat_turn_creates_downloadable_outputs(tmp_path):
