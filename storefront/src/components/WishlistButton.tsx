@@ -1,5 +1,6 @@
 "use client";
 
+import { IconHeart } from "@/components/icons";
 import { useWishlist } from "@/store/wishlist";
 
 export function WishlistButton({
@@ -17,16 +18,18 @@ export function WishlistButton({
     <button
       type="button"
       aria-label={active ? "Remove from wishlist" : "Add to wishlist"}
-      onClick={() => toggle(slug)}
-      className={`inline-flex h-10 w-10 items-center justify-center rounded-md border transition ${
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        toggle(slug);
+      }}
+      className={`relative z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-soft transition ${
         active
-          ? "border-gold bg-gold/15 text-gold-deep"
-          : "border-forest/15 bg-white text-forest hover:border-gold hover:text-gold-deep"
+          ? "border-gold bg-gold text-ink"
+          : "border-gold/50 bg-white text-gold-deep hover:bg-gold hover:text-ink"
       } ${className}`}
     >
-      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden>
-        <path d="M12 21s-6.7-4.35-9.33-8.1C.8 10.1 1.2 6.8 3.7 5.2c2.1-1.35 4.7-.7 6.1 1.15L12 8.2l2.2-1.85c1.4-1.85 4-2.5 6.1-1.15 2.5 1.6 2.9 4.9 1.03 7.7C18.7 16.65 12 21 12 21z" />
-      </svg>
+      <IconHeart className="h-[18px] w-[18px]" filled={active} />
     </button>
   );
 }

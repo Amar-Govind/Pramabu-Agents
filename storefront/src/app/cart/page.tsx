@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { CheckoutSteps } from "@/components/CheckoutSteps";
+import { ProductRail } from "@/components/ProductRail";
 import { QuantitySelector } from "@/components/QuantitySelector";
 import { formatINR, products } from "@/lib/products";
-import { ProductRail } from "@/components/ProductRail";
 import { useCart } from "@/store/cart";
 
 export default function CartPage() {
@@ -29,13 +30,24 @@ export default function CartPage() {
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-deep">Cart</p>
       <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
         <h1 className="font-display text-5xl text-ink">Your bag</h1>
-        <button
-          type="button"
-          onClick={openCart}
-          className="rounded-md border border-gold/40 px-4 py-2 text-sm font-semibold text-gold-deep hover:bg-gold/10"
-        >
-          Open quick cart
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={openCart}
+            className="rounded-md border border-gold/40 px-4 py-2 text-sm font-semibold text-gold-deep hover:bg-gold/10"
+          >
+            Quick cart
+          </button>
+          <Link
+            href="/checkout"
+            className="rounded-md bg-gold px-4 py-2 text-sm font-semibold text-ink hover:bg-gold-light"
+          >
+            Checkout
+          </Link>
+        </div>
+      </div>
+      <div className="mt-6 max-w-2xl">
+        <CheckoutSteps current="cart" />
       </div>
 
       {!items.length ? (
@@ -118,14 +130,12 @@ export default function CartPage() {
                 ? `Add ${formatINR(999 - subtotal)} more for free shipping.`
                 : "You’ve unlocked free shipping."}
             </p>
-            <a
-              href="https://parambu.in/shop/"
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              href="/checkout"
               className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-gold px-5 py-3 text-sm font-semibold text-ink hover:bg-gold-light"
             >
-              Checkout on parambu.in
-            </a>
+              Proceed to checkout
+            </Link>
             <Link
               href="/shop"
               className="mt-3 inline-flex w-full items-center justify-center px-5 py-3 text-sm font-semibold text-forest"

@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
+import { CheckoutSteps } from "@/components/CheckoutSteps";
 import { QuantitySelector } from "@/components/QuantitySelector";
+import { IconClose, IconTrash } from "@/components/icons";
 import { formatINR } from "@/lib/products";
 import { useCart } from "@/store/cart";
 
@@ -18,6 +20,7 @@ export function CartDrawer() {
     0
   );
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
+  const remainingForFreeShip = Math.max(0, 999 - subtotal);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -43,18 +46,40 @@ export function CartDrawer() {
         onClick={closeCart}
       />
       <aside className="animate-drawer absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-[#fffaf0] shadow-soft">
-        <div className="flex items-center justify-between border-b border-gold/20 px-5 py-4">
-          <div>
-            <p className="font-display text-2xl text-ink">Your cart</p>
-            <p className="text-xs text-ink/55">{count} item{count === 1 ? "" : "s"}</p>
+        <div className="border-b border-gold/20 px-5 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-display text-2xl text-ink">Your cart</p>
+              <p className="text-xs text-ink/55">{count} item{count === 1 ? "" : "s"}</p>
+            </div>
+            <button
+              type="button"
+              onClick={closeCart}
+              aria-label="Close cart"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-forest/15 text-ink hover:border-gold"
+            >
+              <IconClose />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={closeCart}
-            className="rounded-md border border-forest/15 px-3 py-2 text-sm text-ink hover:border-gold"
-          >
-            Close
-          </button>
+          <div className="mt-4">
+            <CheckoutSteps current="cart" />
+          </div>
+          <div className="mt-4">
+            <div className="mb-1 flex justify-between text-[11px] text-ink/55">
+              <span>Free shipping</span>
+              <span>
+                {remainingForFreeShip === 0
+                  ? "Unlocked"
+                  : `${formatINR(remainingForFreeShip)} away`}
+              </span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-mist">
+              <div
+                className="h-full rounded-full bg-gold transition-all"
+                style={{ width: `${Math.min(100, (subtotal / 999) * 100)}%` }}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-5">
@@ -92,10 +117,11 @@ export function CartDrawer() {
                       />
                       <button
                         type="button"
+                        aria-label="Remove item"
                         onClick={() => removeItem(product.slug)}
-                        className="text-xs text-ink/50 underline-offset-2 hover:text-gold-deep hover:underline"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-forest/15 text-ink/60 hover:border-gold hover:text-gold-deep"
                       >
-                        Remove
+                        <IconTrash className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -111,23 +137,22 @@ export function CartDrawer() {
             <span className="text-lg font-semibold text-forest">{formatINR(subtotal)}</span>
           </div>
           <p className="mt-2 text-xs text-ink/50">
-            Shipping & taxes calculated at checkout.
+            Next: add delivery details, then pay securely.
           </p>
+          <Link
+            href="/checkout"
+            onClick={closeCart}
+            className="mt-4 flex w-full items-center justify-center rounded-md bg-gold px-4 py-3 text-sm font-semibold text-ink hover:bg-gold-light"
+          >
+            Proceed to checkout
+          </Link>
           <Link
             href="/cart"
             onClick={closeCart}
-            className="mt-4 flex w-full items-center justify-center rounded-md border border-forest/20 px-4 py-3 text-sm font-semibold text-forest hover:border-gold"
+            className="mt-3 flex w-full items-center justify-center rounded-md border border-forest/20 px-4 py-3 text-sm font-semibold text-forest hover:border-gold"
           >
-            View full cart
+            Review full cart
           </Link>
-          <a
-            href="https://parambu.in/shop/"
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 flex w-full items-center justify-center rounded-md bg-gold px-4 py-3 text-sm font-semibold text-ink hover:bg-gold-light"
-          >
-            Checkout on parambu.in
-          </a>
         </div>
       </aside>
     </div>

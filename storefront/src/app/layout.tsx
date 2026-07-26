@@ -24,7 +24,9 @@ export const metadata: Metadata = {
     "Everyday pure & natural care from Parambu Organics — handcrafted soaps, virgin coconut oil, and coco gardening essentials.",
   metadataBase: new URL("https://parambu.in"),
   icons: {
-    icon: "/brand/logo-gold.png",
+    icon: [{ url: "/favicon.png", type: "image/png" }],
+    apple: ["/brand/logo-gold.png"],
+    shortcut: ["/favicon.png"],
   },
 };
 

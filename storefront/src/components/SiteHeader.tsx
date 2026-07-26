@@ -2,6 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import {
+  IconCart,
+  IconClose,
+  IconHeart,
+  IconMenu,
+  IconSearch,
+} from "@/components/icons";
 import { useCart } from "@/store/cart";
 import { useUI } from "@/store/ui";
 import { useWishlist } from "@/store/wishlist";
@@ -36,11 +43,11 @@ export function SiteHeader() {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              className="rounded-md border border-forest/15 px-3 py-2 text-sm md:hidden"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-forest/15 bg-white text-forest md:hidden"
               onClick={openMobileNav}
               aria-label="Open menu"
             >
-              Menu
+              <IconMenu />
             </button>
             <Link href="/" className="flex items-center gap-2.5">
               <Image
@@ -74,17 +81,19 @@ export function SiteHeader() {
             <button
               type="button"
               onClick={openSearch}
-              className="rounded-md border border-forest/15 bg-white px-3 py-2 text-sm text-ink hover:border-gold"
+              aria-label="Search"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-forest/15 bg-white text-forest hover:border-gold hover:text-gold-deep"
             >
-              Search
+              <IconSearch />
             </button>
             <Link
               href="/wishlist"
-              className="relative hidden rounded-md border border-forest/15 bg-white px-3 py-2 text-sm text-ink hover:border-gold sm:inline-flex"
+              aria-label="Wishlist"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-md border border-forest/15 bg-white text-forest hover:border-gold hover:text-gold-deep"
             >
-              Wishlist
+              <IconHeart />
               {wishlistCount > 0 ? (
-                <span className="ml-1 inline-flex min-w-5 justify-center rounded-sm bg-gold px-1 text-[11px] font-bold text-ink">
+                <span className="absolute -right-1 -top-1 inline-flex min-w-5 justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-ink">
                   {wishlistCount}
                 </span>
               ) : null}
@@ -92,9 +101,11 @@ export function SiteHeader() {
             <button
               type="button"
               onClick={openCart}
-              className="inline-flex items-center gap-2 rounded-md bg-gold px-3.5 py-2 text-sm font-semibold text-ink transition hover:bg-gold-light"
+              aria-label="Open cart"
+              className="relative inline-flex h-10 items-center gap-2 rounded-md bg-gold px-3 text-sm font-semibold text-ink transition hover:bg-gold-light"
             >
-              Cart
+              <IconCart className="h-5 w-5" />
+              <span className="hidden sm:inline">Cart</span>
               <span className="inline-flex min-w-5 justify-center rounded-sm bg-forest px-1.5 text-[11px] font-bold text-sand">
                 {totalItems}
               </span>
@@ -109,8 +120,8 @@ export function SiteHeader() {
           <div className="absolute left-0 top-0 flex h-full w-[80%] max-w-xs flex-col bg-[#fffaf0] p-5 shadow-soft animate-rise">
             <div className="flex items-center justify-between">
               <p className="font-display text-2xl text-forest">Menu</p>
-              <button type="button" onClick={closeMobileNav} className="text-sm text-ink/60">
-                Close
+              <button type="button" onClick={closeMobileNav} aria-label="Close" className="text-ink/60">
+                <IconClose />
               </button>
             </div>
             <nav className="mt-8 flex flex-col gap-4 text-base font-medium text-ink">
@@ -119,12 +130,9 @@ export function SiteHeader() {
                   {link.label}
                 </Link>
               ))}
-              <Link href="/wishlist" onClick={closeMobileNav}>
-                Wishlist
-              </Link>
-              <Link href="/cart" onClick={closeMobileNav}>
-                Cart
-              </Link>
+              <Link href="/wishlist" onClick={closeMobileNav}>Wishlist</Link>
+              <Link href="/cart" onClick={closeMobileNav}>Cart</Link>
+              <Link href="/checkout" onClick={closeMobileNav}>Checkout</Link>
             </nav>
           </div>
         </div>

@@ -14,23 +14,30 @@
   },
   "banners": [
     {
+      "title": "Everyday Pure & Natural",
+      "subtitle": "Handcrafted soaps, cold-pressed oil, and coco growing media for every home.",
+      "image": "/banners/hero-banner.png",
+      "href": "/shop",
+      "cta": "Shop all essentials"
+    },
+    {
       "title": "Handcrafted Organic Soap",
-      "subtitle": "Essential daily nourishment for gentle skin care",
-      "image": "https://parambu.in/wp-content/uploads/2026/06/soapbannerHD-2048x1024.jpg",
+      "subtitle": "Heritage herbal bars cured slowly for a gentle daily cleanse.",
+      "image": "/banners/sub-banner-soap.png",
       "href": "/shop/soap",
       "cta": "Shop soaps"
     },
     {
       "title": "Virgin Coconut Oil",
-      "subtitle": "Cold pressed purity for family wellness",
-      "image": "https://parambu.in/wp-content/uploads/2026/07/VirginCocoOil.png",
+      "subtitle": "Cold pressed purity for skin, hair, and family wellness.",
+      "image": "/banners/sub-banner-oil.png",
       "href": "/product/virgin-coconut-oil",
       "cta": "Shop oil"
     },
     {
       "title": "Premium Coco Growing Media",
-      "subtitle": "Moisture-rich support for thriving gardens",
-      "image": "https://parambu.in/wp-content/uploads/2026/07/cocopithbannerOG.png",
+      "subtitle": "Moisture-rich coco pith and chips for thriving terrace gardens.",
+      "image": "/banners/sub-banner-gardening.png",
       "href": "/shop/gardening",
       "cta": "Shop gardening"
     }
@@ -39,34 +46,47 @@
     {
       "title": "Oils",
       "href": "/shop/oils",
-      "image": "https://parambu.in/wp-content/uploads/2026/07/VOilImge.png",
+      "image": "/categories/category-oils.png",
       "copy": "Cold processed virgin coconut oil"
     },
     {
       "title": "Soap",
       "href": "/shop/soap",
-      "image": "https://parambu.in/wp-content/uploads/2026/07/SoapImge.png",
+      "image": "/categories/category-soap.png",
       "copy": "Heritage herbal handcrafted bars"
     },
     {
       "title": "Gardening",
       "href": "/shop/gardening",
-      "image": "https://parambu.in/wp-content/uploads/2026/06/gardening.png",
+      "image": "/categories/category-gardening.png",
       "copy": "Coco pith and chips for healthy plants"
     }
   ],
   "testimonials": [
     {
       "name": "Murugan",
-      "quote": "Plant health has improved a lot. It\u2019s a genuine product and I would definitely recommend it."
+      "quote": "Plant health has improved a lot. It\u2019s a genuine product and I would definitely recommend it.",
+      "role": "Terrace gardener"
     },
     {
       "name": "Priya",
-      "quote": "The packaging was neat and the product quality is excellent. A trusted organic brand."
+      "quote": "The packaging was neat and the product quality is excellent. A trusted organic brand.",
+      "role": "Chennai"
     },
     {
       "name": "Lakshmi R",
-      "quote": "While searching for chemical-free products, I found Parambu Organics. Fully satisfied."
+      "quote": "While searching for chemical-free products, I found Parambu Organics. Fully satisfied.",
+      "role": "Homemaker"
+    },
+    {
+      "name": "Senthil Kumar",
+      "quote": "The coco pith has excellent moisture retention and is very useful for farming purposes.",
+      "role": "Farmer"
+    },
+    {
+      "name": "Suresh K",
+      "quote": "Parambu Organics coco pith is of very good quality. I can clearly see improved growth.",
+      "role": "Home gardener"
     }
   ]
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconCart, IconCheck } from "@/components/icons";
 import type { Product } from "@/lib/products";
 import { useCart } from "@/store/cart";
 
@@ -8,7 +9,7 @@ export function AddToCartButton({
   product,
   quantity = 1,
   className = "",
-  label = "Add to cart",
+  label = "Add",
 }: {
   product: Product;
   quantity?: number;
@@ -26,8 +27,9 @@ export function AddToCartButton({
         setAdded(true);
         window.setTimeout(() => setAdded(false), 1200);
       }}
-      className={`rounded-md bg-gold px-5 py-3 text-sm font-semibold text-ink transition hover:bg-gold-light ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-md bg-gold px-5 py-3 text-sm font-semibold text-ink transition hover:bg-gold-light ${className}`}
     >
+      {added ? <IconCheck className="h-4 w-4" /> : <IconCart className="h-4 w-4" />}
       {added ? "Added" : label}
     </button>
   );

@@ -31,7 +31,12 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
 
       <div className="mt-8 flex flex-wrap items-center gap-3">
         <QuantitySelector value={quantity} onChange={setQuantity} />
-        <AddToCartButton product={product} quantity={quantity} className="min-w-[160px]" />
+        <AddToCartButton
+          product={product}
+          quantity={quantity}
+          className="min-w-[180px]"
+          label="Add to cart"
+        />
         <WishlistButton slug={product.slug} />
       </div>
 
