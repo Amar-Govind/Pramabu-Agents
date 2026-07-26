@@ -1,0 +1,93 @@
+{
+  "name": "Parambu Organics",
+  "tagline": "Everyday Pure & Natural",
+  "website": "https://parambu.in",
+  "logo": "/brand/logo-wordmark-transparent.png",
+  "logoMark": "/brand/logo-gold.png",
+  "colors": {
+    "gold": "#D6AA84",
+    "goldLight": "#E8C9AD",
+    "goldDeep": "#B18767",
+    "forest": "#1B4332",
+    "leaf": "#2D6A4F",
+    "ink": "#14201A",
+    "sand": "#F7F1E4"
+  },
+  "banners": [
+    {
+      "title": "Everyday Pure & Natural",
+      "subtitle": "Hair care, skin care, and gardening essentials for every home.",
+      "image": "/banners/hero-banner.png",
+      "href": "/shop",
+      "cta": "Shop all essentials"
+    },
+    {
+      "title": "Skin Care",
+      "subtitle": "Heritage herbal soaps cured slowly for a gentle daily cleanse.",
+      "image": "/banners/sub-banner-soap.png",
+      "href": "/shop/skin-care/soap",
+      "cta": "Shop soap"
+    },
+    {
+      "title": "Hair Care",
+      "subtitle": "Cold pressed virgin coconut oil for soft, nourished hair.",
+      "image": "/banners/sub-banner-oil.png",
+      "href": "/shop/hair-care/oils",
+      "cta": "Shop oils"
+    },
+    {
+      "title": "Gardening",
+      "subtitle": "Moisture-rich cocopeat for thriving terrace gardens.",
+      "image": "/banners/sub-banner-gardening.png",
+      "href": "/shop/gardening/cocopeat",
+      "cta": "Shop cocopeat"
+    }
+  ],
+  "categoryTiles": [
+    {
+      "title": "Hair Care",
+      "href": "/shop/hair-care",
+      "image": "/categories/category-oils.png",
+      "copy": "Oils and more for nourished hair"
+    },
+    {
+      "title": "Skin Care",
+      "href": "/shop/skin-care",
+      "image": "/categories/category-soap.png",
+      "copy": "Soaps and more for gentle skin care"
+    },
+    {
+      "title": "Gardening",
+      "href": "/shop/gardening",
+      "image": "/categories/category-gardening.png",
+      "copy": "Cocopeat and more for thriving plants"
+    }
+  ],
+  "testimonials": [
+    {
+      "name": "Murugan",
+      "quote": "Plant health has improved a lot. It’s a genuine product and I would definitely recommend it.",
+      "role": "Terrace gardener"
+    },
+    {
+      "name": "Priya",
+      "quote": "The packaging was neat and the product quality is excellent. A trusted organic brand.",
+      "role": "Chennai"
+    },
+    {
+      "name": "Lakshmi R",
+      "quote": "While searching for chemical-free products, I found Parambu Organics. Fully satisfied.",
+      "role": "Homemaker"
+    },
+    {
+      "name": "Senthil Kumar",
+      "quote": "The coco pith has excellent moisture retention and is very useful for farming purposes.",
+      "role": "Farmer"
+    },
+    {
+      "name": "Suresh K",
+      "quote": "Parambu Organics coco pith is of very good quality. I can clearly see improved growth.",
+      "role": "Home gardener"
+    }
+  ]
+}

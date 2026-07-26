@@ -10,7 +10,8 @@ We are shipping **Phase 1 MVP now** — a runnable weekly pipeline that coordina
 |---|---|---|
 | **0 – Today** | Run pipeline against Parambu Organics brand bible + [parambu.in](https://parambu.in) | Ready |
 | **1 – Agents** | Full specialist agent suite in weekly campaign pack | Ready |
-| **2 – Next** | Social drafts, ads APIs, approval workflow, live connectors | Planned |
+| **1b – Storefront** | Custom Next.js site in `/storefront` with gold branding, gallery, recommendations, cart, coupons, reviews | In progress |
+| **2 – Next** | Razorpay checkout, social drafts, ads APIs, approval workflow, live connectors | Planned |
 | **3 – Scale** | Closed-loop learning from analytics winners | Planned |
 
 ### Why this starting point
@@ -43,7 +44,7 @@ Building every agent at once stalls delivery. The fastest path to value:
 17. Analytics & BI  
 18. QA (approval gate)
 
-## Quick start
+## Quick start — agents
 
 ```bash
 python3 -m venv .venv
@@ -59,6 +60,16 @@ python -m pramabu_agents agents
 # Run this week's campaign pack (no API key needed)
 python -m pramabu_agents weekly --print
 ```
+
+## Quick start — custom storefront
+
+```bash
+cd storefront
+npm install
+npm run dev
+```
+
+Open http://localhost:3000. Includes home, shop, category pages, product pages, cart, coupons, and reviews. Live checkout remains on https://parambu.in until Razorpay is added.
 
 Outputs land in `output/`:
 
@@ -119,6 +130,7 @@ pramabu_agents/
   cli.py                        # CLI entrypoint
   models.py                     # Shared schemas
   report.py                     # Markdown/JSON export
+storefront/                     # Next.js D2C storefront MVP
 tests/                          # Pipeline tests
 ```
 
@@ -135,3 +147,4 @@ pytest -q
 3. Website agent → WooCommerce / GitHub task export
 4. Simple approval UI or Slack “Approve / Reject”
 5. Live marketplace + CRM connectors for drafted actions
+6. Razorpay native checkout on the storefront

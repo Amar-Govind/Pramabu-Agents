@@ -1,0 +1,736 @@
+[
+  {
+    "id": 53651,
+    "slug": "virgin-coconut-oil",
+    "name": "Virgin Coconut Oil",
+    "shortName": "Virgin Coconut Oil",
+    "category": "Oils",
+    "price": 254,
+    "regularPrice": 299,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/Paramu_VirginCoconut_oil.png",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/Paramu_VirginCoconut_oil.png",
+        "alt": "Virgin Coconut Oil"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-27-2026-01_00_28-PM.png",
+        "alt": "Virgin Coconut Oil"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-15-2026-02_34_57-PM.png",
+        "alt": "Virgin Coconut Oil"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-18-2026-12_48_34-PM.png",
+        "alt": "Virgin Coconut Oil"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-15-2026-01_02_25-PM.png",
+        "alt": "Virgin Coconut Oil"
+      }
+    ],
+    "benefits": [
+      "Deeply nourishes skin, hair and supports everyday self-care",
+      "Provides natural moisture care",
+      "Helps reinforce skin hydration",
+      "Rich in Lauric Acid and antioxidants",
+      "Helps soothe skin irritation and dryness",
+      "Naturally nourishes and moisturizes delicate baby skin"
+    ],
+    "description": "Virgin Coconut Oil \u2013 Pure Coconut Goodness For generations, coconut has been cherished for its nourishing properties. Inspired by traditional coconut oil-making heritage , our Virgin Coconut Oil is extracted directly from fresh coconut milk using the gentle centrifuge method , ensuring its natural richness is preserved. A gentle choice for baby massage , providing natural nourishment and helping to moisturize delicate skin with the goodness of natural hydration. Rooted in traditional wisdom and guided by modern precision , every drop delivers pure and purposeful care for your skin, hair, and well-being. With no additives , no artificial ingredients , and no shortcuts , it is crafted to provide a legacy of pure care in every drop. A treasured 100 mL of Pure Coconut Goodness . Cold Processed and Unrefined Non-Bleached and Non-Deodorized",
+    "tagline": "Cold pressed coconut oil for daily wellness",
+    "inStock": true,
+    "rating": 4.8,
+    "reviewCount": 12,
+    "recommended": [],
+    "alsoBought": [
+      "neem-handcrafted-organic-soap",
+      "coconut-oil-soap",
+      "rose-soap"
+    ]
+  },
+  {
+    "id": 53649,
+    "slug": "vetpalai-soap",
+    "name": "Vetpalai Soap",
+    "shortName": "Vetpalai Soap",
+    "category": "Soap",
+    "price": 169,
+    "regularPrice": 199,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-Jun-1-2026-06_55_53-PM.png",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-Jun-1-2026-06_55_53-PM.png",
+        "alt": "Natural Vetpalai Soap for healthy skin care."
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/vetpalai-1-scaled.jpg",
+        "alt": "Vetpalai Soap"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/vetpalai_soap_portrait.png",
+        "alt": "Vetpalai Soap helps soothe and protect healthy skin naturally."
+      }
+    ],
+    "benefits": [
+      "Soothes dry, flaky and itchy skin",
+      "Helps maintain the skin\u2019s natural moisture balance",
+      "Nourishes with natural oils and herbal ingredients",
+      "Provides gentle cleansing without drying the skin"
+    ],
+    "description": "Vetpalai Soap \u2013 Skin Rescue Inspired by generations of botanical traditions, our Vetpalai Soap is crafted with oils infused with freshly harvested Vetpalai leaves , allowing their natural essence to be slowly absorbed over time. These enriched oils, along with premium butters , are transformed into soap using the traditional cold process method and patiently cured for 6\u20138 weeks. This extended curing period helps the soap mature naturally, creating a rich and creamy lather that provides a gentle and nourishing cleansing experience.",
+    "tagline": "Handcrafted organic bars for gentle daily care",
+    "inStock": true,
+    "rating": 4.7,
+    "reviewCount": 8,
+    "recommended": [
+      "charcoal-soap",
+      "green-gram-soap",
+      "rose-soap",
+      "manjistha-soap"
+    ],
+    "alsoBought": [
+      "virgin-coconut-oil",
+      "nalangu-maavu-soap",
+      "green-gram-soap"
+    ]
+  },
+  {
+    "id": 53647,
+    "slug": "charcoal-soap",
+    "name": "Charcoal Soap",
+    "shortName": "Charcoal Soap",
+    "category": "Soap",
+    "price": 169,
+    "regularPrice": 199,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-11-2026-03_35_20-PM.png",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-11-2026-03_35_20-PM.png",
+        "alt": "Natural Charcoal Soap for deep skin cleansing."
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/charcoal-soap-scaled.jpg",
+        "alt": "Charcoal Soap"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/charcoal_soap_portrait.png",
+        "alt": "Charcoal Soap"
+      }
+    ],
+    "benefits": [
+      "Helps remove dirt, excess oil, and surface impurities",
+      "Leaves skin feeling fresh, clean, and revitalized",
+      "Provides gentle cleansing with nourishing plant oils",
+      "Supports a balanced and healthy-looking complexion"
+    ],
+    "description": "Charcoal Soap \u2013 Nature\u2019s Detox Bar Crafted through the traditional cold process method and cured for 6\u20138 weeks , our Charcoal Soap combines the cleansing power of activated charcoal with nourishing plant-based oils and premium butters. Known for its ability to attract and lift away impurities, activated charcoal helps leave skin feeling fresh , clean , and balanced without over-drying . Perfect for daily use, this soap creates a rich, creamy lather that gently cleanses while helping your skin feel smooth and refreshed .",
+    "tagline": "Handcrafted organic bars for gentle daily care",
+    "inStock": true,
+    "rating": 4.7,
+    "reviewCount": 8,
+    "recommended": [
+      "vetpalai-soap",
+      "green-gram-soap",
+      "rose-soap",
+      "manjistha-soap"
+    ],
+    "alsoBought": [
+      "virgin-coconut-oil",
+      "nalangu-maavu-soap",
+      "green-gram-soap"
+    ]
+  },
+  {
+    "id": 53645,
+    "slug": "green-gram-soap",
+    "name": "Green Gram Soap",
+    "shortName": "Green Gram Soap",
+    "category": "Soap",
+    "price": 169,
+    "regularPrice": 199,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-11-2026-03_31_26-PM.png",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-11-2026-03_31_26-PM.png",
+        "alt": "Natural Green Gram Soap for gentle skin cleansing."
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/greengram-scaled.jpg",
+        "alt": "Green Gram Soap"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/green_gram_soap_portrait.png",
+        "alt": "Green Gram Soap"
+      }
+    ],
+    "benefits": [
+      "Gently cleanses without stripping natural moisture",
+      "Helps leave skin feeling soft, smooth, and refreshed",
+      "Supports a brighter, healthy-looking complexion",
+      "Suitable for daily use on all skin types"
+    ],
+    "description": "Green Gram Soap \u2013 Timeless Beauty Bar For generations, green gram has been treasured in traditional beauty rituals as a gentle alternative to harsh cleansers. Inspired by this timeless skincare heritage , our Green Gram Soap is handcrafted with freshly ground green gram infused in nourishing oils. These enriched oils, along with premium butters , are transformed into soap using the traditional cold process method and patiently cured for 6\u20138 weeks to create a mild and nourishing bar. Enriched with the goodness of green gram, this soap gently cleanses away impurities while helping maintain the skin\u2019s natural moisture balance. Its creamy lather leaves skin feeling soft, refreshed, and naturally radiant after every wash.",
+    "tagline": "Handcrafted organic bars for gentle daily care",
+    "inStock": true,
+    "rating": 4.7,
+    "reviewCount": 8,
+    "recommended": [
+      "vetpalai-soap",
+      "charcoal-soap",
+      "rose-soap",
+      "manjistha-soap"
+    ],
+    "alsoBought": [
+      "virgin-coconut-oil",
+      "nalangu-maavu-soap"
+    ]
+  },
+  {
+    "id": 53643,
+    "slug": "rose-soap",
+    "name": "Rose Soap",
+    "shortName": "Rose Soap",
+    "category": "Soap",
+    "price": 169,
+    "regularPrice": 199,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-11-2026-03_38_04-PM.png",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-11-2026-03_38_04-PM.png",
+        "alt": "Natural Rose Soap for soft and glowing skin."
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/rose-1-scaled.jpg",
+        "alt": "Rose Soap"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/rose_soap_portrait.png",
+        "alt": "Rose Soap"
+      }
+    ],
+    "benefits": [
+      "Rose petal-infused oils help nourish and soften the skin",
+      "Gently cleanses without stripping natural moisture",
+      "Helps soothe and refresh tired-looking skin",
+      "Supports a smooth, supple, and healthy-looking complexion",
+      "Suitable for daily use and all skin types"
+    ],
+    "description": "Rose Petal Soap \u2013 Floral Glow Ritual For generations, roses have been cherished in traditional beauty rituals for their elegance, soothing touch, and natural skin-loving properties. Inspired by this enduring heritage, our Rose Petal Soap is handcrafted using the cold process method, where carefully selected oils are infused with rose petals and cured for 6\u20138 weeks to create a luxurious floral indulgence . Delicately scented by nature and enriched with the goodness of rose petals , this soap gently cleanses while helping maintain the skin\u2019s natural moisture balance. Its rich, creamy lather leaves skin feeling soft , refreshed , and beautifully pampered after every wash.",
+    "tagline": "Handcrafted organic bars for gentle daily care",
+    "inStock": true,
+    "rating": 4.7,
+    "reviewCount": 8,
+    "recommended": [
+      "vetpalai-soap",
+      "charcoal-soap",
+      "green-gram-soap",
+      "manjistha-soap"
+    ],
+    "alsoBought": [
+      "virgin-coconut-oil",
+      "nalangu-maavu-soap",
+      "green-gram-soap"
+    ]
+  },
+  {
+    "id": 53641,
+    "slug": "manjistha-soap",
+    "name": "Manjistha Soap",
+    "shortName": "Manjistha Soap",
+    "category": "Soap",
+    "price": 169,
+    "regularPrice": 199,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-Jun-1-2026-06_43_57-PM.png",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-Jun-1-2026-06_43_57-PM.png",
+        "alt": "Manjistha Soap for bright and healthy-looking skin."
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/manjistha-scaled.jpg",
+        "alt": "Manjistha Soap"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/manjistha_soap_portrait.png",
+        "alt": "Manjistha Soap"
+      }
+    ],
+    "benefits": [
+      "Helps reveal a naturally radiant, healthy-looking glow",
+      "Supports a more balanced and even-looking complexion",
+      "Gently purifies and refreshes tired, dull-looking skin",
+      "Rich in botanical goodness that nurtures and comforts the skin"
+    ],
+    "description": "Manjistha Soap \u2013 Heritage Botanical Care Rooted in centuries of herbal tradition, our Cold Processed Manjistha Soap is a luxurious fusion of heritage botanicals . Revered as one of nature\u2019s most treasured skin-loving herbs, Manjistha root is carefully infused into a nourishing blend of oils to create a cleansing experience that feels both indulgent and purposeful. Enriched oils, along with premium butters , are crafted in small batches using the traditional cold process method and cured for 6\u20138 weeks to ensure exceptional quality and care. During this curing period, each bar develops a rich , creamy lather that gently cleanses while helping preserve the skin\u2019s natural moisture, leaving it feeling soft, refreshed, and nourished after every wash.",
+    "tagline": "Handcrafted organic bars for gentle daily care",
+    "inStock": true,
+    "rating": 4.7,
+    "reviewCount": 8,
+    "recommended": [
+      "vetpalai-soap",
+      "charcoal-soap",
+      "green-gram-soap",
+      "rose-soap"
+    ],
+    "alsoBought": [
+      "virgin-coconut-oil",
+      "nalangu-maavu-soap",
+      "green-gram-soap"
+    ]
+  },
+  {
+    "id": 53639,
+    "slug": "coconut-oil-soap",
+    "name": "Virgin Coconut Oil Soap",
+    "shortName": "Virgin Coconut Oil Soap",
+    "category": "Soap",
+    "price": 169,
+    "regularPrice": 199,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/virgincoconut.png",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/virgincoconut.png",
+        "alt": "Virgin Coconut Oil Soap"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/coconut-oil-soap-1-scaled.jpg",
+        "alt": "Virgin Coconut Oil Soap"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/vco_soap_portrait.png",
+        "alt": "Virgin Coconut Oil Soap"
+      }
+    ],
+    "benefits": [
+      "Gently cleanses without stripping natural moisture",
+      "Helps keep skin soft, smooth, and hydrated",
+      "Provides a rich, creamy lather for a luxurious cleansing experience",
+      "Suitable for daily use on all skin types",
+      "Crafted with pure Virgin Coconut Oil and no unnecessary additives"
+    ],
+    "description": "Virgin Coconut Oil Soap \u2013 Pearly Glow Bar Crafted with pure Virgin Coconut Oil extracted from fresh coconut milk , this cold processed soap brings the timeless goodness of coconut to your daily skincare ritual . Rich in naturally nourishing fatty acids , it gently cleanses while helping maintain the skin\u2019s natural moisture balance. Handcrafted in small batches and cured for 6\u20138 weeks , each bar develops a rich, creamy lather that leaves the skin feeling soft , refreshed, and cared for.",
+    "tagline": "Handcrafted organic bars for gentle daily care",
+    "inStock": true,
+    "rating": 4.8,
+    "reviewCount": 12,
+    "recommended": [
+      "vetpalai-soap",
+      "charcoal-soap",
+      "green-gram-soap",
+      "rose-soap"
+    ],
+    "alsoBought": [
+      "virgin-coconut-oil",
+      "nalangu-maavu-soap",
+      "green-gram-soap"
+    ]
+  },
+  {
+    "id": 53631,
+    "slug": "neem-handcrafted-organic-soap",
+    "name": "Neem Soap",
+    "shortName": "Neem Soap",
+    "category": "Soap",
+    "price": 169,
+    "regularPrice": 199,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-11-2026-04_08_11-PM.png",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-11-2026-04_08_11-PM.png",
+        "alt": "Neem Soap for clean and healthy-looking skin."
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/neem-1-scaled.jpg",
+        "alt": "Neem Soap"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/neem_soap_portrait.png",
+        "alt": "Neem Soap"
+      }
+    ],
+    "benefits": [
+      "Helps cleanse and refresh the skin naturally",
+      "Supports clearer and healthier-looking skin",
+      "Helps reduce excess oil and leaves skin feeling balanced",
+      "Gently purifies and revitalizes tired, dull-looking skin",
+      "Suitable for daily use and all skin types"
+    ],
+    "description": "Neem Heritage Soap \u2013 Fresh Aura A tribute to age-old cleansing rituals , our Cold Processed Neem Soap is handcrafted with the goodness of neem , a treasured botanical known for its cleansing and skin-purifying properties. Fresh neem is carefully infused into a nourishing blend of oils and crafted using the traditional cold process method. Each bar is patiently cured for 6\u20138 weeks , creating a long-lasting soap with a rich, creamy lather that gently cleanses without over-drying the skin.",
+    "tagline": "Handcrafted organic bars for gentle daily care",
+    "inStock": true,
+    "rating": 4.7,
+    "reviewCount": 8,
+    "recommended": [
+      "vetpalai-soap",
+      "charcoal-soap",
+      "green-gram-soap",
+      "rose-soap"
+    ],
+    "alsoBought": [
+      "virgin-coconut-oil",
+      "nalangu-maavu-soap",
+      "green-gram-soap"
+    ]
+  },
+  {
+    "id": 53629,
+    "slug": "nalangu-maavu-soap",
+    "name": "Nalangu Maavu Soap",
+    "shortName": "Nalangu Maavu Soap",
+    "category": "Soap",
+    "price": 169,
+    "regularPrice": 199,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-11-2026-03_02_09-PM.png",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/ChatGPT-Image-May-11-2026-03_02_09-PM.png",
+        "alt": "Nalangu Maavu Soap for natural skin cleansing and glow."
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/nalangumavu-scaled.jpg",
+        "alt": "Nalangu Maavu Soap"
+      },
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/nalangu_maavu_soap_portrait.png",
+        "alt": "Nalangu Maavu Soap"
+      }
+    ],
+    "benefits": [
+      "Gently cleanses while helping maintain the skin\u2019s natural moisture balance",
+      "Helps leave skin feeling soft, smooth, and refreshed",
+      "Supports a brighter, healthier-looking complexion",
+      "Helps remove daily impurities without stripping the skin",
+      "Suitable for daily use and all skin types"
+    ],
+    "description": "Nalangu Maavu Soap \u2013 Golden Ritual Inspired by the cherished age-old bathing ritual, our Cold Processed Nalangu Maavu Soap brings together the goodness of traditional herbs and grains in a luxurious cleansing bar . Revered for generations as a natural alternative to harsh cleansers , Nalangu Maavu is valued for its gentle cleansing and skin-loving properties. Carefully blended into nourishing oils and handcrafted using the traditional cold process method, each bar is cured for 6\u20138 weeks to create a rich and creamy lather that pampers the skin with every use.",
+    "tagline": "Handcrafted organic bars for gentle daily care",
+    "inStock": true,
+    "rating": 4.7,
+    "reviewCount": 8,
+    "recommended": [
+      "vetpalai-soap",
+      "charcoal-soap",
+      "green-gram-soap",
+      "rose-soap"
+    ],
+    "alsoBought": [
+      "virgin-coconut-oil",
+      "green-gram-soap"
+    ]
+  },
+  {
+    "id": 53627,
+    "slug": "coco-pith-low-ec-2",
+    "name": "Coco Pith (Low EC) \u2014 Home Pack",
+    "shortName": "Coco Pith (Low EC)",
+    "category": "Gardening",
+    "price": 99,
+    "regularPrice": 199,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/NewCocoLEC.png",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/NewCocoLEC.png",
+        "alt": "Coco Pith (Low EC)"
+      }
+    ],
+    "benefits": [
+      "Low EC formulation ideal for sensitive plants and seedlings",
+      "Excellent water retention for consistent moisture",
+      "Promotes healthy root growth and strong plant development",
+      "Improves soil aeration and prevents compaction",
+      "100% natural, biodegradable, and eco-friendly"
+    ],
+    "description": "Parambu Organics Coco Pith (Low EC) is a high-quality, natural growing medium made from processed coconut husk. Its low electrical conductivity makes it perfect for plants that require minimal salt content, ensuring safe and balanced growth from the early stages. With superior moisture-holding capacity and a light, airy structure, coco pith supports strong root development while improving soil texture and aeration. Ideal for vegetable crops, fruit plants, seedlings, potting mixes, and organic cultivation ,Parambu Coco Pith is a sustainable and reliable alternative to traditional soil.",
+    "tagline": "Natural coco growing media for healthy plants",
+    "inStock": true,
+    "rating": 4.8,
+    "reviewCount": 5,
+    "recommended": [
+      "coco-pith-high-ec-2",
+      "coco-chips-low-ec-2",
+      "coco-chips-high-ec-2",
+      "coco-pith-low-ec"
+    ],
+    "alsoBought": [
+      "coco-chips-low-ec-2",
+      "coco-pith-high-ec-2",
+      "virgin-coconut-oil"
+    ]
+  },
+  {
+    "id": 53625,
+    "slug": "coco-pith-high-ec-2",
+    "name": "Coco Pith (High EC) \u2014 Home Pack",
+    "shortName": "Coco Pith (High EC)",
+    "category": "Gardening",
+    "price": 89,
+    "regularPrice": 189,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/NewCocoHEC.png",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/NewCocoHEC.png",
+        "alt": "Coco Pith (High EC)"
+      }
+    ],
+    "benefits": [
+      "High EC coco pith for nutrient-rich growing conditions",
+      "Excellent water retention and moisture balance",
+      "Enhances soil structure and supports healthy root development",
+      "Improves aeration while preventing soil compaction",
+      "100% natural, biodegradable, and eco-friendly"
+    ],
+    "description": "Parambu Organics Coco Pith is a premium-quality growing medium made from finely processed coconut husk. With its High EC composition , it provides a nutrient-rich environment, making it especially suitable for crops and applications that require higher salt levels. Its superior water-holding capacity helps maintain consistent moisture, while the fibrous structure ensures proper aeration and healthy root growth. Widely used for mushroom cultivation, potting mixes, nurseries, and organic agricultural applications , Parambu Coco Pith is a sustainable and reliable alternative to traditional soil.",
+    "tagline": "Natural coco growing media for healthy plants",
+    "inStock": true,
+    "rating": 4.8,
+    "reviewCount": 5,
+    "recommended": [
+      "coco-pith-low-ec-2",
+      "coco-chips-low-ec-2",
+      "coco-chips-high-ec-2",
+      "coco-pith-low-ec"
+    ],
+    "alsoBought": [
+      "coco-pith-low-ec-2",
+      "coco-chips-low-ec-2",
+      "virgin-coconut-oil"
+    ]
+  },
+  {
+    "id": 53623,
+    "slug": "coco-chips-low-ec-2",
+    "name": "Coco Chips (Low EC) \u2014 Home Pack",
+    "shortName": "Coco Chips (Low EC)",
+    "category": "Gardening",
+    "price": 119,
+    "regularPrice": 219,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/chipslowEC-650gm3.jpg",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/chipslowEC-650gm3.jpg",
+        "alt": "Coco Chips (Low EC)"
+      }
+    ],
+    "benefits": [
+      "Made from 100% natural, washed coconut husk",
+      "Low EC formula, safe for delicate roots",
+      "Excellent water retention and aeration",
+      "Improves root growth and overall plant health",
+      "Lightweight, reusable, and long-lasting"
+    ],
+    "description": "Parambu Organics Coco Chips are a premium, eco-friendly soil substitute made from carefully processed coconut husk. With a Low EC level , these coco chips are perfectly suited for sensitive plants, ensuring optimal nutrient absorption without salt stress. Designed to improve aeration while retaining moisture, coco chips promote strong root development and healthier plant growth . They are an ideal growing medium for orchids, anthuriums, hydroponics, potting mixes, and organic gardening applications . Naturally biodegradable and reusable, Parambu Coco Chips offer a sustainable solution for modern growers.",
+    "tagline": "Natural coco growing media for healthy plants",
+    "inStock": true,
+    "rating": 4.8,
+    "reviewCount": 5,
+    "recommended": [
+      "coco-pith-low-ec-2",
+      "coco-pith-high-ec-2",
+      "coco-chips-high-ec-2",
+      "coco-pith-low-ec"
+    ],
+    "alsoBought": [
+      "coco-pith-low-ec-2",
+      "coco-pith-high-ec-2",
+      "virgin-coconut-oil"
+    ]
+  },
+  {
+    "id": 53621,
+    "slug": "coco-chips-high-ec-2",
+    "name": "Coco Chips (High EC) \u2014 Home Pack",
+    "shortName": "Coco Chips (High EC)",
+    "category": "Gardening",
+    "price": 109,
+    "regularPrice": 209,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/chipshighEC-650gm-scaled.jpg",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/chipshighEC-650gm-scaled.jpg",
+        "alt": "Coco Chips (High EC)"
+      }
+    ],
+    "benefits": [
+      "High EC coco chips ideal for mature plants and nutrient-demanding crops",
+      "Improves soil aeration and promotes better root oxygen flow",
+      "Provides excellent moisture retention with proper drainage",
+      "Maintains a long-lasting structure and does not compact easily",
+      "100% natural, eco-friendly, and biodegradable",
+      "Suitable for organic farming and hydroponic use"
+    ],
+    "description": "Parambu Organics Coco Chips (High EC) is a premium soil substitute made from carefully processed coconut husk chips. With an EC level above 1 ms/cm , it is specially suited for established plants , flowering plants , fruit crops , and applications where higher nutrient availability is beneficial. These coco chips improve root aeration while retaining adequate moisture , creating a balanced growing environment for healthy plant development. The coarse structure prevents soil compaction and promotes strong root systems. Free from chemicals and harmful additives , Parambu Organics Coco Chips are an eco-friendly and sustainable alternative to conventional growing media.",
+    "tagline": "Natural coco growing media for healthy plants",
+    "inStock": true,
+    "rating": 4.8,
+    "reviewCount": 5,
+    "recommended": [
+      "coco-pith-low-ec-2",
+      "coco-pith-high-ec-2",
+      "coco-chips-low-ec-2",
+      "coco-pith-low-ec"
+    ],
+    "alsoBought": [
+      "coco-pith-low-ec-2",
+      "coco-chips-low-ec-2",
+      "coco-pith-high-ec-2"
+    ]
+  },
+  {
+    "id": 53619,
+    "slug": "coco-pith-low-ec",
+    "name": "Coco Pith (Low EC) \u2014 Bulk Pack",
+    "shortName": "Coco Pith (Low EC)",
+    "category": "Gardening",
+    "price": 299,
+    "regularPrice": 499,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/lowEC-5kg-scaled.jpg",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/lowEC-5kg-scaled.jpg",
+        "alt": "Coco Pith (Low EC)"
+      }
+    ],
+    "benefits": [
+      "Low EC coco pith suitable for sensitive and young plants",
+      "Provides excellent water retention with balanced drainage",
+      "Promotes strong root development and healthy plant growth",
+      "Ready-to-use organic potting mix component",
+      "100% natural, eco-friendly, and biodegradable"
+    ],
+    "description": "Parambu Organics Coco Pith (Low EC) is a high-quality soil substitute made from carefully processed coconut husk with an EC level below 0.5 ms/cm . It is specially designed for plants that require low salt content, making it ideal for seedlings, vegetables, nurseries, and organic farming . This coco pith retains moisture efficiently while maintaining proper aeration, helping roots grow stronger and healthier . Free from chemicals, sand, and harmful residues , it improves soil structure and fertility over time. An eco-friendly and sustainable alternative to traditional soil , it supports consistent plant growth and better yields.",
+    "tagline": "Natural coco growing media for healthy plants",
+    "inStock": true,
+    "rating": 4.8,
+    "reviewCount": 5,
+    "recommended": [
+      "coco-pith-low-ec-2",
+      "coco-pith-high-ec-2",
+      "coco-chips-low-ec-2",
+      "coco-chips-high-ec-2"
+    ],
+    "alsoBought": [
+      "coco-pith-low-ec-2",
+      "coco-chips-low-ec-2",
+      "coco-pith-high-ec-2"
+    ]
+  },
+  {
+    "id": 53617,
+    "slug": "coco-pith-high-ec",
+    "name": "Coco Pith (High EC) \u2014 Bulk Pack",
+    "shortName": "Coco Pith (High EC)",
+    "category": "Gardening",
+    "price": 249,
+    "regularPrice": 399,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/highEC-5kg-scaled.jpg",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/highEC-5kg-scaled.jpg",
+        "alt": "Coco Pith (High EC)"
+      }
+    ],
+    "benefits": [
+      "High EC coco pith ideal for nutrient-demanding plants",
+      "Provides excellent water-holding capacity for consistent moisture",
+      "Improves soil structure and promotes better root aeration",
+      "Ready-to-use organic potting mix component",
+      "100% natural, eco-friendly, and biodegradable"
+    ],
+    "description": "Parambu Organics Coco Pith (High EC) is a premium-quality growing medium made from finely processed coconut husk. With an EC level above 1 ms/cm , it is well suited for plants that requirehigher nutrient availability and moisture retention. This coco pith enhances soil fertility, promotes excellent root formation , and maintains long-term soilstability . Its superior water-holding capacity reduces irrigation frequency while ensuring healthy plant growth . Free from harmful chemicals and safe for the environment, it is an ideal soil substitute for organic farming, gardening, nurseries, and horticultural applications .",
+    "tagline": "Natural coco growing media for healthy plants",
+    "inStock": true,
+    "rating": 4.8,
+    "reviewCount": 5,
+    "recommended": [
+      "coco-pith-low-ec-2",
+      "coco-pith-high-ec-2",
+      "coco-chips-low-ec-2",
+      "coco-chips-high-ec-2"
+    ],
+    "alsoBought": [
+      "coco-pith-low-ec-2",
+      "coco-chips-low-ec-2",
+      "coco-pith-high-ec-2"
+    ]
+  },
+  {
+    "id": 53615,
+    "slug": "coco-chips-low-ec",
+    "name": "Coco Chips (Low EC) \u2014 Bulk Pack",
+    "shortName": "Coco Chips (Low EC)",
+    "category": "Gardening",
+    "price": 349,
+    "regularPrice": 599,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/CocoLowEc-5kg-scaled.jpg",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/CocoLowEc-5kg-scaled.jpg",
+        "alt": "Coco Chips (Low EC)"
+      }
+    ],
+    "benefits": [
+      "Low EC coco chips ideal for sensitive plants and seedlings",
+      "Provides excellent moisture retention with superior drainage",
+      "Enhances root aeration and supports healthy root development",
+      "Perfect for orchids, hydroponics, and potting mixes",
+      "100% natural, eco-friendly, and biodegradable"
+    ],
+    "description": "Parambu Organics Coco Chips (Low EC) are carefully processed from high-quality coconut husk to create a clean and stable growing medium for plants that require low salt content. With an EC level below 0.5 ms/cm , these coco chips are especially suitable for orchids, nursery plants, seedlings, and hydroponic systems . The chunky structure improves soil aeration while maintaining optimal moisture , preventing root rot and promoting stronger root growth. Free from chemicals, sand, and harmful additives , our low EC coco chips are an excellent alternative to traditional soil and synthetic substrates. Designed for sustainable cultivation , they support healthy plant growth while being safe for the environment.",
+    "tagline": "Natural coco growing media for healthy plants",
+    "inStock": true,
+    "rating": 4.8,
+    "reviewCount": 5,
+    "recommended": [
+      "coco-pith-low-ec-2",
+      "coco-pith-high-ec-2",
+      "coco-chips-low-ec-2",
+      "coco-chips-high-ec-2"
+    ],
+    "alsoBought": [
+      "coco-pith-low-ec-2",
+      "coco-chips-low-ec-2",
+      "coco-pith-high-ec-2"
+    ]
+  },
+  {
+    "id": 53613,
+    "slug": "coco-chips-high-ec",
+    "name": "Coco Chips (High EC) \u2014 Bulk Pack",
+    "shortName": "Coco Chips (High EC)",
+    "category": "Gardening",
+    "price": 299,
+    "regularPrice": 449,
+    "image": "https://parambu.in/wp-content/uploads/2026/01/chipshighEC-5kg-scaled.jpg",
+    "images": [
+      {
+        "src": "https://parambu.in/wp-content/uploads/2026/01/chipshighEC-5kg-scaled.jpg",
+        "alt": "Coco Chips (High EC)"
+      }
+    ],
+    "benefits": [
+      "High EC coco chips for enhanced plant nutrition",
+      "Improves soil aeration and moisture retention",
+      "Ideal for gardening, hydroponics, and organic farming",
+      "Promotes strong root development and healthy plant growth",
+      "100% natural, eco-friendly, and chemical-free"
+    ],
+    "description": "Parambu Organics Coco Chips (High EC) are made from carefully processed coconut husk to provide an excellent growing medium for plants. These coco chips improve soil structure by increasing aeration while retaining optimal moisture, creating a balanced environment for strong root development. Suitable for flowers, vegetables, terrace gardens, nurseries, and hydroponic systems , our coco chips act as a natural mulch and soil conditioner. Free from harmful chemicals and fully biodegradable , they support sustainable and eco-friendly cultivation practices . Ideal for gardeners and farmers who prefer natural alternatives for healthier plants and higher yield .",
+    "tagline": "Natural coco growing media for healthy plants",
+    "inStock": true,
+    "rating": 4.8,
+    "reviewCount": 5,
+    "recommended": [
+      "coco-pith-low-ec-2",
+      "coco-pith-high-ec-2",
+      "coco-chips-low-ec-2",
+      "coco-chips-high-ec-2"
+    ],
+    "alsoBought": [
+      "coco-pith-low-ec-2",
+      "coco-chips-low-ec-2",
+      "coco-pith-high-ec-2"
+    ]
+  }
+]
