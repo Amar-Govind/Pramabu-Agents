@@ -115,7 +115,7 @@ export function SiteHeader() {
               type="button"
               onClick={openCart}
               aria-label={`Open cart, ${totalItems} items`}
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-gold text-white transition hover:bg-gold-deep"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-gold text-ink transition hover:bg-gold-deep hover:text-white"
             >
               <IconCart className="h-5 w-5" />
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-forest text-[10px] font-bold text-sand ring-2 ring-[#faf6ee]">

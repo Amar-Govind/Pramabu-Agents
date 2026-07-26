@@ -25,8 +25,8 @@ export function WishlistButton({
       }}
       className={`relative z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-soft transition ${
         active
-          ? "border-gold bg-gold text-ink"
-          : "border-gold/50 bg-white text-gold-deep hover:bg-gold hover:text-ink"
+          ? "border-gold-deep bg-gold text-ink"
+          : "border-gold/60 bg-white text-gold-deep hover:bg-gold hover:text-ink"
       } ${className}`}
     >
       <IconHeart className="h-[18px] w-[18px]" filled={active} />

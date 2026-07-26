@@ -29,9 +29,9 @@ brand:
       - Sound corporate or jargon-heavy
       - Overstate "100% guaranteed" outcomes
   visual:
-    primary_colors: ["#B76E79", "#1B4332", "#F7F1E4", "#1A1A1A"]
+    primary_colors: ["#D6AA84", "#1B4332", "#F7F1E4", "#1A1A1A"]
     logo: /brand/logo-gold.png
-    style: rose-gold leaf accent, natural product photography, earthy textures, clean typography, heritage organic feel
+    style: champagne rose-gold leaf accent (#D6AA84), natural product photography, earthy textures, clean typography, heritage organic feel
   menu:
     - Hair Care (Oils)
     - Skin Care (Soap)
