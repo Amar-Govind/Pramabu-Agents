@@ -11,6 +11,7 @@ from pramabu_agents.agents.localization import LocalizationAgent
 from pramabu_agents.agents.market_analysis import MarketAnalysisAgent
 from pramabu_agents.agents.marketplace import MarketplaceAgent
 from pramabu_agents.agents.performance_marketing import PerformanceMarketingAgent
+from pramabu_agents.agents.poster_production import PosterProductionAgent
 from pramabu_agents.agents.qa import QAAgent
 from pramabu_agents.agents.social_media import SocialMediaAgent
 from pramabu_agents.agents.supply_chain import SupplyChainAgent
@@ -30,6 +31,7 @@ __all__ = [
     "MarketAnalysisAgent",
     "MarketplaceAgent",
     "PerformanceMarketingAgent",
+    "PosterProductionAgent",
     "QAAgent",
     "SocialMediaAgent",
     "SupplyChainAgent",

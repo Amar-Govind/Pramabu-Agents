@@ -14,6 +14,7 @@ class AgentRole(str, Enum):
     MARKET_ANALYSIS = "market_analysis"
     CONTENT_IDEATION = "content_ideation"
     CREATIVE_PRODUCTION = "creative_production"
+    POSTER_PRODUCTION = "poster_production"
     SOCIAL_MEDIA = "social_media"
     ECOMMERCE = "ecommerce"
     PERFORMANCE_MARKETING = "performance_marketing"
@@ -67,6 +68,15 @@ class SocialPostPlan(BaseModel):
     best_time_local: str
 
 
+class PosterAsset(BaseModel):
+    idea_title: str
+    headline: str
+    path: str
+    width: int = 1080
+    height: int = 1350
+    format: str = "poster"
+
+
 class CampaignPack(BaseModel):
     brand: str
     week_of: str
@@ -75,6 +85,7 @@ class CampaignPack(BaseModel):
     trends: list[str] = Field(default_factory=list)
     ideas: list[ContentIdea] = Field(default_factory=list)
     creatives: list[CreativeBrief] = Field(default_factory=list)
+    posters: list[PosterAsset] = Field(default_factory=list)
     social_calendar: list[SocialPostPlan] = Field(default_factory=list)
     ecommerce_actions: list[str] = Field(default_factory=list)
     ad_plan: list[str] = Field(default_factory=list)
