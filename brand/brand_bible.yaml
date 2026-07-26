@@ -1,0 +1,133 @@
+brand:
+  name: Parambu Organics
+  short_name: Parambu
+  tagline: Everyday Pure & Natural
+  category: Organic FMCG
+  website: https://parambu.in
+  platform: WooCommerce
+  markets:
+    - India
+  categories:
+    - Oils
+    - Soap
+    - Gardening
+  voice:
+    tone: warm, natural, heritage-rooted, trustworthy
+    do:
+      - Speak like a trusted organic Indian brand
+      - Highlight handcrafted and cold-processed quality
+      - Keep benefits concrete for skin, hair, and gardening
+      - Prefer short sentences and clear Shop Now CTAs
+      - Mention chemical-free / pure & natural carefully and truthfully
+    dont:
+      - Use medical or disease-cure claims
+      - Promise whitening, miracle, or clinical results
+      - Sound corporate or jargon-heavy
+      - Overstate "100% guaranteed" outcomes
+  visual:
+    primary_colors: ["#2F6B3A", "#F4E9D8", "#1A1A1A"]
+    style: natural product photography, earthy textures, clean typography, heritage organic feel
+  compliance:
+    required_disclaimers: []
+    forbidden_claims:
+      - cures
+      - clinically proven
+      - 100% natural guaranteed
+      - treats disease
+      - medical grade
+
+products:
+  - sku: PRB-OIL-VCO-001
+    name: Virgin Coconut Oil
+    category: Oils
+    url: https://parambu.in/product/virgin-coconut-oil/
+    benefits:
+      - Deeply nourishes skin and hair
+      - Natural moisture care
+      - Rich in lauric acid and antioxidants
+    price_inr: 254
+    channels: [d2c]
+  - sku: PRB-SOAP-NEEM-001
+    name: Neem Soap
+    category: Soap
+    url: https://parambu.in/product/neem-handcrafted-organic-soap/
+    benefits:
+      - Helps cleanse and refresh skin naturally
+      - Supports clearer healthier-looking skin
+      - Helps balance excess oil
+    price_inr: 169
+    channels: [d2c]
+  - sku: PRB-SOAP-VET-001
+    name: Vetpalai Soap
+    category: Soap
+    url: https://parambu.in/product/vetpalai-soap/
+    benefits:
+      - Soothes dry flaky itchy skin
+      - Maintains natural moisture balance
+      - Gentle herbal cleansing
+    price_inr: 169
+    channels: [d2c]
+  - sku: PRB-SOAP-CHAR-001
+    name: Charcoal Soap
+    category: Soap
+    url: https://parambu.in/product/charcoal-soap/
+    benefits:
+      - Helps remove dirt and excess oil
+      - Leaves skin fresh and revitalized
+      - Gentle cleansing with plant oils
+    price_inr: 169
+    channels: [d2c]
+  - sku: PRB-SOAP-ROSE-001
+    name: Rose Soap
+    category: Soap
+    url: https://parambu.in/product/rose-soap/
+    benefits:
+      - Rose petal-infused nourishment
+      - Softens and refreshes skin
+      - Gentle daily cleanse
+    price_inr: 169
+    channels: [d2c]
+  - sku: PRB-GARDEN-PITH-LOW-001
+    name: Coco Pith (Low EC)
+    category: Gardening
+    url: https://parambu.in/product/coco-pith-low-ec-2/
+    benefits:
+      - Excellent moisture retention
+      - Supports healthy plant growth
+      - Ideal for terrace gardens and farming
+    price_inr: 99
+    channels: [d2c]
+  - sku: PRB-GARDEN-CHIPS-LOW-001
+    name: Coco Chips (Low EC)
+    category: Gardening
+    url: https://parambu.in/product/coco-chips-low-ec-2/
+    benefits:
+      - Improves aeration in soil mix
+      - Natural growing medium
+      - Useful for gardening and farming
+    price_inr: 119
+    channels: [d2c]
+
+goals:
+  primary:
+    - Grow D2C sales on parambu.in
+    - Improve social content velocity for organic soaps oils and gardening
+    - Win on pure heritage care and natural everyday wellness
+  kpis:
+    - ROAS
+    - engagement_rate
+    - conversion_rate
+    - repeat_purchase_rate
+    - average_order_value
+
+channels:
+  social: [instagram, youtube_shorts, facebook]
+  commerce: [website]
+  ads: [meta, google]
+  website: https://parambu.in
+
+weekly_defaults:
+  content_pieces: 7
+  poster_concepts: 3
+  video_concepts: 3
+  growth_ideas: 5

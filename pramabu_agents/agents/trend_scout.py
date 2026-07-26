@@ -1,0 +1,40 @@
+from __future__ import annotations
+
+from typing import Any
+
+from pramabu_agents.agents.base import BaseAgent
+from pramabu_agents.llm import complete_json
+from pramabu_agents.models import AgentRole, CampaignPack
+
+
+class TrendScoutAgent(BaseAgent):
+    role = AgentRole.TREND_SCOUT
+    name = "Trend Scout"
+
+    def run(self, pack: CampaignPack, context: dict[str, Any]) -> CampaignPack:
+        season = context.get("season", "general")
+        fallback = {
+            "trends": [
+                "POV morning self-care rituals with oil and soap",
+                "Handcrafted process / behind-the-scenes making",
+                "Ingredient spotlight (neem, coconut, rose, charcoal)",
+                "Terrace garden before-after with coco pith",
+                "ASMR unboxing and first-use lather moments",
+                "Myth-busting organic vs chemical personal care",
+                "Festival / seasonal natural wellness routines",
+            ]
+        }
+        result = complete_json(
+            system=(
+                "You are a social trend scout for an Indian organic D2C brand "
+                "(soaps, oils, gardening). Return JSON with key trends (array of strings)."
+            ),
+            user=(
+                f"Brand={self.brand_name}. Website={self.website}. Season={season}. "
+                "Find current short-form content trends useful for posters and Reels."
+            ),
+            fallback=fallback,
+        )
+        pack.trends = list(result.get("trends", fallback["trends"]))[:8]
+        pack.agent_trace.append(self.trace("Scouted current content trends", {"count": len(pack.trends)}))
+        return pack
