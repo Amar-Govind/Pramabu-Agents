@@ -74,6 +74,7 @@ def render_poster(
     output_path: Path,
     width: int = 1080,
     height: int = 1350,
+    reference_image: Path | None = None,
 ) -> PosterAsset:
     """Render a branded Instagram-ready poster PNG from a creative brief."""
     gold = _hex_to_rgb(colors[0] if colors else "#D6AA84", (214, 170, 132))
@@ -108,20 +109,39 @@ def render_poster(
     draw.rounded_rectangle(panel, radius=28, fill=(255, 250, 240), outline=gold, width=3)
 
     logo_path = _find_logo()
-    y = panel[1] + 48
+    y = panel[1] + 36
     if logo_path:
         logo = Image.open(logo_path).convert("RGBA")
-        logo.thumbnail((360, 120), Image.Resampling.LANCZOS)
+        logo.thumbnail((320, 100), Image.Resampling.LANCZOS)
         lx = (width - logo.size[0]) // 2
         image.paste(logo, (lx, y), logo)
-        y += logo.size[1] + 36
+        y += logo.size[1] + 24
     else:
         brand_font = _load_font(42, bold=True)
         bw = draw.textlength(brand_name.upper(), font=brand_font)
         draw.text(((width - bw) / 2, y), brand_name.upper(), font=brand_font, fill=forest)
         y += 70
 
-    headline_font = _load_font(54, bold=True)
+    if reference_image and Path(reference_image).exists():
+        try:
+            ref = Image.open(reference_image).convert("RGBA")
+            ref.thumbnail((420, 320), Image.Resampling.LANCZOS)
+            rx = (width - ref.size[0]) // 2
+            # soft backing plate
+            pad = 16
+            draw.rounded_rectangle(
+                (rx - pad, y - pad, rx + ref.size[0] + pad, y + ref.size[1] + pad),
+                radius=18,
+                fill=(255, 255, 255),
+                outline=gold,
+                width=2,
+            )
+            image.paste(ref, (rx, y), ref)
+            y += ref.size[1] + 36
+        except Exception:
+            pass
+
+    headline_font = _load_font(48 if reference_image else 54, bold=True)
     body_font = _load_font(30)
     meta_font = _load_font(24)
     cta_font = _load_font(28, bold=True)

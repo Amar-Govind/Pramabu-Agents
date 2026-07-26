@@ -10,7 +10,8 @@ We are shipping **Phase 1 MVP now** — a runnable weekly pipeline that coordina
 |---|---|---|
 | **0 – Today** | Run pipeline against Parambu Organics brand bible + [parambu.in](https://parambu.in) | Ready |
 | **1 – Agents** | Full specialist agent suite in weekly campaign pack | Ready |
-| **1b – Storefront** | Custom Next.js site in `/storefront` with gold branding, gallery, recommendations, cart, coupons, reviews | In progress |
+| **1b – Storefront** | Custom Next.js site in `/storefront` with gold branding, gallery, recommendations, cart, coupons, reviews | Ready |
+| **1c – Agent Chat** | Web chat console to talk to agents, upload files, download outputs | Ready |
 | **2 – Next** | Razorpay checkout, social drafts, ads APIs, approval workflow, live connectors | Planned |
 | **3 – Scale** | Closed-loop learning from analytics winners | Planned |
 
@@ -61,6 +62,20 @@ python -m pramabu_agents agents
 # Run this week's campaign pack (no API key needed)
 python -m pramabu_agents weekly --print
 ```
+
+## Quick start — agent chat console
+
+```bash
+pip install -r requirements.txt
+python -m agent_chat.app
+```
+
+Open http://localhost:8000
+
+- Chat with any specialist agent or run the full weekly pipeline
+- Upload images, PDFs, Word docs, CSV, text, and more as agent context
+- Read the reply in chat
+- Download generated posters, markdown, and JSON from the reply chips
 
 ## Quick start — custom storefront
 
@@ -133,8 +148,10 @@ pramabu_agents/
   cli.py                        # CLI entrypoint
   models.py                     # Shared schemas
   report.py                     # Markdown/JSON export
+  poster.py                     # Poster PNG renderer
+agent_chat/                     # Web chat console (FastAPI + UI)
 storefront/                     # Next.js D2C storefront MVP
-tests/                          # Pipeline tests
+tests/                          # Pipeline + chat tests
 ```
 
 ## Tests

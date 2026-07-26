@@ -29,6 +29,11 @@ class PosterProductionAgent(BaseAgent):
             poster_ideas = [c for c in pack.creatives if c.brand_safe][:1]
             candidates = poster_ideas
 
+        # Prefer an uploaded image as optional product/reference art when provided via chat.
+        reference_images = [
+            Path(p) for p in context.get("uploaded_images", []) if Path(p).exists()
+        ]
+
         for index, creative in enumerate(candidates, start=1):
             filename = f"{index:02d}-{slugify(creative.idea_title)}.png"
             path = poster_dir / filename
@@ -38,6 +43,7 @@ class PosterProductionAgent(BaseAgent):
                 website=self.website,
                 colors=colors,
                 output_path=path,
+                reference_image=reference_images[0] if reference_images else None,
             )
             posters.append(asset)
             creative.notes = list(creative.notes) + [f"Poster rendered: {asset.path}"]

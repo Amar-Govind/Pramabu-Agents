@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Parambu Agent Chat</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <img src="/static/logo.png" alt="Parambu Organics" onerror="this.style.display='none'" />
+          <div>
+            <h1>Parambu Agent Chat</h1>
+            <p>Talk to every specialist agent · upload briefs · download outputs</p>
+          </div>
+        </div>
+        <div class="pill"><span class="dot"></span><span id="modePill">Ready</span></div>
+      </header>
+
+      <div class="shell">
+        <aside class="sidebar">
+          <h2>Agents</h2>
+          <ul class="agent-list" id="agentList">
+            <li><strong>Loading…</strong><span>Fetching agent roster</span></li>
+          </ul>
+          <div class="hints">
+            Try:
+            <div><code>run weekly campaign</code></div>
+            <div><code>create posters for neem soap</code></div>
+            <div><code>run influencer agent</code></div>
+            Upload PDFs, docs, images, CSV, or text as context.
+          </div>
+        </aside>
+
+        <main class="chat-panel">
+          <div class="messages" id="messages" aria-live="polite"></div>
+          <form class="composer" id="chatForm">
+            <div class="dropzone" id="dropzone">
+              Drop images or documents here, or
+              <label for="fileInput" style="color:#b18767;font-weight:700;cursor:pointer"> browse</label>
+              <input id="fileInput" type="file" multiple accept="*/*" />
+              <div class="file-pills" id="filePills"></div>
+            </div>
+            <div class="row">
+              <textarea
+                id="messageInput"
+                placeholder="Ask the agents… e.g. Create a weekly campaign using the attached brief"
+                required
+              ></textarea>
+              <div class="actions">
+                <button class="primary" id="sendBtn" type="submit">Send</button>
+                <button class="ghost" id="clearBtn" type="button">Clear</button>
+              </div>
+            </div>
+          </form>
+        </main>
+      </div>
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
