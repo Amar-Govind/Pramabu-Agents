@@ -28,10 +28,12 @@ MARGIN = 60
 # Cards per row; the final row holds the single transplanting step, centred.
 ROW_LAYOUT = [3, 3, 1]
 
-# Step 1 reuses the kit product shot from the reference poster; this is the
-# product area of its "Open the Kit" card, excluding that card's own caption.
-KIT_POSTER = "Kit-Poster1.jpeg"
-KIT_POSTER_CROP = (40, 494, 368, 784)
+# Step 1 reuses the kit hero shot from the reference poster, cropped around the
+# canister so the packaging stays legible at card size. The poster's subtitle
+# sits beside the canister, so it is painted out before cropping.
+KIT_POSTER = "Kit-Poster3.jpeg"
+KIT_POSTER_CROP = (358, 406, 1046, 906)
+KIT_POSTER_TEXT_BOX = (352, 412, 698, 516)
 STEP_ONE_PHOTO = "step-01-open-kit.png"
 
 # Each step lists its photo candidates in priority order, so a real product
@@ -101,14 +103,33 @@ def load_sans(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(path, size)
 
 
+def erase_poster_subtitle(poster: Image.Image) -> None:
+    """Paint out the poster subtitle by interpolating the background above and below it."""
+    x0, y0, x1, y1 = KIT_POSTER_TEXT_BOX
+    top, bottom = y0 - 6, y1 + 6
+    px = poster.load()
+    rng = random.Random(5)
+    for x in range(x0, x1):
+        above, below = px[x, top], px[x, bottom]
+        for y in range(y0, y1):
+            ratio = (y - top) / (bottom - top)
+            grain = rng.randint(-2, 2)
+            px[x, y] = tuple(
+                max(0, min(255, int(above[i] * (1 - ratio) + below[i] * ratio) + grain))
+                for i in range(3)
+            )
+    feathered = poster.crop((x0 - 8, y0 - 8, x1 + 8, y1 + 8)).filter(ImageFilter.GaussianBlur(1.0))
+    poster.paste(feathered, (x0 - 8, y0 - 8))
+
+
 def refresh_step_one_photo() -> None:
     """Re-cut the step 1 kit shot from the poster so it stays the source of truth."""
-    poster = STEPS_DIR / KIT_POSTER
-    if not poster.exists():
+    source = STEPS_DIR / KIT_POSTER
+    if not source.exists():
         return
-    crop = Image.open(poster).convert("RGB").crop(KIT_POSTER_CROP)
-    crop = crop.resize((crop.width * 4, crop.height * 4), Image.Resampling.LANCZOS)
-    crop.save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
+    poster = Image.open(source).convert("RGB")
+    erase_poster_subtitle(poster)
+    poster.crop(KIT_POSTER_CROP).save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
 
 
 def resolve_photo(candidates: str | tuple[str, ...]) -> Path:
@@ -281,7 +302,7 @@ def draw_step_card(
     photo_pad = 16
     photo_w = (x2 - x1) - photo_pad * 2
     photo_h = (y2 - y1) - photo_top - 110
-    contain = step_num == 1
+    contain = False
     photo = prepare_photo(image_path, (photo_w, photo_h), contain=contain)
     card.alpha_composite(photo, (photo_pad, photo_top))
 
