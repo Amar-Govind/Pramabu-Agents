@@ -10,7 +10,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 ROOT = Path(__file__).resolve().parent
-LOGO_PATH = ROOT.parents[2] / "storefront" / "public" / "brand" / "logo-stacked-transparent.png"
+LOGO_PATH = ROOT.parents[2] / "storefront" / "public" / "brand" / "logo-wordmark-transparent.png"
 STEPS_DIR = ROOT / "steps"
 OUTPUT_DIR = ROOT / "output"
 
@@ -21,9 +21,12 @@ GOLD = (214, 170, 132)
 WHITE = (255, 255, 255)
 TEXT_MUTED = (90, 110, 95)
 
-WIDTH = 1600
-HEIGHT = 2400
-MARGIN = 56
+WIDTH = 1800
+HEIGHT = 2560
+MARGIN = 60
+
+# Cards per row; the final row holds the single transplanting step, centred.
+ROW_LAYOUT = [3, 3, 1]
 
 STEPS = [
     (
@@ -55,6 +58,11 @@ STEPS = [
         "step-06-watch-grow.png",
         "Watch Them Grow",
         "Nurture daily and enjoy fresh, homegrown vegetables.",
+    ),
+    (
+        "step-07-transplant-grow-bag.png",
+        "Move to a Grow Bag",
+        "Slit the cup sides with a knife and place it straight into a bigger grow bag. The cup breaks down on its own.",
     ),
 ]
 
@@ -131,22 +139,25 @@ def draw_centered(
     draw.text(((canvas_w - tw) // 2, y), text, font=font, fill=fill)
 
 
-def draw_multiline_centered(
+def wrap_text(
     draw: ImageDraw.ImageDraw,
     text: str,
-    y: int,
     font: ImageFont.FreeTypeFont,
-    fill: tuple[int, ...],
-    canvas_w: int,
-    line_gap: int = 6,
-) -> int:
-    lines = text.split("\n")
-    lh = font.size + line_gap
-    for line in lines:
-        tw = text_width(draw, line, font)
-        draw.text(((canvas_w - tw) // 2, y), line, font=font, fill=fill)
-        y += lh
-    return y
+    max_width: int,
+) -> list[str]:
+    lines: list[str] = []
+    current = ""
+    for word in text.split():
+        candidate = f"{current} {word}".strip()
+        if text_width(draw, candidate, font) <= max_width:
+            current = candidate
+        else:
+            if current:
+                lines.append(current)
+            current = word
+    if current:
+        lines.append(current)
+    return lines
 
 
 def draw_step_badge(draw: ImageDraw.ImageDraw, cx: int, cy: int, number: int) -> None:
@@ -232,26 +243,59 @@ def draw_step_card(
 
     # Description
     desc_font = load_sans(18)
-    words = description.split()
-    lines: list[str] = []
-    current = ""
-    max_w = x2 - x1 - 32
-    for word in words:
-        test = f"{current} {word}".strip()
-        if text_width(draw, test, desc_font) <= max_w:
-            current = test
-        else:
-            if current:
-                lines.append(current)
-            current = word
-    if current:
-        lines.append(current)
+    lines = wrap_text(draw, description, desc_font, x2 - x1 - 32)
 
     desc_y = y2 - y1 - 88
     for line in lines:
         tw = text_width(draw, line, desc_font)
         draw.text(((x2 - x1 - tw) // 2, desc_y), line, font=desc_font, fill=TEXT_MUTED)
         desc_y += 24
+
+    canvas.alpha_composite(card, (x1, y1))
+
+
+def draw_wide_step_card(
+    canvas: Image.Image,
+    box: tuple[int, int, int, int],
+    step_num: int,
+    title: str,
+    image_path: Path,
+    description: str,
+) -> None:
+    """Final step rendered as a wide card with the photo beside the copy."""
+    x1, y1, x2, y2 = box
+    w, h = x2 - x1, y2 - y1
+    card = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(card)
+
+    draw.rounded_rectangle((0, 0, w - 1, h - 1), radius=14, fill=(*WHITE, 240), outline=(*GOLD, 200), width=2)
+
+    pad = 18
+    photo_w = (w - pad * 3) // 2
+    photo_h = h - pad * 2
+    photo = ImageOps.fit(Image.open(image_path).convert("RGBA"), (photo_w, photo_h), Image.Resampling.LANCZOS)
+    mask = Image.new("L", (photo_w, photo_h), 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, photo_w, photo_h), radius=10, fill=255)
+    photo.putalpha(mask)
+    card.alpha_composite(photo, (pad, pad))
+
+    text_x = pad * 2 + photo_w
+    text_w = w - text_x - pad
+    badge_cx = text_x + 30
+    badge_cy = pad + 42
+    draw_step_badge(draw, badge_cx, badge_cy, step_num)
+
+    title_font = load_font(32, bold=True)
+    draw.text((badge_cx + 44, badge_cy - 20), title, font=title_font, fill=FOREST)
+
+    desc_font = load_sans(19)
+    y = badge_cy + 62
+    for line in wrap_text(draw, description, desc_font, text_w):
+        draw.text((text_x, y), line, font=desc_font, fill=TEXT_MUTED)
+        y += 30
+
+    note_font = load_sans(17, bold=True)
+    draw.text((text_x, y + 16), "No transplant shock · Zero plastic waste", font=note_font, fill=FOREST)
 
     canvas.alpha_composite(card, (x1, y1))
 
@@ -270,51 +314,80 @@ def create_user_guide() -> Image.Image:
 
     # Logo
     logo = Image.open(LOGO_PATH).convert("RGBA")
-    logo_w = 220
+    logo_w = 620
     logo_h = int(logo.height * (logo_w / logo.width))
     logo = logo.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
-    canvas.alpha_composite(logo, ((WIDTH - logo_w) // 2, 48))
+    canvas.alpha_composite(logo, ((WIDTH - logo_w) // 2, 62))
 
     # Headlines
-    title_font = load_font(72, bold=True)
-    script_font = load_font(42, italic=True)
+    title_font = load_font(78, bold=True)
+    script_font = load_font(46, italic=True)
     draw_centered(draw, "Grow Fresh Food", 300, title_font, FOREST, WIDTH)
-    draw_centered(draw, "in Just 6 Easy Steps", 390, script_font, FOREST, WIDTH)
+    draw_centered(draw, "in Just 7 Easy Steps", 398, script_font, FOREST, WIDTH)
 
-    # Step grid 2 columns x 3 rows
-    grid_top = 470
-    col_gap = 28
+    # Step grid: rows of 3, 3, and a single wide finale card
+    grid_top = 500
+    col_gap = 24
     row_gap = 28
-    card_w = (WIDTH - 2 * MARGIN - col_gap) // 2
-    card_h = 520
+    card_w = (WIDTH - 2 * MARGIN - 2 * col_gap) // 3
+    card_h = 560
+    wide_card_h = 420
 
-    for i, (filename, title, description) in enumerate(STEPS):
-        col = i % 2
-        row = i // 2
-        x1 = MARGIN + col * (card_w + col_gap)
-        y1 = grid_top + row * (card_h + row_gap)
-        draw_step_card(canvas, (x1, y1, x1 + card_w, y1 + card_h), i + 1, title, STEPS_DIR / filename, description)
+    step_index = 0
+    y = grid_top
+    for count in ROW_LAYOUT:
+        if count == 1:
+            filename, title, description = STEPS[step_index]
+            wide_w = 2 * card_w + col_gap
+            x1 = (WIDTH - wide_w) // 2
+            draw_wide_step_card(
+                canvas,
+                (x1, y, x1 + wide_w, y + wide_card_h),
+                step_index + 1,
+                title,
+                STEPS_DIR / filename,
+                description,
+            )
+            step_index += 1
+            y += wide_card_h + row_gap
+            continue
+
+        row_w = count * card_w + (count - 1) * col_gap
+        x_start = (WIDTH - row_w) // 2
+        for col in range(count):
+            filename, title, description = STEPS[step_index]
+            x1 = x_start + col * (card_w + col_gap)
+            draw_step_card(
+                canvas,
+                (x1, y, x1 + card_w, y + card_h),
+                step_index + 1,
+                title,
+                STEPS_DIR / filename,
+                description,
+            )
+            step_index += 1
+        y += card_h + row_gap
 
     # Footer slogan
-    footer_y = grid_top + 3 * (card_h + row_gap) + 24
+    footer_y = y + 6
     draw_footer_flourish(draw, footer_y, WIDTH)
     slogan_font = load_font(34, bold=True)
     draw_centered(draw, "Grow Naturally. Grow Sustainably.", footer_y + 24, slogan_font, FOREST, WIDTH)
     draw_footer_flourish(draw, footer_y + 84, WIDTH)
 
     # Feature icons row
-    icon_y = footer_y + 130
+    icon_y = footer_y + 150
     icon_spacing = (WIDTH - 2 * MARGIN) // 4
-    label_font = load_sans(13, bold=True)
+    label_font = load_sans(19, bold=True)
     for i, (label, icon_key) in enumerate(FEATURES):
         cx = MARGIN + icon_spacing // 2 + i * icon_spacing
-        draw.ellipse((cx - 52, icon_y - 52, cx + 52, icon_y + 52), outline=(*GOLD, 200), width=2)
-        ICON_DRAWERS[icon_key](draw, cx, icon_y, size=22)
-        y = icon_y + 68
+        draw.ellipse((cx - 58, icon_y - 58, cx + 58, icon_y + 58), outline=(*GOLD, 210), width=3)
+        ICON_DRAWERS[icon_key](draw, cx, icon_y, size=28)
+        y = icon_y + 78
         for line in label.split("\n"):
             tw = text_width(draw, line, label_font)
             draw.text((cx - tw // 2, y), line, font=label_font, fill=FOREST)
-            y += label_font.size + 2
+            y += label_font.size + 4
 
     return canvas.convert("RGB")
 
