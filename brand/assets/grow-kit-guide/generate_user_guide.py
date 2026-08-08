@@ -221,6 +221,23 @@ ICON_DRAWERS = {
 }
 
 
+def prepare_photo(image_path: Path, size: tuple[int, int], *, contain: bool = False) -> Image.Image:
+    """Fit a photo into size. Use contain for packaging shots so nothing is cropped."""
+    src = Image.open(image_path).convert("RGBA")
+    w, h = size
+    if contain:
+        canvas = Image.new("RGBA", size, (*CREAM, 255))
+        fitted = ImageOps.contain(src, (w - 12, h - 12), Image.Resampling.LANCZOS)
+        canvas.alpha_composite(fitted, ((w - fitted.width) // 2, (h - fitted.height) // 2))
+        photo = canvas
+    else:
+        photo = ImageOps.fit(src, size, Image.Resampling.LANCZOS)
+    mask = Image.new("L", size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, w, h), radius=10, fill=255)
+    photo.putalpha(mask)
+    return photo
+
+
 def draw_step_card(
     canvas: Image.Image,
     box: tuple[int, int, int, int],
@@ -243,16 +260,13 @@ def draw_step_card(
     title_font = load_font(30, bold=True)
     draw.text((82, 24), title, font=title_font, fill=FOREST)
 
-    # Photo area
+    # Photo area — step 1 uses the original kit packaging photo without cropping
     photo_top = 72
     photo_pad = 16
-    photo_box = (photo_pad, photo_top, x2 - x1 - photo_pad, y2 - y1 - 110)
-    photo_w = photo_box[2] - photo_box[0]
-    photo_h = photo_box[3] - photo_box[1]
-    photo = ImageOps.fit(Image.open(image_path).convert("RGBA"), (photo_w, photo_h), Image.Resampling.LANCZOS)
-    mask = Image.new("L", (photo_w, photo_h), 0)
-    ImageDraw.Draw(mask).rounded_rectangle((0, 0, photo_w, photo_h), radius=10, fill=255)
-    photo.putalpha(mask)
+    photo_w = (x2 - x1) - photo_pad * 2
+    photo_h = (y2 - y1) - photo_top - 110
+    contain = "kit-org" in image_path.name.lower() or step_num == 1
+    photo = prepare_photo(image_path, (photo_w, photo_h), contain=contain)
     card.alpha_composite(photo, (photo_pad, photo_top))
 
     # Description
