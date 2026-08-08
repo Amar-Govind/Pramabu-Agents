@@ -32,7 +32,10 @@ ROW_LAYOUT = [3, 3, 1]
 # canister so the packaging stays legible at card size. The poster's subtitle
 # sits beside the canister, so it is painted out before cropping.
 KIT_POSTER = "Kit-Poster3.jpeg"
-KIT_POSTER_CROP = (358, 406, 1046, 906)
+# Whole product spread: canister, cups, cocopeat discs, seed packets, spray
+# bottle and stirrers. The lower bound stops just above the poster's
+# "What's Inside" banner.
+KIT_POSTER_CROP = (30, 408, 1052, 978)
 KIT_POSTER_TEXT_BOX = (352, 412, 698, 516)
 STEP_ONE_PHOTO = "step-01-open-kit.png"
 
@@ -302,7 +305,8 @@ def draw_step_card(
     photo_pad = 16
     photo_w = (x2 - x1) - photo_pad * 2
     photo_h = (y2 - y1) - photo_top - 110
-    contain = False
+    # The kit spread is wider than the card, so letterbox it rather than crop
+    contain = step_num == 1
     photo = prepare_photo(image_path, (photo_w, photo_h), contain=contain)
     card.alpha_composite(photo, (photo_pad, photo_top))
 
