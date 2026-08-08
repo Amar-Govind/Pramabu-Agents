@@ -28,11 +28,17 @@ MARGIN = 60
 # Cards per row; the final row holds the single transplanting step, centred.
 ROW_LAYOUT = [3, 3, 1]
 
+# Step 1 reuses the kit product shot from the reference poster; this is the
+# product area of its "Open the Kit" card, excluding that card's own caption.
+KIT_POSTER = "Kit-Poster1.jpeg"
+KIT_POSTER_CROP = (40, 494, 368, 784)
+STEP_ONE_PHOTO = "step-01-open-kit.png"
+
 # Each step lists its photo candidates in priority order, so a real product
 # photo dropped into steps/ is preferred over the generated placeholder.
 STEPS = [
     (
-        ("Kit-OrginalImage.JPG", "Kit-OriginalImage.JPG", "step-01-open-kit.png"),
+        (STEP_ONE_PHOTO,),
         "Open the Kit",
         "Unbox your organic farming kit and get everything ready.",
     ),
@@ -93,6 +99,16 @@ def load_sans(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
         else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     )
     return ImageFont.truetype(path, size)
+
+
+def refresh_step_one_photo() -> None:
+    """Re-cut the step 1 kit shot from the poster so it stays the source of truth."""
+    poster = STEPS_DIR / KIT_POSTER
+    if not poster.exists():
+        return
+    crop = Image.open(poster).convert("RGB").crop(KIT_POSTER_CROP)
+    crop = crop.resize((crop.width * 4, crop.height * 4), Image.Resampling.LANCZOS)
+    crop.save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
 
 
 def resolve_photo(candidates: str | tuple[str, ...]) -> Path:
@@ -265,7 +281,7 @@ def draw_step_card(
     photo_pad = 16
     photo_w = (x2 - x1) - photo_pad * 2
     photo_h = (y2 - y1) - photo_top - 110
-    contain = "kit-org" in image_path.name.lower() or step_num == 1
+    contain = step_num == 1
     photo = prepare_photo(image_path, (photo_w, photo_h), contain=contain)
     card.alpha_composite(photo, (photo_pad, photo_top))
 
@@ -422,6 +438,7 @@ def create_user_guide() -> Image.Image:
 
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    refresh_step_one_photo()
     guide = create_user_guide()
     out = OUTPUT_DIR / "grow-kit-user-guide.png"
     guide.save(out, "PNG", optimize=True)
