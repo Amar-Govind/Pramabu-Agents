@@ -28,9 +28,11 @@ MARGIN = 60
 # Cards per row; the final row holds the single transplanting step, centred.
 ROW_LAYOUT = [3, 3, 1]
 
+# Each step lists its photo candidates in priority order, so a real product
+# photo dropped into steps/ is preferred over the generated placeholder.
 STEPS = [
     (
-        "step-01-open-kit.png",
+        ("Kit-OrginalImage.JPG", "Kit-OriginalImage.JPG", "step-01-open-kit.png"),
         "Open the Kit",
         "Unbox your organic farming kit and get everything ready.",
     ),
@@ -91,6 +93,18 @@ def load_sans(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
         else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     )
     return ImageFont.truetype(path, size)
+
+
+def resolve_photo(candidates: str | tuple[str, ...]) -> Path:
+    """Return the first candidate present in steps/, matched case-insensitively."""
+    if isinstance(candidates, str):
+        candidates = (candidates,)
+    available = {path.name.lower(): path for path in STEPS_DIR.iterdir() if path.is_file()}
+    for name in candidates:
+        match = available.get(name.lower())
+        if match is not None:
+            return match
+    raise FileNotFoundError(f"No photo in {STEPS_DIR} matching any of: {', '.join(candidates)}")
 
 
 def make_background(width: int, height: int) -> Image.Image:
@@ -337,7 +351,7 @@ def create_user_guide() -> Image.Image:
     y = grid_top
     for count in ROW_LAYOUT:
         if count == 1:
-            filename, title, description = STEPS[step_index]
+            photo, title, description = STEPS[step_index]
             wide_w = 2 * card_w + col_gap
             x1 = (WIDTH - wide_w) // 2
             draw_wide_step_card(
@@ -345,7 +359,7 @@ def create_user_guide() -> Image.Image:
                 (x1, y, x1 + wide_w, y + wide_card_h),
                 step_index + 1,
                 title,
-                STEPS_DIR / filename,
+                resolve_photo(photo),
                 description,
             )
             step_index += 1
@@ -355,14 +369,14 @@ def create_user_guide() -> Image.Image:
         row_w = count * card_w + (count - 1) * col_gap
         x_start = (WIDTH - row_w) // 2
         for col in range(count):
-            filename, title, description = STEPS[step_index]
+            photo, title, description = STEPS[step_index]
             x1 = x_start + col * (card_w + col_gap)
             draw_step_card(
                 canvas,
                 (x1, y, x1 + card_w, y + card_h),
                 step_index + 1,
                 title,
-                STEPS_DIR / filename,
+                resolve_photo(photo),
                 description,
             )
             step_index += 1
