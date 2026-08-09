@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate Parambu Organics grow kit user guide poster."""
+"""Generate Parambu Organics grow kit foldable user guide."""
 
 from __future__ import annotations
 
@@ -24,6 +24,13 @@ TEXT_MUTED = (90, 110, 95)
 WIDTH = 1800
 HEIGHT = 2560
 MARGIN = 60
+
+# Foldable accordion layout — 8 vertical panels (cover + 7 steps), z-fold.
+FOLD_PANEL_W = 1080
+FOLD_PANEL_H = 520
+FOLD_PANEL_COUNT = 8
+FOLD_BLEED = 24
+FOLD_VINE_X = 54
 
 # Cards per row; the final row holds the single transplanting step, centred.
 ROW_LAYOUT = [3, 3, 1]
@@ -377,6 +384,327 @@ def draw_footer_flourish(draw: ImageDraw.ImageDraw, y: int, canvas_w: int) -> No
     draw_leaf_icon(draw, cx + 100, y, size=10)
 
 
+def draw_gold_corners(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], inset: int = 28, arm: int = 52) -> None:
+    """Ornamental gold corner brackets for the cover panel."""
+    x1, y1, x2, y2 = box
+    gold = (*GOLD, 220)
+    corners = [
+        ((x1 + inset, y1 + inset), (x1 + inset + arm, y1 + inset), (x1 + inset, y1 + inset + arm)),
+        ((x2 - inset, y1 + inset), (x2 - inset - arm, y1 + inset), (x2 - inset, y1 + inset + arm)),
+        ((x1 + inset, y2 - inset), (x1 + inset + arm, y2 - inset), (x1 + inset, y2 - inset - arm)),
+        ((x2 - inset, y2 - inset), (x2 - inset - arm, y2 - inset), (x2 - inset, y2 - inset - arm)),
+    ]
+    for a, b, c in corners:
+        draw.line((a, b), fill=gold, width=3)
+        draw.line((a, c), fill=gold, width=3)
+
+
+def draw_vine_stem(
+    draw: ImageDraw.ImageDraw,
+    x: int,
+    y_start: int,
+    y_end: int,
+    *,
+    leaf_count: int = 4,
+    leaf_size: int = 16,
+) -> None:
+    """Curved vine stem with alternating leaves along a vertical span."""
+    points: list[tuple[int, int]] = []
+    span = y_end - y_start
+    for i in range(0, span + 1, 8):
+        sway = int(10 * math.sin(i / 42))
+        points.append((x + sway, y_start + i))
+    if len(points) > 1:
+        draw.line(points, fill=(*FOREST, 180), width=4, joint="curve")
+
+    for i in range(leaf_count):
+        t = (i + 1) / (leaf_count + 1)
+        py = y_start + int(span * t)
+        sway = int(10 * math.sin((py - y_start) / 42))
+        side = 1 if i % 2 == 0 else -1
+        draw_leaf_icon(draw, x + sway + side * 22, py, size=leaf_size)
+
+
+def draw_fold_crease(draw: ImageDraw.ImageDraw, y: int, width: int, *, label: str = "fold") -> None:
+    """Dashed accordion fold line with leaf markers."""
+    margin = 70
+    dash, gap = 14, 10
+    x = margin
+    while x < width - margin:
+        draw.line((x, y, min(x + dash, width - margin), y), fill=(*GOLD, 170), width=2)
+        x += dash + gap
+    draw_leaf_icon(draw, margin - 18, y, size=9)
+    draw_leaf_icon(draw, width - margin + 18, y, size=9)
+    font = load_sans(14, bold=True)
+    tw = text_width(draw, label, font)
+    draw.text(((width - tw) // 2, y - 22), label, font=font, fill=(*GOLD, 210))
+
+
+def draw_crop_marks(draw: ImageDraw.ImageDraw, width: int, height: int) -> None:
+    """Light printer crop marks around the flat accordion sheet."""
+    mark = 18
+    inset = 10
+    corners = [
+        ((inset, inset), (inset + mark, inset), (inset, inset + mark)),
+        ((width - inset, inset), (width - inset - mark, inset), (width - inset, inset + mark)),
+        ((inset, height - inset), (inset + mark, height - inset), (inset, height - inset - mark)),
+        ((width - inset, height - inset), (width - inset - mark, height - inset), (width - inset, height - inset - mark)),
+    ]
+    for a, b, c in corners:
+        draw.line((a, b), fill=(*KRAFT_DARK, 120), width=1)
+        draw.line((a, c), fill=(*KRAFT_DARK, 120), width=1)
+
+
+def draw_cover_panel(panel: Image.Image) -> None:
+    """Forest-green front cover shown when the accordion is folded shut."""
+    w, h = panel.size
+    draw = ImageDraw.Draw(panel)
+
+    # Deep forest gradient wash
+    for y in range(h):
+        ratio = y / h
+        shade = int(8 * math.sin(ratio * math.pi))
+        row = Image.new("RGBA", (w, 1), (FOREST[0] - shade, FOREST[1] + shade // 2, FOREST[2] - shade // 3, 255))
+        panel.paste(row, (0, y))
+
+    draw_gold_corners(draw, (18, 18, w - 18, h - 18))
+
+    # Inner cream frame
+    draw.rounded_rectangle((34, 34, w - 34, h - 34), radius=18, outline=(*GOLD, 150), width=2)
+
+    logo = Image.open(LOGO_PATH).convert("RGBA")
+    logo_w = 460
+    logo_h = int(logo.height * (logo_w / logo.width))
+    logo = logo.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
+    # Warm the logo slightly so it reads on dark green
+    warm = Image.new("RGBA", logo.size, (*CREAM, 40))
+    logo = Image.alpha_composite(logo, warm)
+    panel.alpha_composite(logo, ((w - logo_w) // 2, 58))
+
+    title_font = load_font(58, bold=True)
+    script_font = load_font(34, italic=True)
+    draw_centered(draw, "Grow Fresh Food", 250, title_font, CREAM, w)
+    draw_centered(draw, "in Just 7 Easy Steps", 322, script_font, GOLD, w)
+
+    # Unfold cue
+    cue_y = h - 150
+    draw.line((w // 2 - 90, cue_y, w // 2 + 90, cue_y), fill=(*GOLD, 180), width=2)
+    cue_font = load_sans(20, bold=True)
+    draw_centered(draw, "Unfold Your Garden Journey", cue_y + 16, cue_font, CREAM, w)
+
+    # Down arrows
+    arrow_font = load_sans(28, bold=True)
+    draw_centered(draw, "▼  ▼  ▼", cue_y + 52, arrow_font, GOLD, w)
+
+    draw_vine_stem(draw, FOLD_VINE_X, 120, h - 90, leaf_count=3, leaf_size=14)
+
+    tab_font = load_sans(13, bold=True)
+    draw.text((w - 88, 20), "COVER", font=tab_font, fill=(*GOLD, 200))
+
+
+def draw_accordion_step_panel(
+    panel: Image.Image,
+    step_num: int,
+    title: str,
+    image_path: Path,
+    description: str,
+    *,
+    tint: tuple[int, int, int] = CREAM,
+) -> None:
+    """Single accordion panel for steps 1–6."""
+    w, h = panel.size
+    draw = ImageDraw.Draw(panel)
+
+    # Alternating panel wash for zigzag fold readability
+    base = Image.new("RGB", (w, h), tint)
+    panel.paste(base, (0, 0))
+
+    # Vine rail
+    draw.rounded_rectangle((16, 16, 78, h - 16), radius=12, fill=(*WHITE, 230), outline=(*GOLD, 140), width=2)
+    draw_vine_stem(draw, FOLD_VINE_X, 40, h - 40, leaf_count=2, leaf_size=12 + step_num)
+
+    content_x = 96
+    content_w = w - content_x - 28
+
+    # Step badge on vine
+    draw_step_badge(draw, FOLD_VINE_X, 52, step_num)
+
+    title_font = load_font(34, bold=True)
+    draw.text((content_x, 24), title, font=title_font, fill=FOREST)
+
+    photo_top = 78
+    photo_h = h - photo_top - 118
+    contain = step_num == 1
+    photo = prepare_photo(image_path, (content_w, photo_h), contain=contain)
+    panel.alpha_composite(photo, (content_x, photo_top))
+
+    desc_font = load_sans(19)
+    lines = wrap_text(draw, description, desc_font, content_w)
+    desc_y = h - 24 - len(lines) * 26
+    for line in lines:
+        draw.text((content_x, desc_y), line, font=desc_font, fill=TEXT_MUTED)
+        desc_y += 26
+
+    tab_font = load_sans(13, bold=True)
+    draw.text((w - 72, 20), f"0{step_num}", font=tab_font, fill=(*GOLD, 200))
+
+
+def draw_finale_panel(
+    panel: Image.Image,
+    image_path: Path,
+    title: str,
+    description: str,
+) -> None:
+    """Final accordion panel: step 7, slogan, and feature icons."""
+    w, h = panel.size
+    draw = ImageDraw.Draw(panel)
+
+    base = make_background(w, h)
+    panel.paste(base, (0, 0))
+    draw = ImageDraw.Draw(panel)
+
+    draw_vine_stem(draw, FOLD_VINE_X, 30, h - 30, leaf_count=5, leaf_size=18)
+
+    # Step 7 hero band
+    hero_h = 268
+    draw.rounded_rectangle((88, 20, w - 24, hero_h), radius=14, fill=(*WHITE, 240), outline=(*GOLD, 180), width=2)
+    draw_step_badge(draw, 118, 52, 7)
+
+    title_font = load_font(28, bold=True)
+    draw.text((156, 28), title, font=title_font, fill=FOREST)
+
+    photo_w = 280
+    photo = ImageOps.fit(Image.open(image_path).convert("RGBA"), (photo_w, hero_h - 52), Image.Resampling.LANCZOS)
+    mask = Image.new("L", photo.size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, photo_w, hero_h - 52), radius=10, fill=255)
+    photo.putalpha(mask)
+    panel.alpha_composite(photo, (100, 40))
+
+    text_x = 100 + photo_w + 16
+    text_w = w - text_x - 28
+    desc_font = load_sans(16)
+    y = 44
+    for line in wrap_text(draw, description, desc_font, text_w):
+        draw.text((text_x, y), line, font=desc_font, fill=TEXT_MUTED)
+        y += 22
+    note_font = load_sans(14, bold=True)
+    draw.text((text_x, y + 6), "No transplant shock · Zero plastic waste", font=note_font, fill=FOREST)
+
+    # Footer band
+    footer_y = hero_h + 22
+    draw_footer_flourish(draw, footer_y, w)
+    slogan_font = load_font(26, bold=True)
+    draw_centered(draw, "Grow Naturally. Grow Sustainably.", footer_y + 18, slogan_font, FOREST, w)
+
+    icon_y = footer_y + 78
+    icon_spacing = (w - 120) // 4
+    label_font = load_sans(14, bold=True)
+    for i, (label, icon_key) in enumerate(FEATURES):
+        cx = 60 + icon_spacing // 2 + i * icon_spacing
+        draw.ellipse((cx - 42, icon_y - 42, cx + 42, icon_y + 42), outline=(*GOLD, 210), width=2)
+        ICON_DRAWERS[icon_key](draw, cx, icon_y, size=20)
+        ly = icon_y + 54
+        for line in label.split("\n"):
+            tw = text_width(draw, line, label_font)
+            draw.text((cx - tw // 2, ly), line, font=label_font, fill=FOREST)
+            ly += label_font.size + 2
+
+    site_font = load_sans(16, bold=True)
+    draw_centered(draw, "parambu.in", h - 34, site_font, FOREST, w)
+
+    tab_font = load_sans(13, bold=True)
+    draw.text((w - 72, 20), "07", font=tab_font, fill=(*GOLD, 200))
+
+
+def create_foldable_guide() -> Image.Image:
+    """Flat print layout for an 8-panel vertical accordion fold."""
+    bleed = FOLD_BLEED
+    w = FOLD_PANEL_W + bleed * 2
+    h = FOLD_PANEL_COUNT * FOLD_PANEL_H + bleed * 2 + (FOLD_PANEL_COUNT - 1) * 6
+
+    canvas = Image.new("RGBA", (w, h), (*CREAM, 255))
+
+    for i in range(FOLD_PANEL_COUNT):
+        y = bleed + i * (FOLD_PANEL_H + 6)
+        panel = Image.new("RGBA", (FOLD_PANEL_W, FOLD_PANEL_H), (0, 0, 0, 0))
+
+        if i == 0:
+            draw_cover_panel(panel)
+        elif i == FOLD_PANEL_COUNT - 1:
+            photo, title, description = STEPS[6]
+            draw_finale_panel(panel, resolve_photo(photo), title, description)
+        else:
+            photo, title, description = STEPS[i - 1]
+            tint = CREAM if i % 2 == 1 else WHITE
+            draw_accordion_step_panel(
+                panel,
+                i,
+                title,
+                resolve_photo(photo),
+                description,
+                tint=tint,
+            )
+
+        canvas.alpha_composite(panel, (bleed, y))
+
+        if i < FOLD_PANEL_COUNT - 1:
+            crease_y = y + FOLD_PANEL_H + 3
+            draw_fold_crease(ImageDraw.Draw(canvas), crease_y, w)
+
+    draw = ImageDraw.Draw(canvas)
+    draw_crop_marks(draw, w, h)
+
+    # Print legend
+    legend_font = load_sans(15)
+    legend = "Print flat · Accordion-fold along dashed lines · Finished size ≈ 108 × 192 mm"
+    tw = text_width(draw, legend, legend_font)
+    draw.text(((w - tw) // 2, h - bleed + 4), legend, font=legend_font, fill=TEXT_MUTED)
+
+    return canvas.convert("RGB")
+
+
+def create_foldable_mockup(flat: Image.Image) -> Image.Image:
+    """Preview of the folded accordion cover as it sits inside the kit."""
+    cover_h = FOLD_PANEL_H
+    cover = flat.crop((FOLD_BLEED, FOLD_BLEED, FOLD_BLEED + FOLD_PANEL_W, FOLD_BLEED + cover_h))
+
+    mock_w, mock_h = 900, 1100
+    mock = Image.new("RGBA", (mock_w, mock_h), (235, 228, 215, 255))
+
+    # Soft tabletop shadow
+    shadow = Image.new("RGBA", mock.size, (0, 0, 0, 0))
+    sdraw = ImageDraw.Draw(shadow)
+    sdraw.ellipse((mock_w // 2 - 260, mock_h - 180, mock_w // 2 + 260, mock_h - 40), fill=(0, 0, 0, 35))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(28))
+    mock = Image.alpha_composite(mock, shadow)
+
+    # Stack slivers peeking beneath the cover (accordion depth)
+    for depth, offset in enumerate([18, 10, 4], start=1):
+        sliver = Image.new("RGBA", (FOLD_PANEL_W, 14), (*CREAM, 255))
+        sdraw = ImageDraw.Draw(sliver)
+        sdraw.line((40, 0, FOLD_PANEL_W - 40, 0), fill=(*GOLD, 140), width=2)
+        sx = (mock_w - FOLD_PANEL_W) // 2
+        sy = (mock_h - cover_h) // 2 + offset
+        mock.alpha_composite(sliver, (sx, sy))
+
+    # Cover card with slight lift shadow
+    card_shadow = Image.new("RGBA", (FOLD_PANEL_W + 40, cover_h + 40), (0, 0, 0, 0))
+    ImageDraw.Draw(card_shadow).rounded_rectangle((12, 12, FOLD_PANEL_W + 28, cover_h + 28), radius=16, fill=(0, 0, 0, 55))
+    card_shadow = card_shadow.filter(ImageFilter.GaussianBlur(16))
+    cx = (mock_w - FOLD_PANEL_W) // 2
+    cy = (mock_h - cover_h) // 2 - 10
+    mock.alpha_composite(card_shadow, (cx - 12, cy - 6))
+    mock.alpha_composite(cover.convert("RGBA"), (cx, cy))
+
+    draw = ImageDraw.Draw(mock)
+    label_font = load_sans(22, bold=True)
+    draw_centered(draw, "Folded Accordion View", 48, label_font, FOREST, mock_w)
+    sub_font = load_sans(16)
+    draw_centered(draw, "Front cover · unfolds vertically inside the grow kit", 82, sub_font, TEXT_MUTED, mock_w)
+
+    return mock.convert("RGB")
+
+
 def create_user_guide() -> Image.Image:
     canvas = make_background(WIDTH, HEIGHT)
     draw = ImageDraw.Draw(canvas)
@@ -464,10 +792,16 @@ def create_user_guide() -> Image.Image:
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     refresh_step_one_photo()
-    guide = create_user_guide()
-    out = OUTPUT_DIR / "grow-kit-user-guide.png"
-    guide.save(out, "PNG", optimize=True)
-    print(f"Created {out} ({guide.width}x{guide.height})")
+
+    foldable = create_foldable_guide()
+    flat_out = OUTPUT_DIR / "grow-kit-user-guide.png"
+    foldable.save(flat_out, "PNG", optimize=True)
+    print(f"Created {flat_out} ({foldable.width}x{foldable.height})")
+
+    mockup = create_foldable_mockup(foldable)
+    mock_out = OUTPUT_DIR / "grow-kit-user-guide-folded-preview.png"
+    mockup.save(mock_out, "PNG", optimize=True)
+    print(f"Created {mock_out} ({mockup.width}x{mockup.height})")
 
 
 if __name__ == "__main__":
