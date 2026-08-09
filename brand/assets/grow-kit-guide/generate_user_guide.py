@@ -37,13 +37,11 @@ FOLD_INNER_PAD = 20
 PHOTO_ZOOM = 0.86
 PHOTO_PAD = 28
 
-# Step 1 prefers the dedicated disc-and-cup product photo; the poster crop is
-# only generated as a fallback when that file is missing.
-DISC_AND_CUP_PHOTO = "Disc And Cup.jpeg"
+# Step 1 is rebuilt from the kit poster product band: erase the poster subtitle,
+# then crop the full kit spread (cups, discs, seeds, spray, canister, sticks).
 KIT_POSTER = "Kit-Poster3.jpeg"
-# Whole product spread — crop starts right of the cocopeat discs.
-KIT_POSTER_CROP = (320, 395, 1068, 988)
-KIT_POSTER_TEXT_BOX = (352, 412, 698, 516)
+KIT_POSTER_CROP = (10, 430, 1076, 983)
+KIT_POSTER_TEXT_BOX = (300, 405, 780, 520)
 STEP_ONE_PHOTO = "step-01-open-kit.png"
 
 # Cards per row; the final row holds the single transplanting step, centred.
@@ -53,7 +51,7 @@ ROW_LAYOUT = [3, 3, 1]
 # photo dropped into steps/ is preferred over the generated placeholder.
 STEPS = [
     (
-        (DISC_AND_CUP_PHOTO, STEP_ONE_PHOTO),
+        (STEP_ONE_PHOTO, KIT_POSTER),
         "Open the Kit",
         "Unbox your organic farming kit and get everything ready.",
     ),
@@ -154,9 +152,7 @@ def load_cover_logo(width: int) -> Image.Image:
 
 
 def refresh_step_one_photo() -> None:
-    """Generate the poster fallback for step 1 when the disc-and-cup photo is absent."""
-    if (STEPS_DIR / DISC_AND_CUP_PHOTO).exists():
-        return
+    """Rebuild the step 1 photo from Kit-Poster3 so the kit spread stays current."""
     source = STEPS_DIR / KIT_POSTER
     if not source.exists():
         return
