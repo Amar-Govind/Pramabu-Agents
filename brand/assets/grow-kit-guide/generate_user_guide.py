@@ -11,6 +11,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 
 ROOT = Path(__file__).resolve().parent
 LOGO_PATH = ROOT.parents[2] / "storefront" / "public" / "brand" / "logo-wordmark-transparent.png"
+COVER_LOGO_PATH = ROOT.parents[2] / "storefront" / "public" / "brand" / "logo-wordmark.png"
 STEPS_DIR = ROOT / "steps"
 OUTPUT_DIR = ROOT / "output"
 
@@ -45,7 +46,7 @@ KIT_POSTER = "Kit-Poster3.jpeg"
 KIT_POSTER_CROP = (12, 395, 1068, 988)
 KIT_POSTER_TEXT_BOX = (352, 412, 698, 516)
 STEP_ONE_PHOTO = "step-01-open-kit.png"
-COCO_DISC_SOURCE = "step-02-add-water.png"
+COCO_DISC_SOURCE = "step-03-fill-pots.png"
 
 # Cards per row; the final row holds the single transplanting step, centred.
 ROW_LAYOUT = [3, 3, 1]
@@ -136,44 +137,71 @@ def erase_poster_subtitle(poster: Image.Image) -> None:
     poster.paste(feathered, (x0 - 8, y0 - 8))
 
 
+def load_cover_logo(width: int) -> Image.Image:
+    """Load the wordmark with black keyed out for a clean overlay on forest green."""
+    logo = Image.open(COVER_LOGO_PATH).convert("RGBA")
+    pixels = logo.load()
+    for y in range(logo.height):
+        for x in range(logo.width):
+            r, g, b, a = pixels[x, y]
+            if a < 120 or (r < 45 and g < 45 and b < 45):
+                pixels[x, y] = (0, 0, 0, 0)
+            else:
+                pixels[x, y] = (r, g, b, 255)
+    bbox = logo.split()[-1].getbbox()
+    if bbox:
+        logo = logo.crop(bbox)
+    logo_h = int(logo.height * (width / logo.width))
+    return logo.resize((width, logo_h), Image.Resampling.LANCZOS)
+
+
+def inpaint_disc_region(kit_spread: Image.Image) -> Image.Image:
+    """Paint out the poster's stylised discs using table texture from the same photo."""
+    out = kit_spread.copy()
+    patch = kit_spread.crop((420, 430, 680, 580))
+    patch = patch.resize((270, 200), Image.Resampling.LANCZOS)
+    patch = patch.filter(ImageFilter.GaussianBlur(2.5))
+    out.paste(patch, (14, 378))
+    return out
+
+
 def replace_cocopeat_discs(kit_spread: Image.Image) -> Image.Image:
-    """Swap the poster's stylised cocopeat discs for real product photography."""
+    """Swap the poster's stylised cocopeat discs for real side-view product photography."""
     disc_source = STEPS_DIR / COCO_DISC_SOURCE
     if not disc_source.exists():
         return kit_spread
 
-    step2 = Image.open(disc_source)
-    sw, sh = step2.size
-    disc_src = step2.crop((int(sw * 0.18), int(sh * 0.48), int(sw * 0.48), int(sh * 0.78)))
+    step3 = Image.open(disc_source)
+    sw, sh = step3.size
+    disc_src = step3.crop((int(sw * 0.70), int(sh * 0.45), int(sw * 0.98), int(sh * 0.78)))
 
-    def top_disc(diameter: int, src: Image.Image, *, darken: float = 0.0) -> Image.Image:
-        fitted = src.resize((diameter, diameter), Image.Resampling.LANCZOS)
+    def side_disc(width: int, height: int, src: Image.Image, *, darken: float = 0.0) -> Image.Image:
+        fitted = src.resize((width, height), Image.Resampling.LANCZOS)
         if darken:
             fitted = ImageEnhance.Brightness(fitted).enhance(1 - darken)
-        mask = Image.new("L", (diameter, diameter), 0)
-        ImageDraw.Draw(mask).ellipse((3, 3, diameter - 3, diameter - 3), fill=255)
-        mask = mask.filter(ImageFilter.GaussianBlur(1))
-        out = Image.new("RGBA", (diameter, diameter), (0, 0, 0, 0))
+        mask = Image.new("L", (width, height), 0)
+        draw = ImageDraw.Draw(mask)
+        draw.ellipse((1, 1, width - 1, max(8, int(height * 0.42))), fill=255)
+        draw.rectangle((int(width * 0.07), int(height * 0.15), int(width * 0.93), height - 1), fill=255)
+        mask = mask.filter(ImageFilter.GaussianBlur(0.9))
+        out = Image.new("RGBA", (width, height), (0, 0, 0, 0))
         out.paste(fitted.convert("RGBA"), (0, 0), mask)
         return out
 
-    out = kit_spread.convert("RGBA")
-    bg = kit_spread.getpixel((95, 365))
-    draw = ImageDraw.Draw(out)
-    draw.rounded_rectangle((20, 375, 265, 578), radius=20, fill=bg)
+    out = inpaint_disc_region(kit_spread).convert("RGBA")
 
     for ox, oy, scale, darken in (
-        (48, 452, 1.0, 0.0),
-        (55, 424, 0.96, 0.05),
-        (62, 396, 0.92, 0.1),
+        (34, 462, 1.0, 0.0),
+        (40, 434, 0.97, 0.04),
+        (46, 406, 0.94, 0.08),
     ):
-        diameter = int(118 * scale)
-        disc = top_disc(diameter, disc_src, darken=darken)
-        shadow = Image.new("RGBA", (diameter, diameter), (0, 0, 0, 0))
-        shadow_mask = Image.new("L", (diameter, diameter), 0)
-        ImageDraw.Draw(shadow_mask).ellipse((6, 10, diameter - 6, diameter - 2), fill=75)
-        shadow.putalpha(shadow_mask.filter(ImageFilter.GaussianBlur(4)))
-        out.alpha_composite(shadow, (ox + 5, oy + 7))
+        w, h = int(150 * scale), int(50 * scale)
+        disc = side_disc(w, h, disc_src, darken=darken)
+        shadow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        sm = Image.new("L", (w, h), 0)
+        ImageDraw.Draw(sm).ellipse((10, h - 14, w - 10, h), fill=90)
+        shadow.putalpha(sm.filter(ImageFilter.GaussianBlur(3)))
+        out.alpha_composite(shadow, (ox + 5, oy + 6))
         out.alpha_composite(disc, (ox, oy))
 
     return out.convert("RGB")
@@ -447,6 +475,13 @@ def draw_footer_flourish(draw: ImageDraw.ImageDraw, y: int, canvas_w: int) -> No
     draw_leaf_icon(draw, cx + 100, y, size=10)
 
 
+def draw_simple_flourish(draw: ImageDraw.ImageDraw, y: int, canvas_w: int, *, inset: int = 100) -> None:
+    """Horizontal divider without centre leaf markers (avoids overlapping footer text)."""
+    cx = canvas_w // 2
+    draw.line((inset, y, cx - 90, y), fill=(*GOLD, 200), width=2)
+    draw.line((cx + 90, y, canvas_w - inset, y), fill=(*GOLD, 200), width=2)
+
+
 def draw_gold_corners(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], inset: int = 28, arm: int = 52) -> None:
     """Ornamental gold corner brackets for the cover panel."""
     x1, y1, x2, y2 = box
@@ -493,8 +528,6 @@ def draw_fold_crease(
     gap_top: int,
     gap_bottom: int,
     width: int,
-    *,
-    label: str = "fold",
 ) -> None:
     """Dashed accordion fold line drawn inside the inter-panel gap only."""
     y = (gap_top + gap_bottom) // 2
@@ -506,10 +539,6 @@ def draw_fold_crease(
         x += dash + gap
     draw_leaf_icon(draw, margin - 18, y, size=9)
     draw_leaf_icon(draw, width - margin + 18, y, size=9)
-    font = load_sans(13, bold=True)
-    tw = text_width(draw, label, font)
-    label_y = max(gap_top + 4, min(y - 10, gap_bottom - font.size - 6))
-    draw.text(((width - tw) // 2, label_y), label, font=font, fill=(*GOLD, 210))
 
 
 def draw_crop_marks(draw: ImageDraw.ImageDraw, width: int, height: int) -> None:
@@ -544,13 +573,8 @@ def draw_cover_panel(panel: Image.Image) -> None:
     # Inner cream frame
     draw.rounded_rectangle((34, 34, w - 34, h - 34), radius=18, outline=(*GOLD, 150), width=2)
 
-    logo = Image.open(LOGO_PATH).convert("RGBA")
     logo_w = 460
-    logo_h = int(logo.height * (logo_w / logo.width))
-    logo = logo.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
-    # Warm the logo slightly so it reads on dark green
-    warm = Image.new("RGBA", logo.size, (*CREAM, 40))
-    logo = Image.alpha_composite(logo, warm)
+    logo = load_cover_logo(logo_w)
     panel.alpha_composite(logo, ((w - logo_w) // 2, 58))
 
     title_font = load_font(58, bold=True)
@@ -676,19 +700,22 @@ def draw_finale_panel(
         y += 22
     draw.text((text_x, y + 6), "No transplant shock · Zero plastic waste", font=note_font, fill=FOREST)
 
-    footer_y = card_top + card_h + 18
-    draw_footer_flourish(draw, footer_y, w)
-    slogan_font = load_font(24, bold=True)
-    draw_centered(draw, "Grow Naturally. Grow Sustainably.", footer_y + 14, slogan_font, FOREST, w)
+    footer_y = card_top + card_h + 12
+    slogan_font = load_font(22, bold=True)
+    slogan_y = footer_y + 8
+    draw_centered(draw, "Grow Naturally. Grow Sustainably.", slogan_y, slogan_font, FOREST, w)
 
-    icon_y = footer_y + 58
+    flourish_y = footer_y + 40
+    draw_simple_flourish(draw, flourish_y, w, inset=pad + 60)
+
+    icon_y = footer_y + 100
     icon_spacing = (w - 2 * pad) // 4
-    label_font = load_sans(12, bold=True)
+    label_font = load_sans(11, bold=True)
     for i, (label, icon_key) in enumerate(FEATURES):
         cx = pad + icon_spacing // 2 + i * icon_spacing
-        draw.ellipse((cx - 36, icon_y - 36, cx + 36, icon_y + 36), outline=(*GOLD, 210), width=2)
-        ICON_DRAWERS[icon_key](draw, cx, icon_y, size=17)
-        ly = icon_y + 46
+        draw.ellipse((cx - 30, icon_y - 30, cx + 30, icon_y + 30), outline=(*GOLD, 210), width=2)
+        ICON_DRAWERS[icon_key](draw, cx, icon_y, size=14)
+        ly = icon_y + 38
         for line in label.split("\n"):
             tw = text_width(draw, line, label_font)
             draw.text((cx - tw // 2, ly), line, font=label_font, fill=FOREST)
