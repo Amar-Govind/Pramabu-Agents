@@ -21,12 +21,12 @@ GOLD = (214, 170, 132)
 WHITE = (255, 255, 255)
 TEXT_MUTED = (90, 110, 95)
 
-WIDTH = 1800
-HEIGHT = 2560
-MARGIN = 60
-
-# Cards per row; the final row holds the single transplanting step, centred.
-ROW_LAYOUT = [3, 3, 1]
+# A landscape, three-panel accordion guide. Each panel is designed to be
+# readable on its own when the sheet is folded along the two dotted seams.
+WIDTH = 3000
+HEIGHT = 2100
+MARGIN = 84
+PANEL_W = WIDTH // 3
 
 # Step 1 reuses the kit hero shot from the reference poster, cropped around the
 # canister so the packaging stays legible at card size. The poster's subtitle
@@ -377,86 +377,127 @@ def draw_footer_flourish(draw: ImageDraw.ImageDraw, y: int, canvas_w: int) -> No
     draw_leaf_icon(draw, cx + 100, y, size=10)
 
 
+def draw_fold_line(draw: ImageDraw.ImageDraw, x: int) -> None:
+    """Draw a deliberately visible, but print-friendly, accordion fold guide."""
+    draw.line((x, 48, x, HEIGHT - 48), fill=(*GOLD, 155), width=3)
+    for y in range(70, HEIGHT - 70, 28):
+        draw.line((x - 12, y, x + 12, y), fill=(*GOLD, 220), width=3)
+    tab_font = load_sans(17, bold=True)
+    label = "FOLD HERE"
+    draw.rounded_rectangle((x - 62, 16, x + 62, 48), radius=12, fill=(*CREAM, 235), outline=(*GOLD, 190), width=2)
+    draw.text((x - text_width(draw, label, tab_font) // 2, 21), label, font=tab_font, fill=TEXT_MUTED)
+
+
+def draw_panel_label(draw: ImageDraw.ImageDraw, panel: int, label: str) -> None:
+    x = panel * PANEL_W + MARGIN
+    font = load_sans(21, bold=True)
+    draw.rounded_rectangle((x, 76, x + 180, 116), radius=20, fill=FOREST)
+    draw.text((x + 20, 84), label.upper(), font=font, fill=WHITE)
+
+
+def draw_fold_step(
+    canvas: Image.Image,
+    box: tuple[int, int, int, int],
+    step_num: int,
+    step: tuple[str | tuple[str, ...], str, str],
+    *,
+    photo_ratio: float = 0.54,
+) -> None:
+    """A compact step card that creates a visual path down each fold panel."""
+    x1, y1, x2, y2 = box
+    w, h = x2 - x1, y2 - y1
+    photo_name, title, description = step
+    card = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(card)
+    draw.rounded_rectangle((2, 2, w - 3, h - 3), radius=26, fill=(*WHITE, 240), outline=(*GOLD, 180), width=3)
+
+    photo_h = int(h * photo_ratio)
+    photo = prepare_photo(resolve_photo(photo_name), (w - 32, photo_h), contain=step_num == 1)
+    card.alpha_composite(photo, (16, 16))
+
+    badge_y = 16 + photo_h
+    draw_step_badge(draw, 44, badge_y + 30, step_num)
+    title_font = load_font(30, bold=True)
+    draw.text((86, badge_y + 8), title, font=title_font, fill=FOREST)
+
+    desc_font = load_sans(19)
+    y = badge_y + 55
+    for line in wrap_text(draw, description, desc_font, w - 42):
+        draw.text((22, y), line, font=desc_font, fill=TEXT_MUTED)
+        y += 25
+    canvas.alpha_composite(card, (x1, y1))
+
+
+def draw_feature_strip(canvas: Image.Image, panel: int, y: int) -> None:
+    draw = ImageDraw.Draw(canvas)
+    panel_x = panel * PANEL_W
+    spacing = (PANEL_W - 2 * MARGIN) // 2
+    label_font = load_sans(16, bold=True)
+    for i, (label, icon_key) in enumerate(FEATURES):
+        col, row = i % 2, i // 2
+        cx = panel_x + MARGIN + spacing // 2 + col * spacing
+        cy = y + row * 128
+        draw.ellipse((cx - 36, cy - 36, cx + 36, cy + 36), fill=(*WHITE, 180), outline=(*GOLD, 210), width=2)
+        ICON_DRAWERS[icon_key](draw, cx, cy, size=18)
+        lines = label.split("\n")
+        text_y = cy + 46
+        for line in lines:
+            tw = text_width(draw, line, label_font)
+            draw.text((cx - tw // 2, text_y), line, font=label_font, fill=FOREST)
+            text_y += 19
+
+
 def create_user_guide() -> Image.Image:
     canvas = make_background(WIDTH, HEIGHT)
     draw = ImageDraw.Draw(canvas)
 
-    # Logo
+    # Alternating panel tints make the three folds feel intentional, while the
+    # central planting panel remains the visual anchor.
+    for panel, color in enumerate(((*WHITE, 80), (*FOREST, 16), (*WHITE, 80))):
+        x = panel * PANEL_W + 20
+        draw.rounded_rectangle((x, 34, x + PANEL_W - 40, HEIGHT - 34), radius=38, fill=color)
+
+    draw_fold_line(draw, PANEL_W)
+    draw_fold_line(draw, PANEL_W * 2)
+
+    # Left panel: unbox and prepare.
+    draw_panel_label(draw, 0, "Start")
     logo = Image.open(LOGO_PATH).convert("RGBA")
-    logo_w = 620
+    logo_w = 470
     logo_h = int(logo.height * (logo_w / logo.width))
     logo = logo.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
-    canvas.alpha_composite(logo, ((WIDTH - logo_w) // 2, 62))
+    canvas.alpha_composite(logo, ((PANEL_W - logo_w) // 2, 164))
+    draw_centered(draw, "Your tiny garden", 330, load_font(50, bold=True), FOREST, PANEL_W)
+    draw_centered(draw, "starts right here.", 390, load_font(34, italic=True), TEXT_MUTED, PANEL_W)
+    draw_fold_step(canvas, (MARGIN, 510, PANEL_W - MARGIN, 1060), 1, STEPS[0])
+    draw_fold_step(canvas, (MARGIN, 1100, PANEL_W - MARGIN, 1650), 2, STEPS[1])
+    draw_centered(draw, "OPEN  •  HYDRATE  •  BEGIN", 1810, load_sans(18, bold=True), FOREST, PANEL_W)
 
-    # Headlines
-    title_font = load_font(78, bold=True)
-    script_font = load_font(46, italic=True)
-    draw_centered(draw, "Grow Fresh Food", 300, title_font, FOREST, WIDTH)
-    draw_centered(draw, "in Just 7 Easy Steps", 398, script_font, FOREST, WIDTH)
+    # Centre panel: the fold-out garden path.
+    draw_panel_label(draw, 1, "Plant")
+    centre_x = PANEL_W
+    draw_centered(draw, "Follow the green path", 150, load_font(48, bold=True), FOREST, WIDTH)
+    # Mask the title centring area to the centre panel rather than whole sheet.
+    draw.rectangle((0, 125, PANEL_W - 1, 226), fill=(0, 0, 0, 0))
+    draw.text((centre_x + (PANEL_W - text_width(draw, "Follow the green path", load_font(48, bold=True))) // 2, 150), "Follow the green path", font=load_font(48, bold=True), fill=FOREST)
+    for i, (y1, y2) in enumerate(((290, 820), (870, 1400), (1450, 1980)), start=2):
+        draw_fold_step(canvas, (centre_x + MARGIN, y1, centre_x + PANEL_W - MARGIN, y2), i, STEPS[i - 1])
 
-    # Step grid: rows of 3, 3, and a single wide finale card
-    grid_top = 500
-    col_gap = 24
-    row_gap = 28
-    card_w = (WIDTH - 2 * MARGIN - 2 * col_gap) // 3
-    card_h = 560
-    wide_card_h = 420
-
-    step_index = 0
-    y = grid_top
-    for count in ROW_LAYOUT:
-        if count == 1:
-            photo, title, description = STEPS[step_index]
-            wide_w = 2 * card_w + col_gap
-            x1 = (WIDTH - wide_w) // 2
-            draw_wide_step_card(
-                canvas,
-                (x1, y, x1 + wide_w, y + wide_card_h),
-                step_index + 1,
-                title,
-                resolve_photo(photo),
-                description,
-            )
-            step_index += 1
-            y += wide_card_h + row_gap
-            continue
-
-        row_w = count * card_w + (count - 1) * col_gap
-        x_start = (WIDTH - row_w) // 2
-        for col in range(count):
-            photo, title, description = STEPS[step_index]
-            x1 = x_start + col * (card_w + col_gap)
-            draw_step_card(
-                canvas,
-                (x1, y, x1 + card_w, y + card_h),
-                step_index + 1,
-                title,
-                resolve_photo(photo),
-                description,
-            )
-            step_index += 1
-        y += card_h + row_gap
-
-    # Footer slogan
-    footer_y = y + 6
-    draw_footer_flourish(draw, footer_y, WIDTH)
-    slogan_font = load_font(34, bold=True)
-    draw_centered(draw, "Grow Naturally. Grow Sustainably.", footer_y + 24, slogan_font, FOREST, WIDTH)
-    draw_footer_flourish(draw, footer_y + 84, WIDTH)
-
-    # Feature icons row
-    icon_y = footer_y + 150
-    icon_spacing = (WIDTH - 2 * MARGIN) // 4
-    label_font = load_sans(19, bold=True)
-    for i, (label, icon_key) in enumerate(FEATURES):
-        cx = MARGIN + icon_spacing // 2 + i * icon_spacing
-        draw.ellipse((cx - 58, icon_y - 58, cx + 58, icon_y + 58), outline=(*GOLD, 210), width=3)
-        ICON_DRAWERS[icon_key](draw, cx, icon_y, size=28)
-        y = icon_y + 78
-        for line in label.split("\n"):
-            tw = text_width(draw, line, label_font)
-            draw.text((cx - tw // 2, y), line, font=label_font, fill=FOREST)
-            y += label_font.size + 4
+    # Right panel: the harvest-facing finish and sustainable material message.
+    draw_panel_label(draw, 2, "Grow")
+    right_x = PANEL_W * 2
+    title = "Grow Fresh Food"
+    title_font = load_font(52, bold=True)
+    draw.text((right_x + (PANEL_W - text_width(draw, title, title_font)) // 2, 154), title, font=title_font, fill=FOREST)
+    subtitle = "in Just 7 Easy Steps"
+    subtitle_font = load_font(31, italic=True)
+    draw.text((right_x + (PANEL_W - text_width(draw, subtitle, subtitle_font)) // 2, 222), subtitle, font=subtitle_font, fill=TEXT_MUTED)
+    draw_fold_step(canvas, (right_x + MARGIN, 330, right_x + PANEL_W - MARGIN, 910), 5, STEPS[5])
+    draw_fold_step(canvas, (right_x + MARGIN, 950, right_x + PANEL_W - MARGIN, 1530), 7, STEPS[6])
+    draw_feature_strip(canvas, 2, 1640)
+    slogan = "Grow Naturally. Grow Sustainably."
+    slogan_font = load_font(25, bold=True)
+    draw.text((right_x + (PANEL_W - text_width(draw, slogan, slogan_font)) // 2, 1980), slogan, font=slogan_font, fill=FOREST)
 
     return canvas.convert("RGB")
 
@@ -466,7 +507,7 @@ def main() -> None:
     refresh_step_one_photo()
     guide = create_user_guide()
     out = OUTPUT_DIR / "grow-kit-user-guide.png"
-    guide.save(out, "PNG", optimize=True)
+    guide.save(out, "PNG", optimize=True, dpi=(300, 300))
     print(f"Created {out} ({guide.width}x{guide.height})")
 
 
