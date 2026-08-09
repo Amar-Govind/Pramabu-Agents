@@ -37,9 +37,9 @@ FOLD_INNER_PAD = 20
 PHOTO_ZOOM = 0.86
 PHOTO_PAD = 28
 
-# Step 1 reuses the kit hero shot from the reference poster, cropped around the
-# canister so the packaging stays legible at card size. The poster's subtitle
-# sits beside the canister, so it is painted out before cropping.
+# Step 1 prefers the dedicated disc-and-cup product photo; the poster crop is
+# only generated as a fallback when that file is missing.
+DISC_AND_CUP_PHOTO = "Disc And Cup.jpeg"
 KIT_POSTER = "Kit-Poster3.jpeg"
 # Whole product spread — crop starts right of the cocopeat discs.
 KIT_POSTER_CROP = (320, 395, 1068, 988)
@@ -53,7 +53,7 @@ ROW_LAYOUT = [3, 3, 1]
 # photo dropped into steps/ is preferred over the generated placeholder.
 STEPS = [
     (
-        (STEP_ONE_PHOTO,),
+        (DISC_AND_CUP_PHOTO, STEP_ONE_PHOTO),
         "Open the Kit",
         "Unbox your organic farming kit and get everything ready.",
     ),
@@ -154,7 +154,9 @@ def load_cover_logo(width: int) -> Image.Image:
 
 
 def refresh_step_one_photo() -> None:
-    """Re-cut the step 1 kit shot from the poster so it stays the source of truth."""
+    """Generate the poster fallback for step 1 when the disc-and-cup photo is absent."""
+    if (STEPS_DIR / DISC_AND_CUP_PHOTO).exists():
+        return
     source = STEPS_DIR / KIT_POSTER
     if not source.exists():
         return
