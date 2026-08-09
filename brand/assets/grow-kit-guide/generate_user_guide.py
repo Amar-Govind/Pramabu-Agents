@@ -7,7 +7,7 @@ import math
 import random
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 
 ROOT = Path(__file__).resolve().parent
 LOGO_PATH = ROOT.parents[2] / "storefront" / "public" / "brand" / "logo-wordmark-transparent.png"
@@ -33,20 +33,22 @@ FOLD_PANEL_GAP = 44
 FOLD_BLEED = 24
 FOLD_VINE_X = 54
 FOLD_INNER_PAD = 20
-
-# Cards per row; the final row holds the single transplanting step, centred.
-ROW_LAYOUT = [3, 3, 1]
+PHOTO_ZOOM = 0.86
+PHOTO_PAD = 28
 
 # Step 1 reuses the kit hero shot from the reference poster, cropped around the
 # canister so the packaging stays legible at card size. The poster's subtitle
 # sits beside the canister, so it is painted out before cropping.
 KIT_POSTER = "Kit-Poster3.jpeg"
 # Whole product spread: canister, cups, cocopeat discs, seed packets, spray
-# bottle and stirrers. The lower bound stops just above the poster's
-# "What's Inside" banner.
-KIT_POSTER_CROP = (30, 408, 1052, 978)
+# bottle and stirrers. Slightly wider crop so the flat lay breathes in panels.
+KIT_POSTER_CROP = (12, 395, 1068, 988)
 KIT_POSTER_TEXT_BOX = (352, 412, 698, 516)
 STEP_ONE_PHOTO = "step-01-open-kit.png"
+COCO_DISC_SOURCE = "step-02-add-water.png"
+
+# Cards per row; the final row holds the single transplanting step, centred.
+ROW_LAYOUT = [3, 3, 1]
 
 # Each step lists its photo candidates in priority order, so a real product
 # photo dropped into steps/ is preferred over the generated placeholder.
@@ -134,6 +136,49 @@ def erase_poster_subtitle(poster: Image.Image) -> None:
     poster.paste(feathered, (x0 - 8, y0 - 8))
 
 
+def replace_cocopeat_discs(kit_spread: Image.Image) -> Image.Image:
+    """Swap the poster's stylised cocopeat discs for real product photography."""
+    disc_source = STEPS_DIR / COCO_DISC_SOURCE
+    if not disc_source.exists():
+        return kit_spread
+
+    step2 = Image.open(disc_source)
+    sw, sh = step2.size
+    disc_src = step2.crop((int(sw * 0.18), int(sh * 0.48), int(sw * 0.48), int(sh * 0.78)))
+
+    def top_disc(diameter: int, src: Image.Image, *, darken: float = 0.0) -> Image.Image:
+        fitted = src.resize((diameter, diameter), Image.Resampling.LANCZOS)
+        if darken:
+            fitted = ImageEnhance.Brightness(fitted).enhance(1 - darken)
+        mask = Image.new("L", (diameter, diameter), 0)
+        ImageDraw.Draw(mask).ellipse((3, 3, diameter - 3, diameter - 3), fill=255)
+        mask = mask.filter(ImageFilter.GaussianBlur(1))
+        out = Image.new("RGBA", (diameter, diameter), (0, 0, 0, 0))
+        out.paste(fitted.convert("RGBA"), (0, 0), mask)
+        return out
+
+    out = kit_spread.convert("RGBA")
+    bg = kit_spread.getpixel((95, 365))
+    draw = ImageDraw.Draw(out)
+    draw.rounded_rectangle((20, 375, 265, 578), radius=20, fill=bg)
+
+    for ox, oy, scale, darken in (
+        (48, 452, 1.0, 0.0),
+        (55, 424, 0.96, 0.05),
+        (62, 396, 0.92, 0.1),
+    ):
+        diameter = int(118 * scale)
+        disc = top_disc(diameter, disc_src, darken=darken)
+        shadow = Image.new("RGBA", (diameter, diameter), (0, 0, 0, 0))
+        shadow_mask = Image.new("L", (diameter, diameter), 0)
+        ImageDraw.Draw(shadow_mask).ellipse((6, 10, diameter - 6, diameter - 2), fill=75)
+        shadow.putalpha(shadow_mask.filter(ImageFilter.GaussianBlur(4)))
+        out.alpha_composite(shadow, (ox + 5, oy + 7))
+        out.alpha_composite(disc, (ox, oy))
+
+    return out.convert("RGB")
+
+
 def refresh_step_one_photo() -> None:
     """Re-cut the step 1 kit shot from the poster so it stays the source of truth."""
     source = STEPS_DIR / KIT_POSTER
@@ -141,7 +186,9 @@ def refresh_step_one_photo() -> None:
         return
     poster = Image.open(source).convert("RGB")
     erase_poster_subtitle(poster)
-    poster.crop(KIT_POSTER_CROP).save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
+    spread = poster.crop(KIT_POSTER_CROP)
+    spread = replace_cocopeat_discs(spread)
+    spread.save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
 
 
 def resolve_photo(candidates: str | tuple[str, ...]) -> Path:
@@ -270,17 +317,31 @@ ICON_DRAWERS = {
 }
 
 
-def prepare_photo(image_path: Path, size: tuple[int, int], *, contain: bool = False) -> Image.Image:
-    """Fit a photo into size. Use contain for packaging shots so nothing is cropped."""
+def prepare_photo(
+    image_path: Path,
+    size: tuple[int, int],
+    *,
+    contain: bool = False,
+    zoom: float = 1.0,
+    pad: int = 12,
+    bg: tuple[int, int, int] = CREAM,
+) -> Image.Image:
+    """Fit a photo into size. Use contain to letterbox; zoom scales down within the box."""
     src = Image.open(image_path).convert("RGBA")
     w, h = size
+    fit_w = max(1, int(w * zoom) - pad * 2)
+    fit_h = max(1, int(h * zoom) - pad * 2)
     if contain:
-        canvas = Image.new("RGBA", size, (*CREAM, 255))
-        fitted = ImageOps.contain(src, (w - 12, h - 12), Image.Resampling.LANCZOS)
+        canvas = Image.new("RGBA", size, (*bg, 255))
+        fitted = ImageOps.contain(src, (fit_w, fit_h), Image.Resampling.LANCZOS)
         canvas.alpha_composite(fitted, ((w - fitted.width) // 2, (h - fitted.height) // 2))
         photo = canvas
     else:
-        photo = ImageOps.fit(src, size, Image.Resampling.LANCZOS)
+        photo = ImageOps.fit(src, (fit_w, fit_h), Image.Resampling.LANCZOS)
+        if fit_w < w or fit_h < h:
+            canvas = Image.new("RGBA", size, (*bg, 255))
+            canvas.alpha_composite(photo, ((w - photo.width) // 2, (h - photo.height) // 2))
+            photo = canvas
     mask = Image.new("L", size, 0)
     ImageDraw.Draw(mask).rounded_rectangle((0, 0, w, h), radius=10, fill=255)
     photo.putalpha(mask)
@@ -551,8 +612,14 @@ def draw_accordion_step_panel(
     title_bottom = title_y + title_font.size + 10
     photo_top = title_bottom
     photo_h = max(180, desc_y - photo_top - 12)
-    contain = step_num == 1
-    photo = prepare_photo(image_path, (content_w, photo_h), contain=contain)
+    photo = prepare_photo(
+        image_path,
+        (content_w, photo_h),
+        contain=True,
+        zoom=PHOTO_ZOOM,
+        pad=PHOTO_PAD,
+        bg=tint,
+    )
     panel.alpha_composite(photo, (content_x, photo_top))
 
     for i, line in enumerate(lines):
@@ -600,10 +667,7 @@ def draw_finale_panel(
     draw_step_badge(draw, card_x + 30, card_top + 34, 7)
     draw.text((card_x + 78, card_top + 16), title, font=title_font, fill=FOREST)
 
-    photo = ImageOps.fit(Image.open(image_path).convert("RGBA"), (photo_w, photo_h), Image.Resampling.LANCZOS)
-    mask = Image.new("L", (photo_w, photo_h), 0)
-    ImageDraw.Draw(mask).rounded_rectangle((0, 0, photo_w, photo_h), radius=10, fill=255)
-    photo.putalpha(mask)
+    photo = prepare_photo(image_path, (photo_w, photo_h), contain=True, zoom=PHOTO_ZOOM, pad=16, bg=WHITE)
     panel.alpha_composite(photo, (card_x + 14, body_top))
 
     y = body_top + 4
