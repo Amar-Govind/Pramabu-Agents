@@ -669,7 +669,7 @@ def draw_cover_panel(panel: Image.Image) -> None:
     logo = load_cover_logo(logo_w)
     # Center optically: the palm leaf sits on the left of the wordmark, so the
     # visual mass is left of the image midpoint — shift right to balance.
-    logo_x = (w - logo.width) // 2 + 10
+    logo_x = (w - logo.width) // 2 - 6
     logo_y = 96
     panel.alpha_composite(logo, (logo_x, logo_y))
 
