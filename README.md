@@ -124,6 +124,7 @@ Goal
 
 ```text
 brand/brand_bible.yaml          # Brand source of truth
+brand/assets/                   # Print-ready kit artwork generators + output
 pramabu_agents/
   agents/                       # Specialist agents
   orchestrator.py               # Pipeline runner

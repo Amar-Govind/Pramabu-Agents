@@ -45,6 +45,14 @@ KIT_POSTER = "Kit-Poster3.jpeg"
 KIT_POSTER_CROP = (30, 408, 1052, 978)
 KIT_POSTER_TEXT_BOX = (352, 412, 698, 516)
 STEP_ONE_PHOTO = "step-01-open-kit.png"
+# Upright hero cut of the same poster: the canister with the spray bottle and
+# ice sticks beside it, proportioned for a portrait arch.
+KIT_HERO_CROP = (600, 390, 1086, 965)
+KIT_HERO_PHOTO = "kit-hero-canister.png"
+# The unpacked kit without the canister — cups, discs, seed pockets, spray
+# bottle — in a landscape shape that fills an arch without cropping anything.
+KIT_UNBOXED_CROP = (40, 520, 700, 978)
+KIT_UNBOXED_PHOTO = "kit-unboxed.png"
 
 # Each step lists its photo candidates in priority order, so a real product
 # photo dropped into steps/ is preferred over the generated placeholder.
@@ -93,6 +101,16 @@ FEATURES = [
     ("PERFECT FOR\nHOME GARDENS", "home"),
     ("SAFE & NATURAL\nMATERIALS", "hands"),
     ("BETTER\nTOMORROW", "sprout"),
+]
+
+# Contents exactly as listed on the kit poster, in the same order.
+KIT_CONTENTS = [
+    ("cup", "3 Biodegradable Cups", "Eco-friendly"),
+    ("seeds", "3 Varieties of Organic Seeds", "Not hybrid"),
+    ("bottle", "Glass Spray Bottle", "For gentle watering"),
+    ("disc", "3 Coco Peat Discs", "Just add water & expand"),
+    ("sticks", "Ice Sticks", "For mixing coco peat"),
+    ("pencil", "Recycled Paper Pencil", "To write & remember what you sow"),
 ]
 
 SERIF_BOLD_FILES = (
@@ -200,14 +218,30 @@ def erase_poster_subtitle(poster: Image.Image) -> None:
     poster.paste(feathered, (x0 - 8, y0 - 8))
 
 
-def refresh_step_one_photo() -> None:
-    """Re-cut the step 1 kit shot from the poster so it stays the source of truth."""
+def _clean_poster() -> Image.Image | None:
     source = STEPS_DIR / KIT_POSTER
     if not source.exists():
-        return
+        return None
     poster = Image.open(source).convert("RGB")
     erase_poster_subtitle(poster)
+    return poster
+
+
+def refresh_step_one_photo() -> None:
+    """Re-cut the step 1 kit shot from the poster so it stays the source of truth."""
+    poster = _clean_poster()
+    if poster is None:
+        return
     poster.crop(KIT_POSTER_CROP).save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
+
+
+def refresh_foldable_photos() -> None:
+    """Re-cut the two crops the foldable guide needs from the same poster."""
+    poster = _clean_poster()
+    if poster is None:
+        return
+    poster.crop(KIT_HERO_CROP).save(STEPS_DIR / KIT_HERO_PHOTO, "PNG", optimize=True)
+    poster.crop(KIT_UNBOXED_CROP).save(STEPS_DIR / KIT_UNBOXED_PHOTO, "PNG", optimize=True)
 
 
 def resolve_photo(candidates: str | tuple[str, ...]) -> Path:
