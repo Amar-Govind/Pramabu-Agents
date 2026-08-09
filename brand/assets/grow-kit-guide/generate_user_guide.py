@@ -41,9 +41,8 @@ PHOTO_PAD = 28
 # canister so the packaging stays legible at card size. The poster's subtitle
 # sits beside the canister, so it is painted out before cropping.
 KIT_POSTER = "Kit-Poster3.jpeg"
-# Whole product spread: canister, cups, cocopeat discs, seed packets, spray
-# bottle and stirrers. Slightly wider crop so the flat lay breathes in panels.
-KIT_POSTER_CROP = (12, 395, 1068, 988)
+# Whole product spread — crop starts right of the cocopeat discs.
+KIT_POSTER_CROP = (320, 395, 1068, 988)
 KIT_POSTER_TEXT_BOX = (352, 412, 698, 516)
 STEP_ONE_PHOTO = "step-01-open-kit.png"
 
@@ -154,16 +153,6 @@ def load_cover_logo(width: int) -> Image.Image:
     return logo.resize((width, logo_h), Image.Resampling.LANCZOS)
 
 
-def remove_cocopeat_discs(kit_spread: Image.Image) -> Image.Image:
-    """Paint out cocopeat discs from the kit flat-lay using nearby table texture."""
-    out = kit_spread.copy()
-    patch = kit_spread.crop((420, 430, 680, 580))
-    patch = patch.resize((270, 200), Image.Resampling.LANCZOS)
-    patch = patch.filter(ImageFilter.GaussianBlur(2.5))
-    out.paste(patch, (14, 378))
-    return out
-
-
 def refresh_step_one_photo() -> None:
     """Re-cut the step 1 kit shot from the poster so it stays the source of truth."""
     source = STEPS_DIR / KIT_POSTER
@@ -171,9 +160,7 @@ def refresh_step_one_photo() -> None:
         return
     poster = Image.open(source).convert("RGB")
     erase_poster_subtitle(poster)
-    spread = poster.crop(KIT_POSTER_CROP)
-    spread = remove_cocopeat_discs(spread)
-    spread.save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
+    poster.crop(KIT_POSTER_CROP).save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
 
 
 def resolve_photo(candidates: str | tuple[str, ...]) -> Path:
@@ -439,19 +426,30 @@ def draw_simple_flourish(draw: ImageDraw.ImageDraw, y: int, canvas_w: int, *, in
     draw.line((cx + 90, y, canvas_w - inset, y), fill=(*GOLD, 200), width=2)
 
 
-def draw_gold_corners(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], inset: int = 28, arm: int = 52) -> None:
-    """Ornamental gold corner brackets for the cover panel."""
-    x1, y1, x2, y2 = box
-    gold = (*GOLD, 220)
-    corners = [
-        ((x1 + inset, y1 + inset), (x1 + inset + arm, y1 + inset), (x1 + inset, y1 + inset + arm)),
-        ((x2 - inset, y1 + inset), (x2 - inset - arm, y1 + inset), (x2 - inset, y1 + inset + arm)),
-        ((x1 + inset, y2 - inset), (x1 + inset + arm, y2 - inset), (x1 + inset, y2 - inset - arm)),
-        ((x2 - inset, y2 - inset), (x2 - inset - arm, y2 - inset), (x2 - inset, y2 - inset - arm)),
-    ]
-    for a, b, c in corners:
-        draw.line((a, b), fill=gold, width=3)
-        draw.line((a, c), fill=gold, width=3)
+def draw_cover_border(draw: ImageDraw.ImageDraw, w: int, h: int) -> None:
+    """Double-line botanical frame for the accordion cover panel."""
+    outer, inner = 22, 40
+    gold = (*GOLD, 210)
+    soft = (*CREAM, 90)
+
+    draw.rounded_rectangle((outer, outer, w - outer, h - outer), radius=24, outline=gold, width=2)
+    draw.rounded_rectangle((inner, inner, w - inner, h - inner), radius=18, outline=soft, width=1)
+
+    # Leaf accents at corners
+    for cx, cy in (
+        (inner + 14, inner + 14),
+        (w - inner - 14, inner + 14),
+        (inner + 14, h - inner - 14),
+        (w - inner - 14, h - inner - 14),
+    ):
+        draw_leaf_icon(draw, cx, cy, size=11)
+
+    # Gold diamonds at top and bottom centre
+    for cy in (outer + 14, h - outer - 14):
+        draw.polygon(
+            [(w // 2, cy - 7), (w // 2 + 7, cy), (w // 2, cy + 7), (w // 2 - 7, cy)],
+            fill=gold,
+        )
 
 
 def draw_vine_stem(
@@ -525,10 +523,7 @@ def draw_cover_panel(panel: Image.Image) -> None:
         row = Image.new("RGBA", (w, 1), (FOREST[0] - shade, FOREST[1] + shade // 2, FOREST[2] - shade // 3, 255))
         panel.paste(row, (0, y))
 
-    draw_gold_corners(draw, (18, 18, w - 18, h - 18))
-
-    # Inner cream frame
-    draw.rounded_rectangle((34, 34, w - 34, h - 34), radius=18, outline=(*GOLD, 150), width=2)
+    draw_cover_border(draw, w, h)
 
     logo_w = 460
     logo = load_cover_logo(logo_w)
@@ -550,9 +545,6 @@ def draw_cover_panel(panel: Image.Image) -> None:
     draw_centered(draw, "▼  ▼  ▼", cue_y + 52, arrow_font, GOLD, w)
 
     draw_vine_stem(draw, FOLD_VINE_X, 120, h - 90, leaf_count=3, leaf_size=14)
-
-    tab_font = load_sans(13, bold=True)
-    draw.text((w - 88, 20), "COVER", font=tab_font, fill=(*GOLD, 200))
 
 
 def draw_accordion_step_panel(
