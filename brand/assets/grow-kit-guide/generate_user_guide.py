@@ -21,12 +21,10 @@ GOLD = (214, 170, 132)
 WHITE = (255, 255, 255)
 TEXT_MUTED = (90, 110, 95)
 
-WIDTH = 1800
-HEIGHT = 2560
+PANEL_WIDTH = 900
+SIDE_WIDTH = PANEL_WIDTH * 4
+SIDE_HEIGHT = 1400
 MARGIN = 60
-
-# Cards per row; the final row holds the single transplanting step, centred.
-ROW_LAYOUT = [3, 3, 1]
 
 # Step 1 reuses the kit hero shot from the reference poster, cropped around the
 # canister so the packaging stays legible at card size. The poster's subtitle
@@ -377,97 +375,234 @@ def draw_footer_flourish(draw: ImageDraw.ImageDraw, y: int, canvas_w: int) -> No
     draw_leaf_icon(draw, cx + 100, y, size=10)
 
 
-def create_user_guide() -> Image.Image:
-    canvas = make_background(WIDTH, HEIGHT)
-    draw = ImageDraw.Draw(canvas)
+def draw_panel_frame(draw: ImageDraw.ImageDraw, panel_x: int, panel_index: int) -> None:
+    """Give each accordion panel a distinct, connected chapter feel."""
+    inset = 24
+    tint = (255, 255, 255, 116) if panel_index % 2 == 0 else (232, 239, 222, 92)
+    draw.rounded_rectangle(
+        (panel_x + inset, inset, panel_x + PANEL_WIDTH - inset, SIDE_HEIGHT - inset),
+        radius=34,
+        fill=tint,
+        outline=(*GOLD, 130),
+        width=2,
+    )
 
-    # Logo
+
+def draw_arch_photo(canvas: Image.Image, image_path: Path, x: int, y: int, *, contain: bool = False) -> None:
+    """Place photography in a soft garden-arch window."""
+    width, height = PANEL_WIDTH - 96, 650
+    if contain:
+        photo = prepare_photo(image_path, (width, height), contain=True)
+    else:
+        photo = ImageOps.fit(
+            Image.open(image_path).convert("RGBA"),
+            (width, height),
+            Image.Resampling.LANCZOS,
+        )
+    mask = Image.new("L", (width, height), 0)
+    mask_draw = ImageDraw.Draw(mask)
+    mask_draw.rounded_rectangle((0, 76, width, height), radius=24, fill=255)
+    mask_draw.ellipse((0, 0, width, 250), fill=255)
+    photo.putalpha(mask)
+
+    shadow = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    shadow_draw = ImageDraw.Draw(shadow)
+    shadow_draw.rounded_rectangle(
+        (x + 8, y + 10, x + width + 8, y + height + 10),
+        radius=28,
+        fill=(27, 67, 50, 28),
+    )
+    shadow = shadow.filter(ImageFilter.GaussianBlur(12))
+    canvas.alpha_composite(shadow)
+    canvas.alpha_composite(photo, (x, y))
+
+
+def draw_growing_vine(draw: ImageDraw.ImageDraw, phase: float = 0.0) -> None:
+    """Run one continuous vine across all four panels."""
+    points = []
+    for x in range(0, SIDE_WIDTH + 1, 12):
+        y = 1262 + int(24 * math.sin((x / 180) + phase))
+        points.append((x, y))
+    draw.line(points, fill=(*FOREST, 150), width=4)
+    for x in range(120, SIDE_WIDTH, 210):
+        y = 1262 + int(24 * math.sin((x / 180) + phase))
+        direction = -1 if (x // 210) % 2 else 1
+        draw.line((x, y, x + 18, y + direction * 34), fill=(*FOREST, 150), width=3)
+        draw.ellipse(
+            (x + 8, y + direction * 48 - 12, x + 48, y + direction * 48 + 12),
+            fill=(*FOREST, 125),
+        )
+
+
+def draw_fold_guides(draw: ImageDraw.ImageDraw, reverse: bool = False) -> None:
+    """Mark alternating mountain and valley folds without overpowering the art."""
+    guide_font = load_sans(14, bold=True)
+    for fold_index, x in enumerate(range(PANEL_WIDTH, SIDE_WIDTH, PANEL_WIDTH), start=1):
+        for y in range(42, SIDE_HEIGHT - 42, 22):
+            draw.line((x, y, x, y + 10), fill=(*GOLD, 145), width=2)
+        is_mountain = (fold_index % 2 == 1) ^ reverse
+        label = "MOUNTAIN FOLD" if is_mountain else "VALLEY FOLD"
+        label_w = text_width(draw, label, guide_font) + 18
+        draw.rounded_rectangle(
+            (x - label_w // 2, SIDE_HEIGHT - 72, x + label_w // 2, SIDE_HEIGHT - 47),
+            radius=8,
+            fill=(*CREAM, 220),
+        )
+        draw.text(
+            (x - label_w // 2 + 9, SIDE_HEIGHT - 68),
+            label,
+            font=guide_font,
+            fill=(*FOREST, 165),
+        )
+
+
+def draw_cover_panel(canvas: Image.Image, panel_x: int) -> None:
+    draw = ImageDraw.Draw(canvas)
     logo = Image.open(LOGO_PATH).convert("RGBA")
-    logo_w = 620
+    logo_w = 660
     logo_h = int(logo.height * (logo_w / logo.width))
     logo = logo.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
-    canvas.alpha_composite(logo, ((WIDTH - logo_w) // 2, 62))
+    canvas.alpha_composite(logo, (panel_x + (PANEL_WIDTH - logo_w) // 2, 100))
 
-    # Headlines
-    title_font = load_font(78, bold=True)
-    script_font = load_font(46, italic=True)
-    draw_centered(draw, "Grow Fresh Food", 300, title_font, FOREST, WIDTH)
-    draw_centered(draw, "in Just 7 Easy Steps", 398, script_font, FOREST, WIDTH)
+    title_font = load_font(66, bold=True)
+    script_font = load_font(39, italic=True)
+    title = "Grow Fresh Food"
+    subtitle = "in Just 7 Easy Steps"
+    draw.text(
+        (panel_x + (PANEL_WIDTH - text_width(draw, title, title_font)) // 2, 365),
+        title,
+        font=title_font,
+        fill=FOREST,
+    )
+    draw.text(
+        (panel_x + (PANEL_WIDTH - text_width(draw, subtitle, script_font)) // 2, 458),
+        subtitle,
+        font=script_font,
+        fill=FOREST,
+    )
 
-    # Step grid: rows of 3, 3, and a single wide finale card
-    grid_top = 500
-    col_gap = 24
-    row_gap = 28
-    card_w = (WIDTH - 2 * MARGIN - 2 * col_gap) // 3
-    card_h = 560
-    wide_card_h = 420
-
-    step_index = 0
-    y = grid_top
-    for count in ROW_LAYOUT:
-        if count == 1:
-            photo, title, description = STEPS[step_index]
-            wide_w = 2 * card_w + col_gap
-            x1 = (WIDTH - wide_w) // 2
-            draw_wide_step_card(
-                canvas,
-                (x1, y, x1 + wide_w, y + wide_card_h),
-                step_index + 1,
-                title,
-                resolve_photo(photo),
-                description,
-            )
-            step_index += 1
-            y += wide_card_h + row_gap
-            continue
-
-        row_w = count * card_w + (count - 1) * col_gap
-        x_start = (WIDTH - row_w) // 2
-        for col in range(count):
-            photo, title, description = STEPS[step_index]
-            x1 = x_start + col * (card_w + col_gap)
-            draw_step_card(
-                canvas,
-                (x1, y, x1 + card_w, y + card_h),
-                step_index + 1,
-                title,
-                resolve_photo(photo),
-                description,
-            )
-            step_index += 1
-        y += card_h + row_gap
-
-    # Footer slogan
-    footer_y = y + 6
-    draw_footer_flourish(draw, footer_y, WIDTH)
-    slogan_font = load_font(34, bold=True)
-    draw_centered(draw, "Grow Naturally. Grow Sustainably.", footer_y + 24, slogan_font, FOREST, WIDTH)
-    draw_footer_flourish(draw, footer_y + 84, WIDTH)
-
-    # Feature icons row
-    icon_y = footer_y + 150
-    icon_spacing = (WIDTH - 2 * MARGIN) // 4
-    label_font = load_sans(19, bold=True)
-    for i, (label, icon_key) in enumerate(FEATURES):
-        cx = MARGIN + icon_spacing // 2 + i * icon_spacing
-        draw.ellipse((cx - 58, icon_y - 58, cx + 58, icon_y + 58), outline=(*GOLD, 210), width=3)
+    draw_footer_flourish(draw, 548, PANEL_WIDTH)
+    label_font = load_sans(17, bold=True)
+    positions = [(250, 690), (650, 690), (250, 955), (650, 955)]
+    for (label, icon_key), (local_x, icon_y) in zip(FEATURES, positions):
+        cx = panel_x + local_x
+        draw.ellipse((cx - 58, icon_y - 58, cx + 58, icon_y + 58), fill=(*WHITE, 160), outline=(*GOLD, 210), width=3)
         ICON_DRAWERS[icon_key](draw, cx, icon_y, size=28)
-        y = icon_y + 78
+        label_y = icon_y + 76
         for line in label.split("\n"):
             tw = text_width(draw, line, label_font)
-            draw.text((cx - tw // 2, y), line, font=label_font, fill=FOREST)
-            y += label_font.size + 4
+            draw.text((cx - tw // 2, label_y), line, font=label_font, fill=FOREST)
+            label_y += 23
 
+    slogan_font = load_font(27, bold=True)
+    slogan = "Grow Naturally. Grow Sustainably."
+    draw.text(
+        (panel_x + (PANEL_WIDTH - text_width(draw, slogan, slogan_font)) // 2, 1168),
+        slogan,
+        font=slogan_font,
+        fill=FOREST,
+    )
+
+
+def draw_step_panel(canvas: Image.Image, panel_x: int, step_index: int) -> None:
+    draw = ImageDraw.Draw(canvas)
+    photo, title, description = STEPS[step_index]
+    step_num = step_index + 1
+
+    draw_step_badge(draw, panel_x + 78, 92, step_num)
+    eyebrow_font = load_sans(15, bold=True)
+    draw.text((panel_x + 122, 68), f"GROWING GUIDE  /  STEP {step_num:02d}", font=eyebrow_font, fill=GOLD)
+
+    title_font = load_font(43 if len(title) < 20 else 37, bold=True)
+    title_lines = wrap_text(draw, title, title_font, PANEL_WIDTH - 96)
+    title_y = 112
+    for line in title_lines:
+        draw.text((panel_x + 48, title_y), line, font=title_font, fill=FOREST)
+        title_y += title_font.size + 3
+
+    photo_y = 224 if len(title_lines) == 1 else 248
+    draw_arch_photo(
+        canvas,
+        resolve_photo(photo),
+        panel_x + 48,
+        photo_y,
+        contain=step_num == 1,
+    )
+
+    desc_font = load_sans(25)
+    desc_lines = wrap_text(draw, description, desc_font, PANEL_WIDTH - 112)
+    desc_y = 925
+    for line in desc_lines:
+        tw = text_width(draw, line, desc_font)
+        draw.text((panel_x + (PANEL_WIDTH - tw) // 2, desc_y), line, font=desc_font, fill=TEXT_MUTED)
+        desc_y += 37
+
+    if step_num == 7:
+        note_font = load_sans(20, bold=True)
+        note = "No transplant shock · Zero plastic waste"
+        draw.text(
+            (panel_x + (PANEL_WIDTH - text_width(draw, note, note_font)) // 2, desc_y + 22),
+            note,
+            font=note_font,
+            fill=FOREST,
+        )
+
+
+def create_guide_side(step_indices: list[int | None], *, reverse_folds: bool = False) -> Image.Image:
+    canvas = make_background(SIDE_WIDTH, SIDE_HEIGHT)
+    draw = ImageDraw.Draw(canvas)
+    for panel_index in range(4):
+        draw_panel_frame(draw, panel_index * PANEL_WIDTH, panel_index)
+    draw_growing_vine(draw, phase=0.8 if reverse_folds else 0.0)
+
+    for panel_index, step_index in enumerate(step_indices):
+        panel_x = panel_index * PANEL_WIDTH
+        if step_index is None:
+            draw_cover_panel(canvas, panel_x)
+        else:
+            draw_step_panel(canvas, panel_x, step_index)
+
+    draw_fold_guides(draw, reverse=reverse_folds)
     return canvas.convert("RGB")
+
+
+def create_user_guide() -> tuple[Image.Image, Image.Image, Image.Image]:
+    """Create two print sides plus one convenient review proof."""
+    front = create_guide_side([None, 0, 1, 2])
+    back = create_guide_side([3, 4, 5, 6], reverse_folds=True)
+
+    separator = 130
+    proof = Image.new("RGB", (SIDE_WIDTH, SIDE_HEIGHT * 2 + separator), CREAM)
+    proof.paste(front, (0, 0))
+    proof.paste(back, (0, SIDE_HEIGHT + separator))
+    proof_draw = ImageDraw.Draw(proof)
+    proof_font = load_sans(24, bold=True)
+    front_label = "SIDE A  ·  COVER + STEPS 1–3"
+    back_label = "SIDE B  ·  STEPS 4–7"
+    proof_draw.text((60, SIDE_HEIGHT + 28), front_label, font=proof_font, fill=FOREST)
+    proof_draw.text(
+        (SIDE_WIDTH - 60 - text_width(proof_draw, back_label, proof_font), SIDE_HEIGHT + 28),
+        back_label,
+        font=proof_font,
+        fill=FOREST,
+    )
+    proof_draw.line((60, SIDE_HEIGHT + 78, SIDE_WIDTH - 60, SIDE_HEIGHT + 78), fill=GOLD, width=2)
+    return front, back, proof
 
 
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     refresh_step_one_photo()
-    guide = create_user_guide()
-    out = OUTPUT_DIR / "grow-kit-user-guide.png"
-    guide.save(out, "PNG", optimize=True)
-    print(f"Created {out} ({guide.width}x{guide.height})")
+    front, back, proof = create_user_guide()
+    outputs = {
+        "grow-kit-user-guide-front.png": front,
+        "grow-kit-user-guide-back.png": back,
+        "grow-kit-user-guide.png": proof,
+    }
+    for filename, image in outputs.items():
+        out = OUTPUT_DIR / filename
+        image.save(out, "PNG", optimize=True)
+        print(f"Created {out} ({image.width}x{image.height})")
 
 
 if __name__ == "__main__":
