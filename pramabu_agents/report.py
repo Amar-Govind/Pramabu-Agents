@@ -48,6 +48,15 @@ def pack_to_markdown(pack: CampaignPack) -> str:
             lines.append("- Notes: " + "; ".join(creative.notes))
         lines.append("")
 
+    lines.extend(["", "## Poster Assets"])
+    if pack.posters:
+        for poster in pack.posters:
+            lines.append(
+                f"- **{poster.idea_title}** — `{poster.path}` ({poster.width}x{poster.height})"
+            )
+    else:
+        lines.append("- _None_")
+
     lines.extend(["", "## Social Calendar"])
     for post in pack.social_calendar:
         lines.append(
@@ -102,10 +111,14 @@ def write_outputs(pack: CampaignPack, output_dir: Path) -> dict[str, Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     json_path = output_dir / f"campaign_{pack.week_of}.json"
     md_path = output_dir / f"campaign_{pack.week_of}.md"
+    posters_dir = output_dir / "posters" / pack.week_of
 
     json_path.write_text(pack.model_dump_json(indent=2), encoding="utf-8")
     md_path.write_text(pack_to_markdown(pack), encoding="utf-8")
-    return {"json": json_path, "markdown": md_path}
+    result = {"json": json_path, "markdown": md_path}
+    if pack.posters or posters_dir.exists():
+        result["posters"] = posters_dir
+    return result
 
 
 def load_pack(path: Path) -> CampaignPack:
