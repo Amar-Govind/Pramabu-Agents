@@ -37,11 +37,14 @@ FOLD_INNER_PAD = 20
 PHOTO_ZOOM = 0.86
 PHOTO_PAD = 28
 
-# Step 1 is a direct sharp crop from Kit-Poster3 (no inpainting / blur filters).
-# Crop stays below the poster subtitle and above the green "What's Inside" banner
-# so every visible pixel is original camera detail.
+# Step 1 fits the full kit canister (box) and branded pencil from Kit-Poster3.
 KIT_POSTER = "Kit-Poster3.jpeg"
-KIT_POSTER_CROP = (18, 528, 1068, 982)
+KIT_POSTER_CROP = (8, 400, 1082, 1020)
+KIT_POSTER_TEXT_BOX = (280, 400, 700, 518)  # subtitle only; stop before canister logo
+KIT_POSTER_BANNER_BOX = (220, 978, 1086, 1040)
+KIT_POSTER_PENCIL_BOX = (465, 960, 1086, 1014)
+KIT_POSTER_SAND_SAMPLE = (620, 940, 780, 970)
+KIT_POSTER_BOTTOM_MARGIN = 20
 STEP_ONE_PHOTO = "step-01-open-kit.png"
 STEP_ONE_PHOTO_ZOOM = 1.0
 STEP_ONE_PHOTO_PAD = 4
@@ -134,17 +137,168 @@ def load_cover_logo(width: int) -> Image.Image:
     return logo.resize((width, logo_h), Image.Resampling.LANCZOS)
 
 
+def _sample_mean_color(image: Image.Image, box: tuple[int, int, int, int]) -> tuple[int, int, int]:
+    patch = image.crop(box).convert("RGB")
+    px = patch.load()
+    total = [0, 0, 0]
+    count = 0
+    for y in range(patch.height):
+        for x in range(patch.width):
+            r, g, b = px[x, y]
+            total[0] += r
+            total[1] += g
+            total[2] += b
+            count += 1
+    count = max(1, count)
+    return total[0] // count, total[1] // count, total[2] // count
+
+
+def erase_poster_subtitle(poster: Image.Image) -> None:
+    """Remove poster subtitle text left of the canister (no blur filter)."""
+    x0, y0, x1, y1 = KIT_POSTER_TEXT_BOX
+    top, bottom = max(0, y0 - 6), min(poster.height - 1, y1 + 6)
+    px = poster.load()
+    rng = random.Random(5)
+    for x in range(x0, x1):
+        above, below = px[x, top], px[x, bottom]
+        for y in range(y0, y1):
+            ratio = (y - top) / max(1, bottom - top)
+            grain = rng.randint(-2, 2)
+            px[x, y] = tuple(
+                max(0, min(255, int(above[i] * (1 - ratio) + below[i] * ratio) + grain))
+                for i in range(3)
+            )
+
+
+def _pencil_protect_mask(size: tuple[int, int], origin: tuple[int, int]) -> Image.Image:
+    """Hard mask of the pencil tip + barrel used while clearing the green banner."""
+    mask = Image.new("L", size, 0)
+    draw = ImageDraw.Draw(mask)
+    ox, oy = origin
+    # Barrel only — keep clear of the banner text zone around x=500–680.
+    draw.rounded_rectangle((720 - ox, 966 - oy, 1084 - ox, 1012 - oy), radius=16, fill=255)
+    # Narrow tip wedge (avoids "What's Inside … Kit" glyphs).
+    draw.polygon(
+        [
+            (475 - ox, 988 - oy),
+            (560 - ox, 974 - oy),
+            (560 - ox, 1004 - oy),
+        ],
+        fill=255,
+    )
+    # Thin connector from tip into the barrel.
+    draw.polygon(
+        [
+            (560 - ox, 978 - oy),
+            (720 - ox, 972 - oy),
+            (720 - ox, 1006 - oy),
+            (560 - ox, 1000 - oy),
+        ],
+        fill=255,
+    )
+    return mask
+
+
+def erase_poster_banner(poster: Image.Image) -> None:
+    """Clear the green What's Inside banner with flat sand, then restore the pencil."""
+    x0, y0, x1, y1 = KIT_POSTER_BANNER_BOX
+    x1 = min(x1, poster.width)
+    y1 = min(y1, poster.height)
+    sand = _sample_mean_color(poster, KIT_POSTER_SAND_SAMPLE)
+    source = poster.copy()
+    px = poster.load()
+    rng = random.Random(21)
+
+    # Wipe the banner pill with resized sand *texture* (not a flat slab), then
+    # restore the pencil sharply on top.
+    sand_tex = source.crop(KIT_POSTER_SAND_SAMPLE).resize(
+        (x1 - x0, y1 - y0), Image.Resampling.BICUBIC
+    )
+    poster.paste(sand_tex, (x0, y0))
+    px = poster.load()
+    # Tiny grain so the resized patch doesn't look plastic.
+    for y in range(y0, y1):
+        for x in range(x0, x1):
+            grain = rng.randint(-3, 3)
+            r, g, b = px[x, y]
+            px[x, y] = (
+                max(0, min(255, r + grain)),
+                max(0, min(255, g + grain)),
+                max(0, min(255, b + grain)),
+            )
+
+    # Put the original sharp pencil back on top of the sand.
+    px0, py0, px1, py1 = KIT_POSTER_PENCIL_BOX
+    px1 = min(px1, poster.width)
+    py1 = min(py1, poster.height)
+    mask = _pencil_protect_mask((px1 - px0, py1 - py0), (px0, py0))
+    patch = source.crop((px0, py0, px1, py1)).convert("RGBA")
+    src_px = source.load()
+    pp = patch.load()
+    mp = mask.load()
+    for y in range(patch.height):
+        for x in range(patch.width):
+            if mp[x, y] == 0:
+                continue
+            r, g, b, _a = pp[x, y]
+            gx, gy = px0 + x, py0 + y
+            # Never bring green banner pixels back.
+            if g > r + 10 and g > b + 10 and r < 110:
+                mp[x, y] = 0
+                continue
+            near_green = False
+            for dy in (-2, -1, 1, 2):
+                ny = min(source.height - 1, max(0, gy + dy))
+                rr, gg, bb = src_px[gx, ny]
+                if gg > rr + 12 and gg > bb + 12 and rr < 100:
+                    near_green = True
+                    break
+            # Cool pure-white glyphs on the green pill — never restore those.
+            is_glyph = r > 220 and g > 220 and b > 210 and abs(r - g) < 20 and abs(g - b) < 25
+            if is_glyph and near_green:
+                mp[x, y] = 0
+                continue
+            # Tip zone can overlap banner text — only keep pencil-like pixels there.
+            if gx < 700:
+                bright = r > 195 and g > 185 and b > 160 and abs(r - g) < 50
+                wood = r > 140 and r > b + 15 and 110 < g < 210 and b < 160
+                graphite = r < 90 and g < 90 and b < 90 and x < 110
+                if not (bright or wood or graphite):
+                    mp[x, y] = 0
+            # Barrel zone (x >= 700): keep remaining non-green / non-glyph mask
+            # pixels so the full pencil thickness is restored.
+    patch.putalpha(mask)
+    composed = poster.convert("RGBA")
+    composed.alpha_composite(patch, (px0, py0))
+    poster.paste(composed.convert("RGB"))
+
+    # Final cleanup: kill any leftover banner glyphs/leaves outside the barrel.
+    px = poster.load()
+    for y in range(y0, y1):
+        for x in range(x0, min(x1, 720)):
+            r, g, b = px[x, y]
+            is_green = g > r + 10 and g > b + 10 and r < 140
+            is_glyph = r > 215 and g > 215 and b > 200 and abs(r - g) < 25
+            if is_green or is_glyph:
+                grain = rng.randint(-2, 2)
+                px[x, y] = tuple(max(0, min(255, sand[i] + grain)) for i in range(3))
+
+
 def refresh_step_one_photo() -> None:
-    """Rebuild step 1 as a direct sharp crop from Kit-Poster3.jpeg."""
+    """Rebuild step 1 so the kit canister and pencil both fit sharply."""
     source = STEPS_DIR / KIT_POSTER
     if not source.exists():
         return
     poster = Image.open(source).convert("RGB")
-    # Mild unsharp mask restores bite lost to JPEG — keeps natural photo grain.
+    erase_poster_subtitle(poster)
+    erase_poster_banner(poster)
     crop = poster.crop(KIT_POSTER_CROP).filter(
         ImageFilter.UnsharpMask(radius=1.2, percent=120, threshold=3)
     )
-    crop.save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
+    sand = _sample_mean_color(poster, KIT_POSTER_SAND_SAMPLE)
+    framed = Image.new("RGB", (crop.width, crop.height + KIT_POSTER_BOTTOM_MARGIN), sand)
+    framed.paste(crop, (0, 0))
+    framed.save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
 
 
 def resolve_photo(candidates: str | tuple[str, ...]) -> Path:
