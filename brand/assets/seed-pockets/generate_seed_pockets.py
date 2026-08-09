@@ -140,33 +140,37 @@ def create_seed_pocket(slug: str, label: str, photo_path: Path) -> Image.Image:
     # Decorative top border line
     draw.line((60, 36, WIDTH - 60, 36), fill=(*GOLD, 180), width=2)
 
-    # Logo
-    logo = Image.open(LOGO_PATH).convert("RGBA")
-    logo_w = 520
-    logo_h = int(logo.height * (logo_w / logo.width))
-    logo = logo.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
-    canvas.alpha_composite(logo, ((WIDTH - logo_w) // 2, 52))
+    # Plant name, centred in a fixed band so one- and two-line names
+    # leave the photo in the same place
+    name_font = load_font(54)
+    name_band_top, name_band_height = 66, 148
+    name_height = len(label.split("\n")) * (name_font.size + 8)
+    name_y = name_band_top + (name_band_height - name_height) // 2
+    draw_centered_multiline(draw, label, name_y, name_font, FOREST, WIDTH)
 
-    # Plant photo
-    photo = Image.open(photo_path)
-    photo_box = (90, 230, WIDTH - 90, 880)
-    add_rounded_photo(canvas, photo, photo_box, radius=28)
-
-    # Divider flourish
-    mid_y = 910
+    # Divider flourish under the name
+    mid_y = 234
     draw.line((WIDTH // 2 - 120, mid_y, WIDTH // 2 + 120, mid_y), fill=(*GOLD, 200), width=2)
     draw.ellipse((WIDTH // 2 - 5, mid_y - 5, WIDTH // 2 + 5, mid_y + 5), fill=FOREST)
 
-    # Plant name
-    name_font = load_font(54)
-    draw_centered_multiline(draw, label, 940, name_font, FOREST, WIDTH)
+    # Plant photo
+    photo = Image.open(photo_path)
+    photo_box = (90, 268, WIDTH - 90, 898)
+    add_rounded_photo(canvas, photo, photo_box, radius=28)
+
+    # Logo below the photo
+    logo = Image.open(LOGO_PATH).convert("RGBA")
+    logo_w = 470
+    logo_h = int(logo.height * (logo_w / logo.width))
+    logo = logo.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
+    canvas.alpha_composite(logo, ((WIDTH - logo_w) // 2, 940))
 
     # Footer tagline
     tag_font = load_font(22, bold=False)
     tag = "100% Organic · Grow Naturally"
     bbox = draw.textbbox((0, 0), tag, font=tag_font)
     tw = bbox[2] - bbox[0]
-    draw.text(((WIDTH - tw) // 2, 1120), tag, font=tag_font, fill=(*KRAFT_DARK,))
+    draw.text(((WIDTH - tw) // 2, 1112), tag, font=tag_font, fill=(*KRAFT_DARK,))
 
     # Outer border
     draw.rounded_rectangle((24, 24, WIDTH - 24, HEIGHT - 24), radius=12, outline=(*GOLD, 160), width=3)
