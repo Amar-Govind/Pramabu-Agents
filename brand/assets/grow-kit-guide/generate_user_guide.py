@@ -27,10 +27,12 @@ MARGIN = 60
 
 # Foldable accordion layout — 8 vertical panels (cover + 7 steps), z-fold.
 FOLD_PANEL_W = 1080
-FOLD_PANEL_H = 520
+FOLD_PANEL_H = 620
 FOLD_PANEL_COUNT = 8
+FOLD_PANEL_GAP = 44
 FOLD_BLEED = 24
 FOLD_VINE_X = 54
+FOLD_INNER_PAD = 20
 
 # Cards per row; the final row holds the single transplanting step, centred.
 ROW_LAYOUT = [3, 3, 1]
@@ -425,8 +427,16 @@ def draw_vine_stem(
         draw_leaf_icon(draw, x + sway + side * 22, py, size=leaf_size)
 
 
-def draw_fold_crease(draw: ImageDraw.ImageDraw, y: int, width: int, *, label: str = "fold") -> None:
-    """Dashed accordion fold line with leaf markers."""
+def draw_fold_crease(
+    draw: ImageDraw.ImageDraw,
+    gap_top: int,
+    gap_bottom: int,
+    width: int,
+    *,
+    label: str = "fold",
+) -> None:
+    """Dashed accordion fold line drawn inside the inter-panel gap only."""
+    y = (gap_top + gap_bottom) // 2
     margin = 70
     dash, gap = 14, 10
     x = margin
@@ -435,9 +445,10 @@ def draw_fold_crease(draw: ImageDraw.ImageDraw, y: int, width: int, *, label: st
         x += dash + gap
     draw_leaf_icon(draw, margin - 18, y, size=9)
     draw_leaf_icon(draw, width - margin + 18, y, size=9)
-    font = load_sans(14, bold=True)
+    font = load_sans(13, bold=True)
     tw = text_width(draw, label, font)
-    draw.text(((width - tw) // 2, y - 22), label, font=font, fill=(*GOLD, 210))
+    label_y = max(gap_top + 4, min(y - 10, gap_bottom - font.size - 6))
+    draw.text(((width - tw) // 2, label_y), label, font=font, fill=(*GOLD, 210))
 
 
 def draw_crop_marks(draw: ImageDraw.ImageDraw, width: int, height: int) -> None:
@@ -487,7 +498,7 @@ def draw_cover_panel(panel: Image.Image) -> None:
     draw_centered(draw, "in Just 7 Easy Steps", 322, script_font, GOLD, w)
 
     # Unfold cue
-    cue_y = h - 150
+    cue_y = h - 170
     draw.line((w // 2 - 90, cue_y, w // 2 + 90, cue_y), fill=(*GOLD, 180), width=2)
     cue_font = load_sans(20, bold=True)
     draw_centered(draw, "Unfold Your Garden Journey", cue_y + 16, cue_font, CREAM, w)
@@ -513,40 +524,42 @@ def draw_accordion_step_panel(
 ) -> None:
     """Single accordion panel for steps 1–6."""
     w, h = panel.size
-    draw = ImageDraw.Draw(panel)
+    pad = FOLD_INNER_PAD
 
-    # Alternating panel wash for zigzag fold readability
     base = Image.new("RGB", (w, h), tint)
     panel.paste(base, (0, 0))
+    draw = ImageDraw.Draw(panel)
 
     # Vine rail
-    draw.rounded_rectangle((16, 16, 78, h - 16), radius=12, fill=(*WHITE, 230), outline=(*GOLD, 140), width=2)
-    draw_vine_stem(draw, FOLD_VINE_X, 40, h - 40, leaf_count=2, leaf_size=12 + step_num)
+    draw.rounded_rectangle((pad, pad, 78, h - pad), radius=12, fill=(*WHITE, 230), outline=(*GOLD, 140), width=2)
+    draw_vine_stem(draw, FOLD_VINE_X, pad + 24, h - pad - 24, leaf_count=2, leaf_size=10 + step_num)
 
-    content_x = 96
-    content_w = w - content_x - 28
+    content_x = 92
+    content_w = w - content_x - pad
+    draw_step_badge(draw, FOLD_VINE_X, pad + 36, step_num)
 
-    # Step badge on vine
-    draw_step_badge(draw, FOLD_VINE_X, 52, step_num)
+    title_font = load_font(30, bold=True)
+    title_y = pad + 18
+    draw.text((content_x, title_y), title, font=title_font, fill=FOREST)
 
-    title_font = load_font(34, bold=True)
-    draw.text((content_x, 24), title, font=title_font, fill=FOREST)
+    desc_font = load_sans(17)
+    lines = wrap_text(draw, description, desc_font, content_w)
+    line_h = 23
+    desc_block_h = len(lines) * line_h + pad
+    desc_y = h - pad - desc_block_h + pad // 2
 
-    photo_top = 78
-    photo_h = h - photo_top - 118
+    title_bottom = title_y + title_font.size + 10
+    photo_top = title_bottom
+    photo_h = max(180, desc_y - photo_top - 12)
     contain = step_num == 1
     photo = prepare_photo(image_path, (content_w, photo_h), contain=contain)
     panel.alpha_composite(photo, (content_x, photo_top))
 
-    desc_font = load_sans(19)
-    lines = wrap_text(draw, description, desc_font, content_w)
-    desc_y = h - 24 - len(lines) * 26
-    for line in lines:
-        draw.text((content_x, desc_y), line, font=desc_font, fill=TEXT_MUTED)
-        desc_y += 26
+    for i, line in enumerate(lines):
+        draw.text((content_x, desc_y + i * line_h), line, font=desc_font, fill=TEXT_MUTED)
 
     tab_font = load_sans(13, bold=True)
-    draw.text((w - 72, 20), f"0{step_num}", font=tab_font, fill=(*GOLD, 200))
+    draw.text((w - pad - 36, pad + 2), f"0{step_num}", font=tab_font, fill=(*GOLD, 200))
 
 
 def draw_finale_panel(
@@ -557,75 +570,84 @@ def draw_finale_panel(
 ) -> None:
     """Final accordion panel: step 7, slogan, and feature icons."""
     w, h = panel.size
-    draw = ImageDraw.Draw(panel)
+    pad = FOLD_INNER_PAD
 
     base = make_background(w, h)
     panel.paste(base, (0, 0))
     draw = ImageDraw.Draw(panel)
 
-    draw_vine_stem(draw, FOLD_VINE_X, 30, h - 30, leaf_count=5, leaf_size=18)
+    draw_vine_stem(draw, FOLD_VINE_X, pad, h - pad, leaf_count=4, leaf_size=16)
 
-    # Step 7 hero band
-    hero_h = 268
-    draw.rounded_rectangle((88, 20, w - 24, hero_h), radius=14, fill=(*WHITE, 240), outline=(*GOLD, 180), width=2)
-    draw_step_badge(draw, 118, 52, 7)
-
+    card_top = pad
+    card_x = 84
+    card_w = w - card_x - pad
     title_font = load_font(28, bold=True)
-    draw.text((156, 28), title, font=title_font, fill=FOREST)
-
-    photo_w = 280
-    photo = ImageOps.fit(Image.open(image_path).convert("RGBA"), (photo_w, hero_h - 52), Image.Resampling.LANCZOS)
-    mask = Image.new("L", photo.size, 0)
-    ImageDraw.Draw(mask).rounded_rectangle((0, 0, photo_w, hero_h - 52), radius=10, fill=255)
-    photo.putalpha(mask)
-    panel.alpha_composite(photo, (100, 40))
-
-    text_x = 100 + photo_w + 16
-    text_w = w - text_x - 28
     desc_font = load_sans(16)
-    y = 44
-    for line in wrap_text(draw, description, desc_font, text_w):
+    note_font = load_sans(14, bold=True)
+
+    body_top = card_top + 58
+    photo_w = int(card_w * 0.42)
+    photo_h = 200
+    text_x = card_x + photo_w + 18
+    text_w = card_x + card_w - text_x
+    lines = wrap_text(draw, description, desc_font, text_w)
+    note_h = note_font.size + 8
+    text_block_h = len(lines) * 22 + note_h
+    card_h = max(photo_h, text_block_h) + 66
+
+    draw.rounded_rectangle((card_x, card_top, card_x + card_w, card_top + card_h), radius=14, fill=(*WHITE, 240), outline=(*GOLD, 180), width=2)
+
+    draw_step_badge(draw, card_x + 30, card_top + 34, 7)
+    draw.text((card_x + 78, card_top + 16), title, font=title_font, fill=FOREST)
+
+    photo = ImageOps.fit(Image.open(image_path).convert("RGBA"), (photo_w, photo_h), Image.Resampling.LANCZOS)
+    mask = Image.new("L", (photo_w, photo_h), 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, photo_w, photo_h), radius=10, fill=255)
+    photo.putalpha(mask)
+    panel.alpha_composite(photo, (card_x + 14, body_top))
+
+    y = body_top + 4
+    for line in lines:
         draw.text((text_x, y), line, font=desc_font, fill=TEXT_MUTED)
         y += 22
-    note_font = load_sans(14, bold=True)
     draw.text((text_x, y + 6), "No transplant shock · Zero plastic waste", font=note_font, fill=FOREST)
 
-    # Footer band
-    footer_y = hero_h + 22
+    footer_y = card_top + card_h + 18
     draw_footer_flourish(draw, footer_y, w)
-    slogan_font = load_font(26, bold=True)
-    draw_centered(draw, "Grow Naturally. Grow Sustainably.", footer_y + 18, slogan_font, FOREST, w)
+    slogan_font = load_font(24, bold=True)
+    draw_centered(draw, "Grow Naturally. Grow Sustainably.", footer_y + 14, slogan_font, FOREST, w)
 
-    icon_y = footer_y + 78
-    icon_spacing = (w - 120) // 4
-    label_font = load_sans(14, bold=True)
+    icon_y = footer_y + 58
+    icon_spacing = (w - 2 * pad) // 4
+    label_font = load_sans(12, bold=True)
     for i, (label, icon_key) in enumerate(FEATURES):
-        cx = 60 + icon_spacing // 2 + i * icon_spacing
-        draw.ellipse((cx - 42, icon_y - 42, cx + 42, icon_y + 42), outline=(*GOLD, 210), width=2)
-        ICON_DRAWERS[icon_key](draw, cx, icon_y, size=20)
-        ly = icon_y + 54
+        cx = pad + icon_spacing // 2 + i * icon_spacing
+        draw.ellipse((cx - 36, icon_y - 36, cx + 36, icon_y + 36), outline=(*GOLD, 210), width=2)
+        ICON_DRAWERS[icon_key](draw, cx, icon_y, size=17)
+        ly = icon_y + 46
         for line in label.split("\n"):
             tw = text_width(draw, line, label_font)
             draw.text((cx - tw // 2, ly), line, font=label_font, fill=FOREST)
-            ly += label_font.size + 2
+            ly += label_font.size + 1
 
-    site_font = load_sans(16, bold=True)
-    draw_centered(draw, "parambu.in", h - 34, site_font, FOREST, w)
+    site_font = load_sans(15, bold=True)
+    draw_centered(draw, "parambu.in", h - pad - 4, site_font, FOREST, w)
 
     tab_font = load_sans(13, bold=True)
-    draw.text((w - 72, 20), "07", font=tab_font, fill=(*GOLD, 200))
+    draw.text((w - pad - 36, pad + 2), "07", font=tab_font, fill=(*GOLD, 200))
 
 
 def create_foldable_guide() -> Image.Image:
     """Flat print layout for an 8-panel vertical accordion fold."""
     bleed = FOLD_BLEED
+    gap = FOLD_PANEL_GAP
     w = FOLD_PANEL_W + bleed * 2
-    h = FOLD_PANEL_COUNT * FOLD_PANEL_H + bleed * 2 + (FOLD_PANEL_COUNT - 1) * 6
+    h = FOLD_PANEL_COUNT * FOLD_PANEL_H + bleed * 2 + (FOLD_PANEL_COUNT - 1) * gap
 
     canvas = Image.new("RGBA", (w, h), (*CREAM, 255))
 
     for i in range(FOLD_PANEL_COUNT):
-        y = bleed + i * (FOLD_PANEL_H + 6)
+        y = bleed + i * (FOLD_PANEL_H + gap)
         panel = Image.new("RGBA", (FOLD_PANEL_W, FOLD_PANEL_H), (0, 0, 0, 0))
 
         if i == 0:
@@ -648,15 +670,16 @@ def create_foldable_guide() -> Image.Image:
         canvas.alpha_composite(panel, (bleed, y))
 
         if i < FOLD_PANEL_COUNT - 1:
-            crease_y = y + FOLD_PANEL_H + 3
-            draw_fold_crease(ImageDraw.Draw(canvas), crease_y, w)
+            gap_top = y + FOLD_PANEL_H
+            gap_bottom = gap_top + gap
+            draw_fold_crease(ImageDraw.Draw(canvas), gap_top, gap_bottom, w)
 
     draw = ImageDraw.Draw(canvas)
     draw_crop_marks(draw, w, h)
 
     # Print legend
     legend_font = load_sans(15)
-    legend = "Print flat · Accordion-fold along dashed lines · Finished size ≈ 108 × 192 mm"
+    legend = "Print flat · Accordion-fold along dashed lines · Finished size ≈ 108 × 230 mm"
     tw = text_width(draw, legend, legend_font)
     draw.text(((w - tw) // 2, h - bleed + 4), legend, font=legend_font, fill=TEXT_MUTED)
 
