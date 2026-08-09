@@ -667,12 +667,17 @@ def draw_cover_panel(panel: Image.Image) -> None:
 
     logo_w = 460
     logo = load_cover_logo(logo_w)
-    panel.alpha_composite(logo, ((w - logo_w) // 2, 58))
+    # Center optically: the palm leaf sits on the left of the wordmark, so the
+    # visual mass is left of the image midpoint — shift right to balance.
+    logo_x = (w - logo.width) // 2 + 28
+    logo_y = 96
+    panel.alpha_composite(logo, (logo_x, logo_y))
 
     title_font = load_font(58, bold=True)
     script_font = load_font(34, italic=True)
-    draw_centered(draw, "Grow Fresh Food", 250, title_font, CREAM, w)
-    draw_centered(draw, "in Just 7 Easy Steps", 322, script_font, GOLD, w)
+    title_y = logo_y + logo.height + 36
+    draw_centered(draw, "Grow Fresh Food", title_y, title_font, CREAM, w)
+    draw_centered(draw, "in Just 7 Easy Steps", title_y + 72, script_font, GOLD, w)
 
     # Unfold cue
     cue_y = h - 170
