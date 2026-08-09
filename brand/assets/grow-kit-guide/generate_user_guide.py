@@ -476,11 +476,10 @@ def create_user_guide() -> Image.Image:
     # Centre panel: the fold-out garden path.
     draw_panel_label(draw, 1, "Plant")
     centre_x = PANEL_W
-    draw_centered(draw, "Follow the green path", 150, load_font(48, bold=True), FOREST, WIDTH)
-    # Mask the title centring area to the centre panel rather than whole sheet.
-    draw.rectangle((0, 125, PANEL_W - 1, 226), fill=(0, 0, 0, 0))
-    draw.text((centre_x + (PANEL_W - text_width(draw, "Follow the green path", load_font(48, bold=True))) // 2, 150), "Follow the green path", font=load_font(48, bold=True), fill=FOREST)
-    for i, (y1, y2) in enumerate(((290, 820), (870, 1400), (1450, 1980)), start=2):
+    centre_title = "Follow the green path"
+    centre_title_font = load_font(48, bold=True)
+    draw.text((centre_x + (PANEL_W - text_width(draw, centre_title, centre_title_font)) // 2, 150), centre_title, font=centre_title_font, fill=WHITE)
+    for i, (y1, y2) in enumerate(((290, 820), (870, 1400), (1450, 1980)), start=3):
         draw_fold_step(canvas, (centre_x + MARGIN, y1, centre_x + PANEL_W - MARGIN, y2), i, STEPS[i - 1])
 
     # Right panel: the harvest-facing finish and sustainable material message.
@@ -492,7 +491,7 @@ def create_user_guide() -> Image.Image:
     subtitle = "in Just 7 Easy Steps"
     subtitle_font = load_font(31, italic=True)
     draw.text((right_x + (PANEL_W - text_width(draw, subtitle, subtitle_font)) // 2, 222), subtitle, font=subtitle_font, fill=TEXT_MUTED)
-    draw_fold_step(canvas, (right_x + MARGIN, 330, right_x + PANEL_W - MARGIN, 910), 5, STEPS[5])
+    draw_fold_step(canvas, (right_x + MARGIN, 330, right_x + PANEL_W - MARGIN, 910), 6, STEPS[5])
     draw_fold_step(canvas, (right_x + MARGIN, 950, right_x + PANEL_W - MARGIN, 1530), 7, STEPS[6])
     draw_feature_strip(canvas, 2, 1640)
     slogan = "Grow Naturally. Grow Sustainably."
