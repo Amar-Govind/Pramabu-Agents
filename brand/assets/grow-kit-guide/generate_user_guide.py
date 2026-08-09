@@ -46,7 +46,6 @@ KIT_POSTER = "Kit-Poster3.jpeg"
 KIT_POSTER_CROP = (12, 395, 1068, 988)
 KIT_POSTER_TEXT_BOX = (352, 412, 698, 516)
 STEP_ONE_PHOTO = "step-01-open-kit.png"
-COCO_DISC_SOURCE = "step-03-fill-pots.png"
 
 # Cards per row; the final row holds the single transplanting step, centred.
 ROW_LAYOUT = [3, 3, 1]
@@ -155,56 +154,14 @@ def load_cover_logo(width: int) -> Image.Image:
     return logo.resize((width, logo_h), Image.Resampling.LANCZOS)
 
 
-def inpaint_disc_region(kit_spread: Image.Image) -> Image.Image:
-    """Paint out the poster's stylised discs using table texture from the same photo."""
+def remove_cocopeat_discs(kit_spread: Image.Image) -> Image.Image:
+    """Paint out cocopeat discs from the kit flat-lay using nearby table texture."""
     out = kit_spread.copy()
     patch = kit_spread.crop((420, 430, 680, 580))
     patch = patch.resize((270, 200), Image.Resampling.LANCZOS)
     patch = patch.filter(ImageFilter.GaussianBlur(2.5))
     out.paste(patch, (14, 378))
     return out
-
-
-def replace_cocopeat_discs(kit_spread: Image.Image) -> Image.Image:
-    """Swap the poster's stylised cocopeat discs for real side-view product photography."""
-    disc_source = STEPS_DIR / COCO_DISC_SOURCE
-    if not disc_source.exists():
-        return kit_spread
-
-    step3 = Image.open(disc_source)
-    sw, sh = step3.size
-    disc_src = step3.crop((int(sw * 0.70), int(sh * 0.45), int(sw * 0.98), int(sh * 0.78)))
-
-    def side_disc(width: int, height: int, src: Image.Image, *, darken: float = 0.0) -> Image.Image:
-        fitted = src.resize((width, height), Image.Resampling.LANCZOS)
-        if darken:
-            fitted = ImageEnhance.Brightness(fitted).enhance(1 - darken)
-        mask = Image.new("L", (width, height), 0)
-        draw = ImageDraw.Draw(mask)
-        draw.ellipse((1, 1, width - 1, max(8, int(height * 0.42))), fill=255)
-        draw.rectangle((int(width * 0.07), int(height * 0.15), int(width * 0.93), height - 1), fill=255)
-        mask = mask.filter(ImageFilter.GaussianBlur(0.9))
-        out = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-        out.paste(fitted.convert("RGBA"), (0, 0), mask)
-        return out
-
-    out = inpaint_disc_region(kit_spread).convert("RGBA")
-
-    for ox, oy, scale, darken in (
-        (34, 462, 1.0, 0.0),
-        (40, 434, 0.97, 0.04),
-        (46, 406, 0.94, 0.08),
-    ):
-        w, h = int(150 * scale), int(50 * scale)
-        disc = side_disc(w, h, disc_src, darken=darken)
-        shadow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-        sm = Image.new("L", (w, h), 0)
-        ImageDraw.Draw(sm).ellipse((10, h - 14, w - 10, h), fill=90)
-        shadow.putalpha(sm.filter(ImageFilter.GaussianBlur(3)))
-        out.alpha_composite(shadow, (ox + 5, oy + 6))
-        out.alpha_composite(disc, (ox, oy))
-
-    return out.convert("RGB")
 
 
 def refresh_step_one_photo() -> None:
@@ -215,7 +172,7 @@ def refresh_step_one_photo() -> None:
     poster = Image.open(source).convert("RGB")
     erase_poster_subtitle(poster)
     spread = poster.crop(KIT_POSTER_CROP)
-    spread = replace_cocopeat_discs(spread)
+    spread = remove_cocopeat_discs(spread)
     spread.save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
 
 
