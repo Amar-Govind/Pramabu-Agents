@@ -37,21 +37,14 @@ FOLD_INNER_PAD = 20
 PHOTO_ZOOM = 0.86
 PHOTO_PAD = 28
 
-# Step 1 is rebuilt from the kit poster product band: erase the poster subtitle
-# and green "What's Inside" banner, restore the branded pencil, then crop the
-# full kit spread (cups, discs, seeds, spray, canister, sticks, pencil).
+# Step 1 is a direct sharp crop from Kit-Poster3 (no inpainting / blur filters).
+# Crop stays below the poster subtitle and above the green "What's Inside" banner
+# so every visible pixel is original camera detail.
 KIT_POSTER = "Kit-Poster3.jpeg"
-# Crop through the pencil; extra sand margin is appended after wipe/restore.
-KIT_POSTER_CROP = (4, 395, 1086, 1024)
-KIT_POSTER_TEXT_BOX = (300, 405, 780, 520)
-KIT_POSTER_BANNER_BOX = (260, 978, 1086, 1040)
-KIT_POSTER_PENCIL_BOX = (470, 960, 1086, 1010)
-KIT_POSTER_SAND_SAMPLE = (620, 940, 780, 970)
-KIT_POSTER_BOTTOM_MARGIN = 48
-KIT_POSTER_SIDE_MARGIN = 28
+KIT_POSTER_CROP = (18, 528, 1068, 982)
 STEP_ONE_PHOTO = "step-01-open-kit.png"
-STEP_ONE_PHOTO_ZOOM = 0.97
-STEP_ONE_PHOTO_PAD = 8
+STEP_ONE_PHOTO_ZOOM = 1.0
+STEP_ONE_PHOTO_PAD = 4
 
 # Cards per row; the final row holds the single transplanting step, centred.
 ROW_LAYOUT = [3, 3, 1]
@@ -123,102 +116,6 @@ def load_sans(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(path, size)
 
 
-def erase_poster_subtitle(poster: Image.Image) -> None:
-    """Paint out the poster subtitle by interpolating the background above and below it."""
-    x0, y0, x1, y1 = KIT_POSTER_TEXT_BOX
-    top, bottom = y0 - 6, y1 + 6
-    px = poster.load()
-    rng = random.Random(5)
-    for x in range(x0, x1):
-        above, below = px[x, top], px[x, bottom]
-        for y in range(y0, y1):
-            ratio = (y - top) / (bottom - top)
-            grain = rng.randint(-2, 2)
-            px[x, y] = tuple(
-                max(0, min(255, int(above[i] * (1 - ratio) + below[i] * ratio) + grain))
-                for i in range(3)
-            )
-    feathered = poster.crop((x0 - 8, y0 - 8, x1 + 8, y1 + 8)).filter(ImageFilter.GaussianBlur(1.0))
-    poster.paste(feathered, (x0 - 8, y0 - 8))
-
-
-def _sample_mean_color(image: Image.Image, box: tuple[int, int, int, int]) -> tuple[float, float, float]:
-    patch = image.crop(box).convert("RGB")
-    px = patch.load()
-    total = [0.0, 0.0, 0.0]
-    count = 0
-    for y in range(patch.height):
-        for x in range(patch.width):
-            r, g, b = px[x, y]
-            total[0] += r
-            total[1] += g
-            total[2] += b
-            count += 1
-    count = max(1, count)
-    return total[0] / count, total[1] / count, total[2] / count
-
-
-def _pencil_mask(size: tuple[int, int], origin: tuple[int, int]) -> Image.Image:
-    """Opaque mask covering the branded pencil tip + barrel in poster coordinates."""
-    mask = Image.new("L", size, 0)
-    draw = ImageDraw.Draw(mask)
-    ox, oy = origin
-    # Barrel (rounded capsule) and tip, mapped into the local patch.
-    draw.rounded_rectangle((690 - ox, 968 - oy, 1084 - ox, 1008 - oy), radius=16, fill=255)
-    # Sharpened tip tapering left.
-    tip = [
-        (470 - ox, 988 - oy),
-        (700 - ox, 968 - oy),
-        (700 - ox, 1008 - oy),
-    ]
-    draw.polygon(tip, fill=255)
-    return mask.filter(ImageFilter.GaussianBlur(0.8))
-
-
-def erase_poster_banner(poster: Image.Image) -> None:
-    """Paint out the green What's Inside banner, then put the pencil back on top."""
-    x0, y0, x1, y1 = KIT_POSTER_BANNER_BOX
-    x1 = min(x1, poster.width)
-    y1 = min(y1, poster.height)
-    sand = _sample_mean_color(poster, KIT_POSTER_SAND_SAMPLE)
-    source = poster.copy()
-    src = source.load()
-    px = poster.load()
-    rng = random.Random(21)
-
-    for y in range(y0, y1):
-        t = (y - y0) / max(1, y1 - 1 - y0)
-        edge = min(1.0, (y - y0) / 6.0)
-        for x in range(x0, x1):
-            base = src[x, max(0, y0 - 8)]
-            filled = tuple(
-                max(0, min(255, int(base[i] * (1 - 0.35 * t) + sand[i] * (0.35 * t) + rng.randint(-5, 5))))
-                for i in range(3)
-            )
-            if edge < 1.0:
-                px[x, y] = tuple(int(src[x, y][i] * (1 - edge) + filled[i] * edge) for i in range(3))
-            else:
-                px[x, y] = filled
-
-    px0, py0, px1, py1 = KIT_POSTER_PENCIL_BOX
-    px1 = min(px1, poster.width)
-    py1 = min(py1, poster.height)
-    patch = source.crop((px0, py0, px1, py1)).convert("RGBA")
-    mask = _pencil_mask(patch.size, (px0, py0))
-    # Keep green banner pixels out of the restored pencil patch.
-    pp = patch.load()
-    mp = mask.load()
-    for y in range(patch.height):
-        for x in range(patch.width):
-            r, g, b, _a = pp[x, y]
-            if g > r + 10 and g > b + 10 and r < 110:
-                mp[x, y] = 0
-    patch.putalpha(mask)
-    composed = poster.convert("RGBA")
-    composed.alpha_composite(patch, (px0, py0))
-    poster.paste(composed.convert("RGB"))
-
-
 def load_cover_logo(width: int) -> Image.Image:
     """Load the wordmark with black keyed out for a clean overlay on forest green."""
     logo = Image.open(COVER_LOGO_PATH).convert("RGBA")
@@ -237,43 +134,17 @@ def load_cover_logo(width: int) -> Image.Image:
     return logo.resize((width, logo_h), Image.Resampling.LANCZOS)
 
 
-def _make_sand_margin(width: int, height: int, sand: tuple[float, float, float]) -> Image.Image:
-    """Build a quiet sand strip so the pencil isn't flush with the frame edge."""
-    margin = Image.new("RGB", (width, height), tuple(int(c) for c in sand))
-    px = margin.load()
-    rng = random.Random(33)
-    for y in range(height):
-        for x in range(width):
-            grain = rng.randint(-6, 6)
-            px[x, y] = tuple(max(0, min(255, int(sand[i]) + grain)) for i in range(3))
-    return margin.filter(ImageFilter.GaussianBlur(0.4))
-
-
 def refresh_step_one_photo() -> None:
-    """Rebuild the step 1 photo from Kit-Poster3 so the kit spread stays current."""
+    """Rebuild step 1 as a direct sharp crop from Kit-Poster3.jpeg."""
     source = STEPS_DIR / KIT_POSTER
     if not source.exists():
         return
     poster = Image.open(source).convert("RGB")
-    erase_poster_subtitle(poster)
-    erase_poster_banner(poster)
-    crop = poster.crop(KIT_POSTER_CROP)
-    sand = _sample_mean_color(poster, KIT_POSTER_SAND_SAMPLE)
-    bottom = _make_sand_margin(crop.width, KIT_POSTER_BOTTOM_MARGIN, sand)
-    side = KIT_POSTER_SIDE_MARGIN
-    framed = Image.new(
-        "RGB",
-        (crop.width + side * 2, crop.height + KIT_POSTER_BOTTOM_MARGIN),
-        tuple(int(c) for c in sand),
+    # Mild unsharp mask restores bite lost to JPEG — keeps natural photo grain.
+    crop = poster.crop(KIT_POSTER_CROP).filter(
+        ImageFilter.UnsharpMask(radius=1.2, percent=120, threshold=3)
     )
-    # Quiet side margins so the pencil tip/end aren't flush with the frame.
-    left = _make_sand_margin(side, framed.height, sand)
-    right = _make_sand_margin(side, framed.height, sand)
-    framed.paste(left, (0, 0))
-    framed.paste(right, (framed.width - side, 0))
-    framed.paste(crop, (side, 0))
-    framed.paste(bottom, (side, crop.height))
-    framed.save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
+    crop.save(STEPS_DIR / STEP_ONE_PHOTO, "PNG", optimize=True)
 
 
 def resolve_photo(candidates: str | tuple[str, ...]) -> Path:
