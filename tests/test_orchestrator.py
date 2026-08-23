@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pramabu_agents.agents.brand_guardian import BrandGuardianAgent
 from pramabu_agents.agents.qa import QAAgent
 from pramabu_agents.config import load_brand
@@ -10,7 +12,12 @@ def test_weekly_pipeline_produces_approved_pack(tmp_path):
     pack = Orchestrator(brand).run_weekly_campaign(
         objective="Grow D2C repeat purchase",
         week_of="2026-07-26",
-        context={"content_pieces": 5, "growth_ideas": 4, "weekly_ad_budget_inr": 10000},
+        context={
+            "content_pieces": 5,
+            "growth_ideas": 4,
+            "weekly_ad_budget_inr": 10000,
+            "output_dir": str(tmp_path),
+        },
     )
 
     assert pack.brand == "Parambu Organics"
@@ -31,11 +38,14 @@ def test_weekly_pipeline_produces_approved_pack(tmp_path):
     assert pack.crisis_pr_plan
     assert pack.localization_plan
     assert pack.analytics_plan
+    assert pack.posters
+    assert all(Path(p.path).exists() for p in pack.posters)
     assert pack.approved is True
     assert any(m.role.value == "orchestrator" for m in pack.agent_trace)
 
     agent_names = [a.name for a in Orchestrator(brand).pipeline]
     for required in (
+        "Poster Production",
         "Marketplace",
         "Influencer",
         "CRM",
@@ -51,6 +61,7 @@ def test_weekly_pipeline_produces_approved_pack(tmp_path):
     md = pack_to_markdown(pack)
     assert "Weekly Campaign Pack" in md
     assert "Content Ideas" in md
+    assert "Poster Assets" in md
     assert "Marketplace Actions" in md
     assert "Influencer / UGC Plan" in md
     assert "CRM Actions" in md

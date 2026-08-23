@@ -31,18 +31,19 @@ Building every agent at once stalls delivery. The fastest path to value:
 4. Content Ideation  
 5. Creative Production  
 6. Brand Guardian  
-7. Social Media Manager  
-8. E-commerce Website  
-9. Performance Marketing  
-10. Business Growth  
-11. Marketplace  
-12. Influencer  
-13. CRM  
-14. Supply Chain  
-15. Crisis & PR  
-16. Localization  
-17. Analytics & BI  
-18. QA (approval gate)
+7. Poster Production (renders PNG posters)  
+8. Social Media Manager  
+9. E-commerce Website  
+10. Performance Marketing  
+11. Business Growth  
+12. Marketplace  
+13. Influencer  
+14. CRM  
+15. Supply Chain  
+16. Crisis & PR  
+17. Localization  
+18. Analytics & BI  
+19. QA (approval gate)
 
 ## Quick start — agents
 
@@ -75,6 +76,7 @@ Outputs land in `output/`:
 
 - `campaign_YYYY-MM-DD.json`
 - `campaign_YYYY-MM-DD.md`
+- `posters/YYYY-MM-DD/*.png` (generated poster creatives)
 
 ### Optional LLM mode
 
@@ -106,6 +108,7 @@ Goal
   → Content Ideation
   → Creative Production
   → Brand Guardian
+  → Poster Production
   → Social Media
   → E-commerce
   → Performance Marketing

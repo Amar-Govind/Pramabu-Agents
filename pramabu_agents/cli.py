@@ -50,6 +50,7 @@ def cmd_agents(verbose: bool = False) -> None:
         ("Content Ideation", "Ideas for posters, reels, shorts"),
         ("Creative Production", "Headlines, scripts, visual briefs"),
         ("Brand Guardian", "Tone, claims, compliance checks"),
+        ("Poster Production", "Renders poster PNG assets from briefs"),
         ("Social Media Manager", "Weekly calendar + captions"),
         ("E-commerce Website", "PDP/site improvement actions"),
         ("Performance Marketing", "Paid media allocation plan"),
@@ -112,7 +113,10 @@ Phase 3 — Scale
 def cmd_weekly(args: argparse.Namespace) -> None:
     load_env()
     brand = load_brand()
-    context = {"weekly_ad_budget_inr": args.budget}
+    context = {
+        "weekly_ad_budget_inr": args.budget,
+        "output_dir": args.output_dir,
+    }
     if args.content_pieces is not None:
         context["content_pieces"] = args.content_pieces
 
@@ -127,11 +131,17 @@ def cmd_weekly(args: argparse.Namespace) -> None:
     )
 
     paths = write_outputs(pack, Path(args.output_dir))
+    poster_line = (
+        f"Posters: {len(pack.posters)} → {paths.get('posters', '')}"
+        if pack.posters
+        else "Posters: 0"
+    )
     console.print(
         Panel(
             f"Brand: {pack.brand}\n"
             f"Week: {pack.week_of}\n"
             f"Ideas: {len(pack.ideas)} | Creatives: {len(pack.creatives)} | Posts: {len(pack.social_calendar)}\n"
+            f"{poster_line}\n"
             f"Approved: {pack.approved}\n"
             f"JSON: {paths['json']}\n"
             f"Markdown: {paths['markdown']}",
