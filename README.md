@@ -97,6 +97,13 @@ Edit `brand/brand_bible.yaml` to refine:
 - Channels and weekly defaults
 - Goals and KPIs
 
+## Product reference notes
+
+- [`docs/soap-quality-is2888.md`](docs/soap-quality-is2888.md) — analysis of the STS lab
+  report for the Virgin Coconut Oil Soap, why the bar currently grades IS 2888 Grade 2,
+  and what has to change to reach Grade 1. Also covers which claims are safe to use in
+  packaging and campaign copy.
+
 ## Weekly pipeline
 
 ```text
@@ -124,6 +131,7 @@ Goal
 
 ```text
 brand/brand_bible.yaml          # Brand source of truth
+docs/                           # Product and manufacturing reference notes
 pramabu_agents/
   agents/                       # Specialist agents
   orchestrator.py               # Pipeline runner
