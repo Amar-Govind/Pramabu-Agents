@@ -7,6 +7,15 @@ from pramabu_agents.agents.base import BaseAgent
 from pramabu_agents.models import AgentRole, CampaignPack
 
 
+def _claim_present(claim: str, text: str) -> bool:
+    """Match a forbidden claim on word boundaries.
+
+    Substring matching would flag 'cures' inside 'secures' and 'grade 1' inside
+    'upgrade 1'.
+    """
+    return re.search(rf"\b{re.escape(claim)}\b", text) is not None
+
+
 class BrandGuardianAgent(BaseAgent):
     role = AgentRole.BRAND_GUARDIAN
     name = "Brand Guardian"
@@ -25,7 +34,7 @@ class BrandGuardianAgent(BaseAgent):
             texts.extend([creative.headline, creative.body, " ".join(creative.script_beats)])
             for claim in forbidden:
                 blob = f"{creative.headline} {creative.body}".lower()
-                if claim and claim in blob:
+                if claim and _claim_present(claim, blob):
                     creative.brand_safe = False
                     creative.notes.append(f"Contains forbidden claim language: '{claim}'")
                     flags.append(f"Creative '{creative.idea_title}' may violate claim policy: {claim}")
@@ -33,7 +42,11 @@ class BrandGuardianAgent(BaseAgent):
         for text in texts:
             lower = text.lower()
             for claim in forbidden:
-                if claim and claim in lower and f"forbidden:{claim}:{text}" not in flags:
+                if (
+                    claim
+                    and _claim_present(claim, lower)
+                    and f"forbidden:{claim}:{text}" not in flags
+                ):
                     flags.append(f"Potential forbidden claim '{claim}' in: {text}")
 
             # Soft checks for overclaim patterns

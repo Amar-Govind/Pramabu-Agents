@@ -47,6 +47,9 @@ brand:
       - 100% natural guaranteed
       - treats disease
       - medical grade
+      # Lab report STS/RE/2026-27/1093 grades the coconut bar as IS 2888 Grade 2.
+      # See docs/soap-quality-is2888.md before any grade claim is used.
+      - grade 1
 
 products:
   - sku: PRB-OIL-VCO-001

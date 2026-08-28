@@ -1,4 +1,4 @@
-from pramabu_agents.agents.brand_guardian import BrandGuardianAgent
+from pramabu_agents.agents.brand_guardian import BrandGuardianAgent, _claim_present
 from pramabu_agents.agents.qa import QAAgent
 from pramabu_agents.config import load_brand
 from pramabu_agents.orchestrator import Orchestrator
@@ -71,3 +71,19 @@ def test_brand_guardian_flags_forbidden_claims():
 
     assert pack.qa_flags
     assert pack.approved is False
+
+
+def test_forbidden_claims_match_on_word_boundaries():
+    assert _claim_present("cures", "this cures all stains")
+    assert not _claim_present("cures", "secures the skin barrier")
+
+    assert _claim_present("grade 1", "certified grade 1 soap")
+    assert not _claim_present("grade 1", "upgrade 1 bar to three")
+    assert not _claim_present("grade 1", "grade 10 cocopeat")
+
+
+def test_grade_1_is_a_forbidden_claim():
+    """The coconut bar tests as IS 2888 Grade 2 (report STS/RE/2026-27/1093)."""
+    brand = load_brand()
+    forbidden = brand["brand"]["compliance"]["forbidden_claims"]
+    assert "grade 1" in [c.lower() for c in forbidden]
