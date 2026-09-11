@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Parambu Agent Chat</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <img src="/static/logo.png" alt="Parambu Organics" onerror="this.style.display='none'" />
+          <div>
+            <h1>Parambu Assistant</h1>
+            <p>Chat with brand knowledge · upload files · download generated outputs</p>
+          </div>
+        </div>
+        <div class="pill"><span class="dot" id="statusDot"></span><span id="modePill">Checking LLM…</span></div>
+      </header>
+
+      <div id="setupBanner" class="setup-banner hidden">
+        <strong>Live LLM is off.</strong>
+        Add your OpenAI key to enable full Parambu LLM chat:
+        <code>cp .env.example .env</code> then set <code>OPENAI_API_KEY=sk-...</code> and restart
+        <code>python -m agent_chat.app</code>.
+        Knowledge-base chat still works meanwhile.
+      </div>
+
+      <div class="shell">
+        <aside class="sidebar">
+          <h2>Knowledge & tools</h2>
+          <ul class="agent-list" id="agentList">
+            <li><strong>Loading…</strong><span>Fetching assistant tools</span></li>
+          </ul>
+          <div class="hints">
+            Chat naturally:
+            <div><code>What’s special about Rose Soap?</code></div>
+            <div><code>Rewrite this caption in our brand voice</code></div>
+            <div><code>Create posters for neem soap</code></div>
+            Uploads become part of the knowledge base for this chat.
+          </div>
+        </aside>
+
+        <main class="chat-panel">
+          <div class="chat-heading" id="chatHeading">
+            <div>
+              <p class="chat-heading-label">Chatting with</p>
+              <h2 id="activeAgentName">Parambu Assistant</h2>
+              <p class="chat-heading-sub" id="activeAgentRole">Brand knowledge + specialist tools</p>
+            </div>
+            <div class="chat-heading-badge" id="activeAgentBadge">Ready</div>
+          </div>
+          <div class="messages" id="messages" aria-live="polite"></div>
+          <form class="composer" id="chatForm">
+            <div class="dropzone" id="dropzone">
+              Drop images or documents into the knowledge base, or
+              <label for="fileInput" style="color:#b18767;font-weight:700;cursor:pointer"> browse</label>
+              <input id="fileInput" type="file" multiple accept="*/*" />
+              <div class="file-pills" id="filePills"></div>
+            </div>
+            <div class="row">
+              <textarea
+                id="messageInput"
+                placeholder="Message Parambu Assistant…"
+                required
+              ></textarea>
+              <div class="actions">
+                <button class="primary" id="sendBtn" type="submit">Send</button>
+                <button class="ghost" id="clearBtn" type="button">Clear</button>
+              </div>
+            </div>
+          </form>
+        </main>
+      </div>
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
