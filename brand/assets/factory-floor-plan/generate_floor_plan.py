@@ -103,41 +103,43 @@ def render() -> Image.Image:
 
     d.text((36, 22), "PARAMBU  —  SOAP & OIL UNIT", fill=INK, font=f_title)
     d.text((36, 50), "FLOOR PLAN   36'-0\"  ×  70'-0\"  =  2,520 SQ FT    ·    EAST FACING", fill=INK, font=f_sub)
-    d.text((36, 70), "11 rooms, each 16'-0\" deep   ·   4'-0\" central path   ·   2\" panel room separators   ·   Vastu + Cosmetics Rules 2020", fill=MUTED, font=f_tiny)
+    d.text((36, 70), "W2–W4 joined soap & curing   ·   E4–E5 joined oil   ·   W1+E1 raw material, no path   ·   2\" panels", fill=MUTED, font=f_tiny)
     d.line([(36, 92), (W - 36, 92)], fill=(190, 184, 170), width=2)
 
-    # Fills — west, south to north: W6 office, W5 raw, W4 oil make, W3 tanks, W2 filling, W1 finished
-    west_fill = [LAB, STORE, PROD, PROD, PACK, STORE]
-    east_fill = [PROD, PROD, CIRC, PACK, STORE, CIRC, LAB]
-    for (y, h), fill in zip(WEST_Y, west_fill):
-        rect(0, y, WEST, h, fill)
-    for (y, h), fill in zip(EAST_Y, east_fill):
-        rect(X_EAST, y, EAST, h, fill)
-    rect(X_PATH, 0, PATH, NS, CIRC)
+    wy = {code: WEST_Y[i] for i, code in enumerate(["W6", "W5", "W4", "W3", "W2", "W1"])}
+    ey = {code: EAST_Y[i] for i, code in enumerate(["E5", "E4", "GD", "E3", "E2", "EN", "E1"])}
+    y_raw = wy["W1"][0]
+    soap_y, soap_h = wy["W4"][0], (wy["W2"][0] + wy["W2"][1]) - wy["W4"][0]
+    oil_y, oil_h = ey["E5"][0], (ey["E4"][0] + ey["E4"][1]) - ey["E5"][0]
 
-    # Panels
-    def panels(xs, xe, zones):
-        y = 0.0
-        for i, h in enumerate(zones):
-            y += h
-            if i < len(zones) - 1:
-                seg(xs, y + PANEL / 2, xe, y + PANEL / 2, 3)
-                y += PANEL
+    # Joined fills. The north 10' is one raw-material room across the full 36'.
+    rect(0, wy["W6"][0], WEST, wy["W6"][1], LAB)
+    rect(0, wy["W5"][0], WEST, wy["W5"][1], LAB)
+    rect(0, soap_y, WEST, soap_h, PROD)
+    rect(0, y_raw, EW, wy["W1"][1], STORE)
+    rect(X_EAST, oil_y, EAST, oil_h, PROD)
+    rect(X_EAST, ey["GD"][0], EAST, ey["GD"][1], CIRC)
+    rect(X_EAST, ey["E3"][0], EAST, ey["E3"][1], PACK)
+    rect(X_EAST, ey["E2"][0], EAST, ey["E2"][1], STORE)
+    rect(X_EAST, ey["EN"][0], EAST, ey["EN"][1], CIRC)
+    rect(X_PATH, 0, PATH, y_raw, CIRC)
 
-    panels(0, WEST, WEST_H)
-    panels(X_EAST, EW, EAST_H)
+    def panel_at(xs, xe, y):
+        seg(xs, y, xe, y, 3)
 
-    # Path walls, open across the two east loading paths (entry index 5, godown index 2)
-    def path_wall(x):
-        y = 0.0
-        for i, h in enumerate(EAST_H):
-            open_bay = i in (2, 5)
-            if not open_bay:
-                seg(x, y, x, y + h, 3)
-            y += h + (PANEL if i < len(EAST_H) - 1 else 0)
+    # Panels that remain. Joins omit the walls inside soap, inside oil, and across the north band.
+    panel_at(0, WEST, wy["W5"][0])
+    panel_at(0, WEST, soap_y)
+    panel_at(0, EW, y_raw)
+    panel_at(X_EAST, EW, oil_y + oil_h)
+    panel_at(X_EAST, EW, ey["E3"][0])
+    panel_at(X_EAST, EW, ey["E2"][0])
+    panel_at(X_EAST, EW, ey["EN"][0])
 
-    path_wall(X_EAST)
-    seg(X_PATH, 0, X_PATH, NS, 3)
+    # Path walls stop at the raw-material band. Godown stays open to the path.
+    seg(X_PATH, 0, X_PATH, y_raw, 3)
+    seg(X_EAST, 0, X_EAST, ey["GD"][0], 3)
+    seg(X_EAST, ey["GD"][0] + ey["GD"][1], X_EAST, y_raw, 3)
 
     # Exterior
     seg(0, 0, EW, 0, 4)
@@ -145,68 +147,65 @@ def render() -> Image.Image:
     seg(0, 0, 0, NS, 4)
     seg(EW, 0, EW, NS, 4)
 
-    # Room content
-    wy = {code: WEST_Y[i] for i, code in enumerate(["W6", "W5", "W4", "W3", "W2", "W1"])}
-    ey = {code: EAST_Y[i] for i, code in enumerate(["E5", "E4", "GD", "E3", "E2", "EN", "E1"])}
-
-    card(d, P, "W1", "FINISHED GOODS STORE", "packed soap & oil  ·  dispatch",
-         "10'-0\" × 16'-0\"", "160 sq ft", 0, *wy["W1"], WEST,
-         [("PALLET RACK", "PALLET RACK", "PALLET RACK"), ("DISPATCH STAGING",)], f_room, f_tiny, f_eq)
-    card(d, P, "W2", "OIL FILLING & PACKING ROOM", "filling  ·  capping  ·  labelling",
-         "10'-0\" × 16'-0\"", "160 sq ft", 0, *wy["W2"], WEST,
-         [("FILLING MACHINE", "CAPPING", "LABELLING"), ("PACKING TABLE",)], f_room, f_tiny, f_eq)
-    card(d, P, "W3", "OIL STORAGE TANKS", "5 tanks  ·  settling & decanting",
-         "10'-0\" × 16'-0\"", "160 sq ft", 0, *wy["W3"], WEST,
-         [], f_room, f_tiny, f_eq)
-    tanks(d, P, *wy["W3"], f_eq)
-    card(d, P, "W4", "OIL MAKING ROOM", "cold press  ·  filter press",
-         "19'-2\" × 16'-0\"", "307 sq ft", 0, *wy["W4"], WEST,
-         [("COLD PRESS", "FILTER PRESS", "COLLECTION TANK"), ("SEED / COPRA FEED", "CAKE & WASTE BIN")],
-         f_room, f_tiny, f_eq)
-    card(d, P, "W5", "RAW MATERIAL STORE", "copra  ·  seeds  ·  oils  ·  lye",
+    card(d, P, "W1 + E1", "RAW MATERIAL ROOM", "joined across the north  ·  no 4' path",
+         "10'-0\" × 36'-0\"", "360 sq ft", 0, y_raw, wy["W1"][1], EW,
+         [("RACK", "RACK", "WEIGHING"), ("RACK", "RACK", "SAMPLING")], f_room, f_tiny, f_eq)
+    card(d, P, "W2–W4", "SOAP MAKING & CURING", "mixer  ·  moulds  ·  curing racks",
+         "39'-6\" × 16'-0\"", "632 sq ft", 0, soap_y, soap_h, WEST,
+         [("MIXER / KETTLE", "MOULD TABLE", "CUTTER"),
+          ("LYE MIXING", "CURING RACK", "CURING RACK"),
+          ("CURING RACK", "SOAP WRAP", "CARTONING")], f_room, f_tiny, f_eq)
+    card(d, P, "W5", "QUALITY CONTROL", "testing  ·  retained samples",
          "10'-0\" × 16'-0\"", "160 sq ft", 0, *wy["W5"], WEST,
-         [("RACK", "RACK", "RACK"), ("WEIGHING & SAMPLING",)], f_room, f_tiny, f_eq)
+         [("LAB BENCH", "SINK & WASH"), ("INSTRUMENTS", "SAMPLE CUPBOARD")], f_room, f_tiny, f_eq)
     card(d, P, "W6", "OFFICE", "records  ·  owner seat faces east",
          "10'-0\" × 16'-0\"", "160 sq ft", 0, *wy["W6"], WEST,
          [("DESK", "VISITOR", "RECORD CABINET",)], f_room, f_tiny, f_eq)
 
-    card(d, P, "E1", "QUALITY CONTROL LAB", "testing  ·  retained samples",
-         "10'-0\" × 16'-0\"", "160 sq ft", X_EAST, *ey["E1"], EAST,
-         [("LAB BENCH", "SINK & WASH"), ("INSTRUMENTS & SAMPLE CUPBOARD",)], f_room, f_tiny, f_eq)
-    card(d, P, "", "ENTRY / LOADING PATH", "",
+    card(d, P, "", "ENTRY / LOADING  ·  D1", "doors to raw material, finished goods, and the path",
          "9'-6\" × 16'-0\"", "152 sq ft", X_EAST, *ey["EN"], EAST,
          [("HAND WASH",)], f_room, f_tiny, f_eq)
-    card(d, P, "E2", "PACKING ITEMS STORE", "bottles  ·  cartons  ·  labels",
+    card(d, P, "E2", "FINISHED PRODUCT", "packed goods out  ·  6' door from D1",
          "10'-0\" × 16'-0\"", "160 sq ft", X_EAST, *ey["E2"], EAST,
-         [("RACK", "RACK", "RACK"), ("CARTON STACK",)], f_room, f_tiny, f_eq)
-    card(d, P, "E3", "SOAP PACKING ROOM", "wrapping  ·  cartoning",
+         [("PALLET RACK", "PALLET RACK", "PALLET RACK"), ("DISPATCH STAGING",)], f_room, f_tiny, f_eq)
+    card(d, P, "E3", "POWDER & FACEPACK", "mixer  ·  mill  ·  filling",
          "10'-0\" × 16'-0\"", "160 sq ft", X_EAST, *ey["E3"], EAST,
-         [("WRAPPING TABLE", "CARTONING TABLE"), ("CODING & SEALING",)], f_room, f_tiny, f_eq)
+         [("MIXER", "POWDER MILL"), ("SIFTER", "FILLING / JARS")], f_room, f_tiny, f_eq)
     card(d, P, "", "GODOWN LOADING PATH", "",
          "9'-6\" × 16'-0\"", "152 sq ft", X_EAST, *ey["GD"], EAST,
          [], f_room, f_tiny, f_eq)
-    card(d, P, "E4", "SOAP CURING ROOM", "curing racks  ·  4 to 6 weeks",
-         "10'-0\" × 16'-0\"", "160 sq ft", X_EAST, *ey["E4"], EAST,
-         [("CURING RACK",), ("CURING RACK",), ("CURING RACK",), ("CURING RACK",)], f_room, f_tiny, f_eq)
-    card(d, P, "E5", "SOAP MAKING ROOM", "mixer  ·  moulds  ·  cutter",
-         "10'-0\" × 16'-0\"", "160 sq ft", X_EAST, *ey["E5"], EAST,
-         [("MIXER / KETTLE", "MOULD TABLE", "CUTTER"), ("LYE MIXING (EXHAUST OVER)",)], f_room, f_tiny, f_eq)
+    card(d, P, "E4 + E5", "OIL MAKING & FILLING", "press  ·  tanks  ·  filling line",
+         "20'-2\" × 16'-0\"", "323 sq ft", X_EAST, oil_y, oil_h, EAST,
+         [("COLD PRESS", "FILTER PRESS"), ("T1  T2  T3  T4  T5",),
+          ("FILLING", "CAPPING", "LABELLING")], f_room, f_tiny, f_eq)
 
-    # Internal doors, opening into the room
-    for code in ("W1", "W2", "W3", "W4", "W5", "W6"):
-        y, h = wy[code]
-        swing(d, P, X_PATH, y + h * 0.28, 3.5, into="west")
-    for code in ("E1", "E2", "E3", "E4", "E5"):
-        y, h = ey[code]
-        swing(d, P, X_EAST, y + h * 0.28, 3.5, into="east")
+    # Path doors for the closed rooms that still open onto the path.
+    swing(d, P, X_PATH, soap_y + soap_h * 0.45, 3.5, into="west")
+    swing(d, P, X_PATH, wy["W5"][0] + 3.0, 3.5, into="west")
+    swing(d, P, X_PATH, wy["W6"][0] + 3.0, 3.5, into="west")
+    swing(d, P, X_EAST, ey["E3"][0] + 3.0, 3.5, into="east")
+    swing(d, P, X_EAST, oil_y + 6.0, 3.5, into="east")
+    swing(d, P, X_EAST, ey["E2"][0] + 3.0, 3.5, into="east")
+
+    # From the D1 entry: two doors north into the raw-material room (E1),
+    # a 6' door south into finished product (E2), and a door west onto the path.
+    en_y, en_h = ey["EN"]
+    swing_h(d, P, 31.5, y_raw, 3.0, into="north")
+    tag(d, P, 33.0, en_y + en_h - 1.3, "3'-0\" MEN ENTRY", f_tiny)
+    swing_h(d, P, 21.5, y_raw, 6.0, into="north")
+    tag(d, P, 24.5, en_y + en_h - 1.3, "6'-0\" RAW MATERIAL", f_tiny)
+    swing_h(d, P, 25.0, en_y, 6.0, into="south")
+    tag(d, P, 28.0, en_y + 1.5, "6'-0\" FINISHED OUT", f_tiny)
+    swing(d, P, X_EAST, en_y + 2.6, 4.0, into="west")
+    tag(d, P, X_EAST + 6.5, en_y + 4.5, "DOOR TO CENTRAL PATH", f_tiny)
 
     # East shutters, centered in each loading path
     for key, label in (("EN", "D1"), ("GD", "D2")):
         y, h = ey[key]
         east_door(d, P, y + (h - 7) / 2, 7.0, f"{label}  ·  7'-0\" DOOR", "FACING EAST", f_tiny)
 
-    paste_vertical(img, "CENTRAL PATH    4'-0\"  ×  70'-0\"", font(12, True), MUTED,
-                   ox + (X_PATH + PATH / 2) * S, oy + plan_h / 2)
+    paste_vertical(img, "CENTRAL PATH    4'-0\"  ×  60'-0\"", font(12, True), MUTED,
+                   ox + (X_PATH + PATH / 2) * S, oy + (NS - 30) * S)
 
     # Header dimensions
     screen_hdim(d, ox, ox + plan_w, oy - 28, "36'-0\"", f_dim)
@@ -229,8 +228,16 @@ def render() -> Image.Image:
                 y += PANEL
         draw_v_chain(d, P, spans, x, f_tiny, side)
 
-    chain(WEST_H, ["10'-0\"  W6", "10'-0\"  W5", "19'-2\"  W4", "10'-0\"  W3", "10'-0\"  W2", "10'-0\"  W1"], -0.45, "left")
-    chain(EAST_H, ["10'-0\"  E5", "10'-0\"  E4", "9'-6\"", "10'-0\"  E3", "10'-0\"  E2", "9'-6\"", "10'-0\"  E1"], EW + 0.4, "right")
+    chain(
+        [10, 10, 39.5, 10],
+        ["10'-0\"  OFFICE", "10'-0\"  QC", "39'-6\"  SOAP", "10'-0\"  RAW"],
+        -0.45, "left",
+    )
+    chain(
+        [20 + 2 / 12, 9.5, 10, 10, 9.5, 10],
+        ["20'-2\"  OIL", "9'-6\"", "10'-0\"  FP", "10'-0\"  FIN", "9'-6\"  D1", "10'-0\"  RAW"],
+        EW + 0.4, "right",
+    )
     paste_vertical(img, "70'-0\"      NORTH   ↓   SOUTH", font(12, True), INK, ox - 128, oy + plan_h / 2)
 
     # North arrow
@@ -270,9 +277,9 @@ def render() -> Image.Image:
     notes = [
         '1.  Room separators are 2" (50 mm) panels — cement board / PUF / gypsum on a light frame. No masonry wall between rooms.',
         '2.  East-west closes exactly: 16\'-0" west rooms + 4\'-0" path + 16\'-0" east rooms = 36\'-0". Every room is 16\'-0" deep.',
-        '3.  West bay north-south: 10 + 10 + 10 + 19\'-2" + 10 + 10 = 69\'-2". The remaining 10" is six 2" panels = 70\'-0".',
-        '4.  East bay north-south: five 10\'-0" rooms + two 9\'-6" loading paths = 70\'-0". Both 7\'-0" east doors sit in those paths.',
-        '5.  Internal doors 3\'-6" × 7\'-0", all opening into the room, not into the 4\'-0" path. External doors D1 and D2 are 7\'-0" rolling shutters facing east.',
+        '3.  W2, W3 and W4 are one soap making and curing room. W5 is the QC room. W6 remains the office.',
+        '4.  E4 and E5 are one oil making and filling room. E3 is powder and facepack. E2 is finished product.',
+        '5.  W1 and E1 are one raw-material room across the north; the 4\' path stops there. From D1: 3\' men door and raw-material door into E1, 6\' door into E2, and a door onto the central path.',
         '6.  Floor: IPS / epoxy with 4" coved skirting, graded to trapped gullies. Ceiling 12\'-0" clear over soap and oil rooms.',
         '7.  Windows 4\'-0" × 3\'-0" on the west and east walls with insect screens; exhaust fan over the lye mixing bench and over the cold press.',
         '8.  Toilet block detached, minimum 25\'-0" clear of the north wall, never opening into a production room. Hand wash at the D1 entry path.',
@@ -335,6 +342,24 @@ def tanks(d, P, y, h, f_eq):
     tw = d.textlength(text, font=f_eq)
     d.rounded_rectangle([x - tw / 2 - 6, yy - 8, x + tw / 2 + 6, yy + 8], radius=3, fill=WHITE, outline=(186, 186, 182))
     d.text((x - tw / 2, yy - 6), text, fill=INK, font=f_eq)
+
+
+def swing_h(d, P, x, wall_y, width, into):
+    """Door in a north-south wall. `into` is the room the leaf opens toward."""
+    x0, y = P(x, wall_y)
+    x1, _ = P(x + width, wall_y)
+    d.rectangle([x0, y - 4, x1, y + 4], fill=WHITE)
+    span = x1 - x0
+    if into == "north":
+        d.arc([x0, y - span, x1, y], 0, 90, fill=GREEN, width=2)
+    else:
+        d.arc([x0, y, x1, y + span], 270, 360, fill=GREEN, width=2)
+
+
+def tag(d, P, x, y, text, fnt):
+    sx, sy = P(x, y)
+    tw = d.textlength(text, font=fnt)
+    d.text((sx - tw / 2, sy), text, fill=RED, font=fnt)
 
 
 def swing(d, P, wall_x, y, width, into):
