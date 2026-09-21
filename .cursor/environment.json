@@ -1,0 +1,11 @@
+{
+  "name": "Parambu Agents",
+  "user": "ubuntu",
+  "install": "bash .cursor/install.sh",
+  "terminals": [
+    {
+      "name": "storefront-dev",
+      "command": "cd storefront && npm run dev"
+    }
+  ]
+}
